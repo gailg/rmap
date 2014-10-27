@@ -1,7 +1,7 @@
 piHatNNInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
   est = rho_piHatNN_Fn(baseArgs)
   iterFn = if(baseArgs$multicore) {
-    require(multicore)
+    require(parallel)
     mclapply
   } else {
     lapply
@@ -43,3 +43,6 @@ piHatNNInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
 ## Thu Sep 22 20:26:29 PDT 2011
 ## Gail "cleaned up" the spacing so she could more easily
 ## follow this as an example for sdBootRiskValidateInternalFn
+
+## Mon Oct 27 16:19:50 PDT 2014
+## Gail changed require(multicore) to require(parallel).
