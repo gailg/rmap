@@ -95,13 +95,13 @@ IAD = function( rvus,
     IAD_RawFn(pos = c(1, 1), rvu = rvus[[i]], col = rvpar$col[i], lightCol = rvpar$lightCol[i] )
   })
 
-  ##----------------------------annotate
-  if(rvpar$annotate) {
-    prettyText = paste("AUC: ", round(rvus[[1]]$AUC$AUC, 4),
-      ", CI: (", round(rvus[[1]]$AUC$AUC_CI[1], 4), ", ",
-      round(rvus[[1]]$AUC$AUC_CI[2], 4), ")", sep = "")
-
-    addTextToTrellisFn(pos = c(1, 1), text = prettyText, where = "topleft")
-  }
+#   ##----------------------------annotate
+#   if(rvpar$annotate) {
+#     prettyText = paste("AUC: ", round(rvus[[1]]$AUC$AUC, 4),
+#       ", CI: (", round(rvus[[1]]$AUC$AUC_CI[1], 4), ", ",
+#       round(rvus[[1]]$AUC$AUC_CI[2], 4), ")", sep = "")
+# 
+#     addTextToTrellisFn(pos = c(1, 1), text = prettyText, where = "topleft")
+#   }
   invisible(rvus)
 }

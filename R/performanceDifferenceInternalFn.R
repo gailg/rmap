@@ -63,19 +63,13 @@ performanceDifferenceInternalFn = function(baseArgs1 = FALSE, baseArgs2 = FALSE)
     ci_PPN_diff = c(lower = PPN_diff - 1.96 * sd_PPN_diff_boot,
                     upper = PPN_diff + 1.96 * sd_PPN_diff_boot)
 
-    list(AUC_diff = AUC_diff,
-         ci_AUC_diff = ci_AUC_diff,
-         SD_diff = SD_diff,
-         ci_SD_diff = ci_SD_diff,
+    list(
          PPP_diff = PPP_diff,
          ci_PPP_diff = ci_PPP_diff,
          PPN_diff = PPN_diff,
          ci_PPN_diff = ci_PPN_diff)
   } else {
-    list(AUC_diff = AUC_diff,
-         ci_AUC_diff = ci_AUC_diff,
-         SD_diff = SD_diff,
-         ci_SD_diff = ci_SD_diff)
+    NULL
   }
 }
 

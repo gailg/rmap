@@ -14,12 +14,14 @@ riskValidateUngrouped = function(
   if( is.list(rvpar) && "rvpar" %in% class(rvpar) ) {
     IAD(rvu, rvpar = rvpar, ocall = ocall)
   } else {
-    cat(paste("Note: No plot produced.  If an IAD is desired, ", 
-              "rvparFn() should be used to set the argument 'rvpar'", 
-              sep = "\n"))
-    cat("\n")
+#     cat(paste("Note: No plot produced.  If an IAD is desired, ", 
+#               "rvparFn() should be used to set the argument 'rvpar'", 
+#               sep = "\n"))
+#     cat("\n")
   }
   
+  rvu = list(CRP = rvu$AUC$CRP, PNN = rvu$PNN)
+  class(rvu) = c("rvu", class(rvu))
   rvu
 
 }

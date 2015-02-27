@@ -80,13 +80,9 @@ attributeDiagram = function(rvs,
   ##----------------------------annotate 
   if(rvpar$annotate) {
     
-    prettyText = paste("HL ChiSq: ", round(rvs[[1]]$ChiSq["HosmerLemeshow"], 
+    prettyText = paste0("HL ChiSq: ", round(rvs[[1]]$ChiSq["HosmerLemeshow"], 
       4), ", df: ", nrow(rvs[[1]]$piHatSummary), ", p-val: ",
-      round(rvs[[1]]$ChiSq["HL_pval"], 4), "\n", "AUC: ",
-      round(rvs[[1]]$AUC, 4), ", CI: (", round(rvs[[1]]$AUC_CI[1], 4), ", ",
-      round(rvs[[1]]$AUC_CI[2], 4), ") \n", "SD: ",
-      round(rvs[[1]]$SD, 4), ", CI: (", round(rvs[[1]]$SD_CI[1], 4), ", ",
-      round(sqrt(rvs[[1]]$SD_CI[2]), 4), ")", sep = "")
+      round(rvs[[1]]$ChiSq["HL_pval"], 4))
 
   addTextToTrellisFn(pos = c(1, 1), text = prettyText, where = "topleft")
 
