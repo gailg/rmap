@@ -35,7 +35,7 @@ IAD_RawFn = function(pos, rvu, color, lightCol) {
   grid.lines(x = c(0, 1), y = c(0, 1), 
              default.units = "npc", gp = gpar(lty = 2))
 
-  grid.rect()
+#   grid.rect()
   
   invisible(rvu)
 }
