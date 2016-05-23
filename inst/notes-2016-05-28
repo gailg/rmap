@@ -1,0 +1,13 @@
+"2016-05-23 16:09:09 PDT"
+In the file stanford-dot-edu-ggong/index.Rmd, I changed the title to this:
+
+title: "rmap---v-0.01-07---2016-05-23 15:39:54 PDT---We are currently working on rmap version v-0.01-08 which will include code for estimating the concordance of a risk model with outcomes observed in cohort studies with censored times to outcome"
+
+When I come back to this, I plan on changing the version to the one below and implement Erin's changes.
+
+Version: 0.01-08
+
+ssh -X ggong@corn
+pwd
+/Users/ggong/aaa-ebony/rmap-stuff/rmap/stanford-dot-edu-ggong
+scp index.html ggong@corn:WWW/rmap/
