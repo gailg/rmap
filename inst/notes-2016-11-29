@@ -1,0 +1,9 @@
+"2016-11-29 12:52:59 PST"
+This is version 0.01-08
+
+Use Davies to compute the p-value of Hosmer-Lemeshow 
+to allow for unequal group sizes.  
+This requires the package CompQuadForm.
+
+Changes were made in ChiSqFn.
+

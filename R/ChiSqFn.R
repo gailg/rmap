@@ -16,7 +16,9 @@ ChiSqFn = function(baseArgs = FALSE, extraArgs = FALSE) {
 
   sigma = sqrt(sapply(1:baseArgs$K, function(kkk) SigmaPi[kkk, kkk]) / sum(baseArgs$N))
   HosmerLemeshow = sum((piHat - baseArgs$rSummary)^2 / sigma^2 )
-  HL_pval =  1 - pchisq(HosmerLemeshow, baseArgs$K)
+  gammaHat = extraArgs$gammaHat
+  HosmerLemeshow = sum( gammaHat * (piHat - baseArgs$rSummary)^2 / sigma^2 )
+  HL_pval =  1 - davies(HosmerLemeshow, lambda = extraArgs$gammaHat)$Qq
 
   ## c(Pearson = Pearson, Pearson_pval = Pearson_pval,
   ##   HosmerLemeshow = HosmerLemeshow, HL_pval = HL_pval)
