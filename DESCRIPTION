@@ -8,4 +8,4 @@ Maintainer: Gail Gong <ggong@stanford.edu>
 Description: rmap contains tools for validating personal risk models uaing a random sample of censored longitudinal cohort data. For overall calibration, rmap offers two chi-square statistics, the mean risk statistic (Hosmer Lemeshow Chi Square statistic) and the observed event count statistics. For grouped calibration, rmap offers grouped attribute diagrams and group-specific standardized residuals together with their corresponding summary goodness of fit. For discrimination rmap offers case risk percentiles, predictive power positive and predictive power negative measures. (Version 0.01-08: Use Davies to obtain p-values for Hosmer-Lemeshow to allow unequal group sizes.)
 License: GPL-3
 LazyLoad: yes
-Depneds: CompQuadForm
+Depends: CompQuadForm
