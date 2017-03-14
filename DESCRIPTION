@@ -1,11 +1,11 @@
 Package: rmap
 Type: Package
 Title: Risk Model Assessment Package
-Version: 0.01-08
-Date: 2016-11-29
+Version: 0.02-01
+Date: 2017-03-14
 Author: Gail Gong and David Johnston
 Maintainer: Gail Gong <ggong@stanford.edu>
-Description: rmap contains tools for validating personal risk models uaing a random sample of censored longitudinal cohort data. For overall calibration, rmap offers two chi-square statistics, the mean risk statistic (Hosmer Lemeshow Chi Square statistic) and the observed event count statistics. For grouped calibration, rmap offers grouped attribute diagrams and group-specific standardized residuals together with their corresponding summary goodness of fit. For discrimination rmap offers case risk percentiles, predictive power positive and predictive power negative measures. (Version 0.01-08: Use Davies to obtain p-values for Hosmer-Lemeshow to allow unequal group sizes.)
+Description: rmap contains tools for calibrating and discriminating personal risk models using a random sample of censored longitudinal cohort data. 
 License: GPL-3
 LazyLoad: yes
 Depends: CompQuadForm
