@@ -22,105 +22,9 @@ fontsize: 12pt
 require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
 ```
-trunk/projects/calibration/07-rmap-v-0.01-06/07-corn-www-rmap/rmap-examples.Rmd
 
-## A `score_statistics` example {#ss-example}
-This subsection includes code that is part of a complete `score_statistics` example.  This example continues in Sections [Adding standardized_residuals to our example](#sr-example), [If you don’t have cumulative mortality hazards](#no-mortality-example), and [Adding risk_model_boxplots to our example](#box-plot-example)
 
-```{r eval = TRUE}
-library(rmap)
-x = read.csv(
-  file = "data_set_score_statistics.csv", 
-  stringsAsFactors = FALSE)
-head(x)
-```
 
-```{r eval = TRUE}
-e = x$e
-t = x$t
-risk_model_1 = list(
-  r = x$r_1, 
-  Lambda_outcome = x$Lambda_outcome_1,
-  Lambda_mortality = x$Lambda_mortality_1,
-  groupings = list(
-    risk = list(k = x$k_1),
-    missing = list(K = 4, variable = x$w)))
-risk_model_2 = list(
-  r = x$r_2, 
-  Lambda_outcome = x$Lambda_outcome_2,
-  Lambda_mortality = x$Lambda_mortality_2,
-  groupings = list(
-    risk = list(K = 4),
-    missing = list(K = 4, variable = x$w)))
-ss = score_statistics(e, t, 
-  risk_model_1 = risk_model_1, 
-  risk_model_2 = risk_model_2)
-ss
-```
-
-## Adding `standardized_residuals` to our example
-
-```{r}
-sr = standardized_residuals(e, t, 
-  risk_model_1 = risk_model_1, 
-  risk_model_2 = risk_model_2)
-plot(sr, grouping_name = "risk")
-```
-
-Prettier...
-
-```{r eval = TRUE}
-plot_pars = list(x_max = 0.17,
-                 y_max = 9,
-                 y_max_ad = 0.33,
-                 xlab = "Risk (%)")
-plot(sr, grouping_name = "risk", plot_pars)
-```
-
-[TOP](#top)
-
-## If you don't have cumulative mortality hazards {#no-mortality-example}
-
-Suppose risk_model_2 has no cumulative mortality hazards.  set `lambda_mortality = NULL` as I have done in the example below.
-
-```{r}
-risk_model_2 = list(
-  r = x$r_2, 
-  Lambda_outcome = x$Lambda_outcome_2,
-  Lambda_mortality = NULL,
-  groupings = list(
-    risk = list(K = 4),
-    missing = list(K = 4, variable = x$w)))
-ss_no_mortality = score_statistics(e, t, 
-  risk_model_1 = risk_model_1, 
-  risk_model_2 = risk_model_2)
-ss_no_mortality
-```
-
-```{r}
-sr_no_mortality = standardized_residuals(e, t, 
-  risk_model_1 = risk_model_1, 
-  risk_model_2 = risk_model_2)
-plot(sr_no_mortality, grouping_name = "risk")
-```
-
-[TOP](#top)
-
-## Adding `risk_model_boxplots` to our example {#boxplot-example}
-
-We continue with [A score_statistics example](#ss-example)
-
-```{r fig.height = 5}
-list_of_risk_models = list(
-  risk_model_1 = x$r_1,
-  risk_model_2 = x$r_2)
-K = 4
-risk_quantile_boxplots(list_of_risk_models, K)
-```
-
-```{r fig.height = 5}
-risk_quantile_boxplots(list_of_risk_models, K, risk_max = 0.6)
-```
 
 [TOP](#top)
 
@@ -220,15 +124,16 @@ IAD(
 ## A `caseRiskPercentiles` example {#crp-example}
 
 ```{r fig.height = 6, fig.width = 6}
-data(data_set_score_statistics)
-xxx = data_set_score_statistics
-tail(xxx)
+library(rmap)
+set.seed(1)
+sampleData = df_randomSample_r1_r2(NTotal = 500)
+
 cutoff = 0.6
 tStar = 10
-e = xxx$e
-t = xxx$t
-r = xxx$r_1
-rAnother = xxx$r_2
+e = sampleData$e
+t = sampleData$t
+r = sampleData$r1
+rAnother = sampleData$r2
 crp = caseRiskPercentiles(
   cutoff, e, t, tStar, r, rAnother, 
   main = "Case risk percentiles",

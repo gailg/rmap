@@ -82,3 +82,5 @@ test_statistics_p_values_one_risk_model_fn."
 "2017-03-20 06:12:41 PDT"
 I added back AUCInternalFn.R, AUC_CI_Fn.R, AUC_Fn.R, and rho_piHatNN_Fn.R
 I deleted man and stanford-dot-edu-ggong files
+
+Remove data/data_set_score_statistics.RData

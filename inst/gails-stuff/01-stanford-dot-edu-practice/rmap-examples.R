@@ -1,76 +1,3 @@
-## A `score_statistics` example {#ss-example}
-
-library(rmap)
-x = read.csv(
-  file = "data_set_score_statistics.csv", 
-  stringsAsFactors = FALSE)
-head(x)
-
-e = x$e
-t = x$t
-risk_model_1 = list(
-  r = x$r_1, 
-  Lambda_outcome = x$Lambda_outcome_1,
-  Lambda_mortality = x$Lambda_mortality_1,
-  groupings = list(
-    risk = list(k = x$k_1),
-    missing = list(K = 4, variable = x$w)))
-risk_model_2 = list(
-  r = x$r_2, 
-  Lambda_outcome = x$Lambda_outcome_2,
-  Lambda_mortality = x$Lambda_mortality_2,
-  groupings = list(
-    risk = list(K = 4),
-    missing = list(K = 4, variable = x$w)))
-ss = score_statistics(e, t, 
-  risk_model_1 = risk_model_1, 
-  risk_model_2 = risk_model_2)
-ss
-
-## Adding `standardized_residuals` to our example
-
-sr = standardized_residuals(e, t, 
-  risk_model_1 = risk_model_1, 
-  risk_model_2 = risk_model_2)
-plot(sr, grouping_name = "risk")
-
-### Prettier...
-
-plot_pars = list(x_max = 0.17,
-                 y_max = 9,
-                 y_max_ad = 0.33,
-                 xlab = "Risk (%)")
-plot(sr, grouping_name = "risk", plot_pars)
-
-## If you don't have cumulative mortality hazards {#no-mortality-example}
-
-risk_model_2 = list(
-  r = x$r_2, 
-  Lambda_outcome = x$Lambda_outcome_2,
-  Lambda_mortality = NULL,
-  groupings = list(
-    risk = list(K = 4),
-    missing = list(K = 4, variable = x$w)))
-ss_no_mortality = score_statistics(e, t, 
-  risk_model_1 = risk_model_1, 
-  risk_model_2 = risk_model_2)
-ss_no_mortality
-
-sr_no_mortality = standardized_residuals(e, t, 
-  risk_model_1 = risk_model_1, 
-  risk_model_2 = risk_model_2)
-plot(sr_no_mortality, grouping_name = "risk")
-
-## Adding `risk_model_boxplots` to our example {#boxplot-example}
-
-list_of_risk_models = list(
-  risk_model_1 = x$r_1,
-  risk_model_2 = x$r_2)
-K = 4
-risk_quantile_boxplots(list_of_risk_models, K)
-
-risk_quantile_boxplots(list_of_risk_models, K, risk_max = 0.6)
-
 ## A `riskValidate` example {#rv-example}
 
 library(rmap)
@@ -137,7 +64,7 @@ IAD(
     comment = "20 bootstraps for confidence bands"))
 
 ## A `caseRiskPercentiles` example {#crp-example}
-
+if(FALSE){
 data(data_set_score_statistics)
 xxx = data_set_score_statistics
 tail(xxx)
@@ -147,6 +74,13 @@ e = xxx$e
 t = xxx$t
 r = xxx$r_1
 rAnother = xxx$r_2
+}
+cutoff = 0.6
+tStar = 10
+e = sampleData$e
+t = sampleData$t
+r = sampleData$r1
+rAnother = sampleData$r2
 crp = caseRiskPercentiles(
   cutoff, e, t, tStar, r, rAnother, 
   main = "Case risk percentiles",
