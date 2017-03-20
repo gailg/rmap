@@ -1,0 +1,84 @@
+"2017-03-14 15:05:13 PDT"
+This is version 0.02-01
+
+Delete 
+
+attribute_diagram_and_residual_plot_fn.R                           
+attribute_diagram_and_residual_plot_one_risk_model_and_grouping_fn.R     
+AUC_CI_Fn.R                                                           
+AUC_Fn.R                                                              
+AUCInternalFn.R     
+combined_outcome_mortality_fn.R     
+grouping_fn.R"                                                       
+grouping_missing_outcome_fn.R                                       
+grouping_quantile_fn.R                                              
+grouping_risk_fn.R                                                  
+grouping_rounded_better_fn.R                                        
+grouping_rounded_fn.R  
+performanceDifference.R                                             
+performanceDifferenceInternalFn.R
+plot_pars_fn.R                                                      
+"plot.standardized_residuals.R                                       
+print_border_text_fn.R 
+random_risk_calibration_fn.R                                        
+random_risk_calibration_gen_params_fn.R                             
+regression_example_1_fn.R                                           
+regression_example_2_fn.R                                           
+regression_example_3_fn.R                                           
+residuals_one_risk_model_fn.R                                       
+rho_piHatNN_Fn.R                                                    
+risk_model_biased_both_fn.R                                         
+risk_model_biased_mortality_fn."                                    
+risk_model_biased_outcome_fn."                                      
+risk_model_correct_fn."                                             
+risk_model_uni_fn."                                                 
+risk_model_uni_lapply_fn."                                          
+risk_model_uni_sim_fn."                                             
+risk_quantile_boxplots."    
+score_statistics."  
+standardized_residuals."                                            
+tau_CI_Fn."                                                         
+tauFn."                                                             
+test_statistics_one_risk_model_fn."                                 
+test_statistics_p_values_one_risk_model_fn."  
+
+
+	deleted:    R/AUCInternalFn.R
+	deleted:    R/AUC_CI_Fn.R
+	deleted:    R/AUC_Fn.R
+	deleted:    R/attribute_diagram_and_residual_plot_fn.R
+	deleted:    R/attribute_diagram_and_residual_plot_one_risk_model_and_grouping_fn.R
+	deleted:    R/combined_outcome_mortality_fn.R
+	deleted:    R/random_risk_calibration_fn.R
+	deleted:    R/random_risk_calibration_gen_params_fn.R
+	deleted:    R/regression_example_1_fn.R
+	deleted:    R/regression_example_2_fn.R
+	deleted:    R/regression_example_3_fn.R
+	deleted:    R/residuals_one_risk_model_fn.R
+	deleted:    R/rho_piHatNN_Fn.R
+	deleted:    R/risk_model_biased_both_fn.R
+	deleted:    R/risk_model_biased_mortality_fn.R
+	deleted:    R/risk_model_biased_outcome_fn.R
+	deleted:    R/risk_model_correct_fn.R
+	deleted:    R/risk_model_uni_fn.R
+	deleted:    R/risk_model_uni_lapply_fn.R
+	deleted:    R/risk_model_uni_sim_fn.R
+	deleted:    R/risk_quantile_boxplots.R
+	deleted:    R/score_statistics.R
+	deleted:    R/standardized_residuals.R
+	deleted:    R/tauFn.R
+	deleted:    R/tau_CI_Fn.R
+	deleted:    R/test_statistics_one_risk_model_fn.R
+	deleted:    R/test_statistics_p_values_one_risk_model_fn.R
+	deleted:    man/AUCInternalFn.Rd
+	deleted:    man/AUC_CI_Fn.Rd
+	deleted:    man/AUC_Fn.Rd
+	deleted:    man/attributeDiagram.Rd
+	deleted:    man/attributeDiagramRawFn.Rd
+	deleted:    man/performanceDifference.Rd
+	deleted:    man/performanceDifferenceInternalFn.Rd
+	deleted:    man/score_statistics.Rd
+
+"2017-03-20 06:12:41 PDT"
+I added back AUCInternalFn.R, AUC_CI_Fn.R, AUC_Fn.R, and rho_piHatNN_Fn.R
+I deleted man and stanford-dot-edu-ggong files
