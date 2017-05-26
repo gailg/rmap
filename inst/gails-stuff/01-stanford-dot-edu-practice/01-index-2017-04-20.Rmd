@@ -1,0 +1,117 @@
+---
+title: "rmap---v-0.02-01--2017-05-24 04:37:31 PDT"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: yes
+fontsize: 12pt
+
+---
+<A NAME="top"> </A>
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+# Introduction {#introduction}
+
+Personal predictive models use an individual's personal covariates to assign him/her a probability of developing a specific disease,  within a specified future time period $[0, \text{t_star})$ and before a competing risk.  The models are often evaluated by comparing their assigned risks to outcome incidences among participants in a cohort study.  Performance of such models are evaluated using two criteria: calibration and concordance.
+
+This package provides the functions `calibration` and `concordance` for evaluating the performance of personal predictive models. 
+
+Both functions allow for unweighted and weighted sampling designs.  `calibration` also allows for two-stage sampling design.
+
+[TOP](#top)
+
+# Data preparation {#data-preparation}
+
+We assume that you have a data set containing $N$ people, and for the $n$-th person, you have recorded $(e_n, t_n, r_n)$ organized into a `data.frame`, one row for each person, containing the following columns.  
+
+## `e`
+
+The event for the subject. Record`e = 1` if the adverse outcome was observed to occur before `t_star` and before the competing event, `e = 2` if the competing risk, such as death from other causes,  was observed to occur before `t_star` and before the adverse outcome, and  `0` if censored or free from adverse outcome and competing risk at time `t_star`.  Acceptable values are `0, 1, 2`.
+
+## `t`
+
+The time until event.  Mathematically speaking, let `t_1` be time until adverse outcome, `t_2` time until competing risk, `t_0` ($\le$ `t_star`) time until censoring . Then `t` is the minimum of `t_1`, `t_2`, `t_0`, `t_star`. And `e` records which of the events occurred first. Acceptable values are `[0, t_star]` (real numbers between `0` and `t_star`, including `0` and `t_star`).
+
+## `r`
+
+The risk assigned by the personal predictive model. This is the probability of adverse outcome occuring before the competing risk and within `[0, t_star)`. Acceptable values are `[0, 1]` (real numbers between `0` and `1`, including `0` and `1`).
+
+## `category` (optional)
+
+If your data were obtained by two-stage sampling, this is the two-stage category indicating which two-stage category the person fell into.   If there were `C` possible categories, acceptable values are `1`, `2`, $\cdots$, `C`.
+
+## `weight` (optional)
+
+If your data sample does not represent the target population, and you would like to weight your sample to more closely match the target population, provide this `weight` column.  Acceptable values are `(0, 1]` (real numbers between `0` and `1`, not including `0` but including `1`.
+
+[TOP](#top)
+
+# Installing rmap {#installing-rmap}
+
+If you have not yet installed R, download the latest version (at least 3.3.1) for your operating system at:
+
+http://www.r-project.org
+
+Run the R application. To install the rmap package, enter the following lines of code to the R prompt:
+
+```
+install.packages("devtools")
+library(devtools)
+install_github("gailg/rmap")
+if("rmap" %in% rownames(installed.packages())){
+  print("rmap installed successfully--you are good to go!")
+} else {
+  print("something went wrong--ask for help")
+}
+```
+If your installation was successful, you should see the message
+
+```
+[1] "rmap installed successfully--you are good to go!"
+```
+[TOP](#top)
+
+# Reading in data {#reading-in-data}
+
+If you saved your data from excel as a CSV (comma separated value) file in your working directory, your next step is to read this CSV file into R.  To practice reading in my example file "data_set_score_statistics.csv", place this file in your working directory and enter the following lines to R. Your result to `head(x)` should look like my output below.
+
+
+```{r eval = TRUE}
+x = read.csv(
+    file = "datafRandomSample.csv",
+    stringsAsFactors = FALSE)
+head(x)
+```
+
+
+
+
+```{r}
+library(rmap)
+set.seed(42)
+df1 = df_randomSample(KKK = 4)
+x = rmap_random_sample = df1[, c("e", "t", "r", "k")]
+head(x)
+riskValidate(e = x$e, t = x$t, r = x$r, 
+             design = "randomSample",
+             riskGroup = list(k = x$k),
+                          rSummary = "mean",
+                          bootstrap = FALSE, rvpar = rvparFn(col = "darkgreen"))
+```
+
+[TOP](#top)
+
+
