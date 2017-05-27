@@ -1,8 +1,8 @@
 Package: rmap
 Type: Package
 Title: Risk Model Assessment Package
-Version: 0.02-01
-Date: 2017-03-14
+Version: 0.02-02
+Date: 2017-05-26
 Author: Gail Gong and David Johnston
 Maintainer: Gail Gong <ggong@stanford.edu>
 Description: rmap contains tools for calibrating and discriminating personal risk models using a random sample of censored longitudinal cohort data. 
