@@ -213,3 +213,19 @@ I commented out the part about CRPs
 +  # cat("\nHead of CRP's: \n")
 +  # print.default(head(rvu$CRP$CRP, n = n))
 ```
+
+# I found I had passed in t_star with a global variable
+
+## `lambdaHatFn`
+
+Add this line
+```
+t_star = baseArgs$t_star
+```
+
+## `baseArgsBootFn`
+
+Add `t_star` to the output list
+```
+t_star = baseArgs$t_star,
+```

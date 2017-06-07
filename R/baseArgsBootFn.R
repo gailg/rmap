@@ -41,6 +41,7 @@ baseArgsBootFn = function(baseArgs) {
        K = baseArgs$K,
        epsilon = baseArgs$epsilon,
        tStar = baseArgs$tStar,
+       t_star = baseArgs$t_star,
        ungrouped = baseArgs$ungrouped,
        N = NBoo,
        n = nBoo,

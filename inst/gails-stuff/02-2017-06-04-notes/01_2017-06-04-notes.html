@@ -139,6 +139,10 @@ $(document).ready(function () {
 <li><a href="#rho_pihatnn_fn"><span class="toc-section-number">4.5</span> <code>rho_piHatNN_Fn</code></a></li>
 <li><a href="#print.rvu"><span class="toc-section-number">4.6</span> <code>print.rvu</code></a></li>
 </ul></li>
+<li><a href="#i-found-i-had-passed-in-t_star-with-a-global-variable"><span class="toc-section-number">5</span> I found I had passed in t_star with a global variable</a><ul>
+<li><a href="#lambdahatfn-1"><span class="toc-section-number">5.1</span> <code>lambdaHatFn</code></a></li>
+<li><a href="#baseargsbootfn"><span class="toc-section-number">5.2</span> <code>baseArgsBootFn</code></a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -290,6 +294,19 @@ $(document).ready(function () {
 -  print.default(head(rvu$CRP$CRP, n = n))
 +  # cat(&quot;\nHead of CRP's: \n&quot;)
 +  # print.default(head(rvu$CRP$CRP, n = n))</code></pre>
+</div>
+</div>
+<div id="i-found-i-had-passed-in-t_star-with-a-global-variable" class="section level1">
+<h1><span class="header-section-number">5</span> I found I had passed in t_star with a global variable</h1>
+<div id="lambdahatfn-1" class="section level2">
+<h2><span class="header-section-number">5.1</span> <code>lambdaHatFn</code></h2>
+<p>Add this line</p>
+<pre><code>t_star = baseArgs$t_star</code></pre>
+</div>
+<div id="baseargsbootfn" class="section level2">
+<h2><span class="header-section-number">5.2</span> <code>baseArgsBootFn</code></h2>
+<p>Add <code>t_star</code> to the output list</p>
+<pre><code>t_star = baseArgs$t_star,</code></pre>
 </div>
 </div>
 

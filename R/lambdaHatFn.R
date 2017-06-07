@@ -1,5 +1,6 @@
   lambdaHatFn = function(baseArgs) {
     aaa = baseArgs$N / baseArgs$n
+    t_star = baseArgs$t_star
     eventUni = 0:2
     structure(lapply(1:baseArgs$K, function(kkk) {
       ind = baseArgs$k == kkk
