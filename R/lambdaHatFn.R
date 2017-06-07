@@ -1,13 +1,13 @@
   lambdaHatFn = function(baseArgs) {
     aaa = baseArgs$N / baseArgs$n
-    t_star = baseArgs$t_star
+    tStar = baseArgs$tStar
     eventUni = 0:2
     structure(lapply(1:baseArgs$K, function(kkk) {
       ind = baseArgs$k == kkk
       t_k = baseArgs$t[ind]
       e_k = baseArgs$e[ind]
       c_k = baseArgs$c[ind]
-      tau = sort(unique(t_k[e_k != 0 & t_k < t_star]))  # GG 2017-05-26 this to compensate for allowing t bigger than t_star
+      tau = sort(unique(t_k[e_k != 0 & t_k < tStar]))  # GG 2017-05-26 this to compensate for allowing t bigger than tStar
       NAR = sapply(tau, function(tauThis) t_k >= tauThis)
   
       DDD = lapply(eventUni[-1], function(eee) {

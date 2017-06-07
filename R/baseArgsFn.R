@@ -257,7 +257,6 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
                   rSummary = rSummary,
                   nBootstraps = nBootstraps,
                   multicore = multicore,
-                  t_star = tStar,
                   tStar = tStar,
                   verbose = verbose,
                   offendingRGs = offendingRGs

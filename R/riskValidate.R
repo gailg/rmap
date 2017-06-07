@@ -1,9 +1,9 @@
 
 
-riskValidate = function(e, t, r, t_star, design = "randomSample", riskGroup, rSummary, bootstrap = FALSE,
+riskValidate = function(e, t, r, tStar, design = "randomSample", riskGroup, rSummary, bootstrap = FALSE,
                         rvpar = rvparFn()) {
   
-  rv = riskValidateExternalFn(e, t, r, t_star, design, riskGroup, rSummary, bootstrap)
+  rv = riskValidateExternalFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
 
   force(rvpar)
 

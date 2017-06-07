@@ -229,3 +229,16 @@ Add `t_star` to the output list
 ```
 t_star = baseArgs$t_star,
 ```
+
+# Change all `t_star` to `tStar`
+
+## `baseArgsFn` and `baseArgsBootFn`
+
+Remove `t_star` from the output list
+
+## `lambdaHatFn`, `riskValidate`, and `riskValidateExternal`
+
+Change all `t_star` to `tStar`
+
+
+
