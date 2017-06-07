@@ -6,7 +6,7 @@ df_raw = function(NTotal, distribution, param1, param2, eta0, eta2, tStar) {
            beta = rbeta(NTotal, shape1 = param1, shape2 = param2)
            )
   tEvents = matrix(c( 
-    pmin(rexp(NTotal, eta0), tStar),  
+    rexp(NTotal, eta0),  # GG 2017-05-26 previously, this was truncated at tStar
     rexp(NTotal, eta1),                   
     rexp(NTotal, eta2)), 
     ncol = 3)         

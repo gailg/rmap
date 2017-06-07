@@ -1,7 +1,7 @@
 
 
-riskValidateExternalFn = function(e, t, r, design = "randomSample", riskGroup, rSummary, bootstrap = FALSE) {
-  baseArgs = baseArgsFn(e, t, r, design, riskGroup, rSummary, bootstrap)
+riskValidateExternalFn = function(e, t, r, t_star, design = "randomSample", riskGroup, rSummary, bootstrap = FALSE) {
+  baseArgs = baseArgsFn(e, t, r, t_star, design, riskGroup, rSummary, bootstrap)
   riskValidateInternalFn(baseArgs)
 }
 

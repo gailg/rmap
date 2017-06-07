@@ -1,4 +1,4 @@
-baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, multicore = FALSE, verbose = FALSE) {
+baseArgsFn = function(e, t, r, t_star, design, riskGroup, rSummary, bootstrap, multicore = FALSE, verbose = FALSE) {
 
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ## Section 1: Checking vectors, and putting them in order of r.
@@ -112,7 +112,10 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
     stop("Please specify epsilon to be (0, 1].")
   }
 
-
+  if( ("ungrouped" %in% names(riskGroup)) && ("tStar" %in% names(riskGroup$ungrouped)) &&
+     (any(t > riskGroup$ungrouped$tStar)) ) {
+    stop("Please specify tStar to be greater than or equal to your largest value of t.")
+  }
        
   
   if(names(riskGroup) == "k") {
@@ -249,16 +252,16 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
                   r = r[order(ord)],  ###DJDJ 
                   c = design$c[order(ord)],  ###DJDJ 
                   k = riskGroup$k[order(ord)],  ###DJDJ 
+                  t_star = t_star, 
                   K = riskGroup$K,
                   epsilon = riskGroup$epsilon,
+                  tStar = riskGroup$tStar,
                   ungrouped = riskGroup$ungrouped,
                   N = design$N,
                   n = design$n,
                   rSummary = rSummary,
                   nBootstraps = nBootstraps,
                   multicore = multicore,
-                  t_star = tStar,
-                  tStar = tStar,
                   verbose = verbose,
                   offendingRGs = offendingRGs
     )

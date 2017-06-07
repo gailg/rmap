@@ -24,6 +24,7 @@ rho_piHatNN_Fn = function(baseArgs) {
       e = baseArgs$e[NN1],
       t = baseArgs$t[NN1],
       r = baseArgs$r[NN1],
+      tStar = baseArgs$tStar,
       design = list(N = tapply(aaa[NN1], names(aaa[NN1]), sum),
         c = baseArgs$c[NN1]),
       riskGroup = list(K = 1),

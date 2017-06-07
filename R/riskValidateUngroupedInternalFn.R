@@ -1,13 +1,13 @@
 
 
 riskValidateUngroupedInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
-
-  auc = AUCInternalFn(baseArgs = baseArgs, extraArgs = extraArgs)
-  # give us AUC, AUC_CI, and CRP
-
+  e = baseArgs$e
+  t = baseArgs$t
+  tStar = baseArgs$tStar
+  baseArgs$e = ifelse(t > tStar, 0, e)
+  baseArgs$t = ifelse(t > tStar, tStar, t)
   pnn = piHatNNInternalFn(baseArgs = baseArgs, extraArgs = extraArgs)
-
-  rvu = list(AUC = auc, PNN = pnn)
+  rvu = list(PNN = pnn)
 
   class(rvu) = c("rvu", class(rvu))
 

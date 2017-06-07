@@ -1,11 +1,11 @@
 
 
 riskValidateUngrouped = function(
-  e, t, r, design = "randomSample", riskGroup, bootstrap = FALSE,
+  e, t, r, tStar, design = "randomSample", riskGroup, bootstrap = FALSE,
   rvpar = rvparFn(), multicore = FALSE, verbose = FALSE) {
 
   rvu = riskValidateUngroupedExternalFn(
-    e = e, t = t, r = r, design = design,
+    e = e, t = t, r = r, tStar, design = design,
     riskGroup = riskGroup,
     bootstrap = bootstrap, multicore = multicore, verbose = verbose) 
 
@@ -20,7 +20,7 @@ riskValidateUngrouped = function(
 #     cat("\n")
   }
   
-  rvu = list(CRP = rvu$AUC$CRP, PNN = rvu$PNN)
+  rvu = list(PNN = rvu$PNN)
   class(rvu) = c("rvu", class(rvu))
   rvu
 

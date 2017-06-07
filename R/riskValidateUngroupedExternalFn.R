@@ -1,11 +1,11 @@
 
 
 riskValidateUngroupedExternalFn = function(
-    e, t, r, design, riskGroup, bootstrap,
+    e, t, r, tStar, design, riskGroup, bootstrap,
     multicore, verbose) {
 
   rSummary = "mean"
-  baseArgs = baseArgsFn(e = e, t = t, r = r, design = design,
+  baseArgs = baseArgsFn(e = e, t = t, r = r, tStar, design = design,
     riskGroup = riskGroup, rSummary = rSummary, bootstrap = bootstrap,
     multicore = multicore, verbose = verbose)
   
