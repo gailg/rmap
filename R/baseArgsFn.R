@@ -6,15 +6,13 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
 
   # browser()
   
-  vecs = vector("list", 6)
+  vecs = vector("list", 5)
   vecs[[1]] = e
   vecs[[2]] = t
   vecs[[3]] = r
   if( "c" %in% names(design)) vecs[[4]] = design$c
   if( "k" %in% names(riskGroup)) vecs[[5]] = riskGroup$k
-  # "2017-06-12 09:28:47 PDT" GG added to handle weighted analysis
-  if( "cohortCategory" %in% names(design)) vecs[[6]] = design$cohortCategory
-  names(vecs) = c("e", "t", "r", "c", "k", "cohortCategory")
+  names(vecs) = c("e", "t", "r", "c", "k")
 
   # Vector checks:
   if(length(unique(sapply(vecs[sapply(vecs, function(vec) !is.null(vec))], length))) != 1) {
@@ -29,7 +27,6 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
     stop("design$c must be a character vector.")
   }
   
-  # "2017-06-12 09:28:47 PDT" GG I need to add something about cohortCategory and targetCategory possible errors
 
   # New Tue Apr 26 15:16:04 PDT 2011 >>> 
   if( !all( vecs[["e"]] %in% c(0, 1, 2) ) )
@@ -48,8 +45,6 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
   r = vecs[["r"]]
   if( "c" %in% names(design)) design$c = vecs[["c"]]
   if( "k" %in% names(riskGroup)) riskGroup$k = vecs[["k"]]
-  # "2017-06-12 09:28:47 PDT" GG added to handle weighted analysis
-  if( "cohortCategory" %in% names(design)) design$cohortCategory = vecs[["cohortCategory"]]
   rm(vecs)
   ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -85,14 +80,17 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
   
   # "2017-06-12 09:28:47 PDT" GG added to handle weighted analysis
   } else if(is.list(design) && "targetCategory" %in% names(design) &&
-            "cohortCategory" %in% names(design)) {
+            "c" %in% names(design)) {
     # this code segment is for setting up weighted
-    # with cohort_category and target_category provided
-    weight_0 = weight_fn(cohort_category, target_category)
+    # with target_category and c provided
+    weight_0 = weight_fn(design$c, target_category)
     weight_code = weight_0$code
     weight_message = weight_0$message
-    design$weight = unname(weight_0$weight)
-    
+    design$category_weights = weight_0$category_weights # "2017-06-12 14:07:48 PDT" GG 
+    # When the design is twoStage, a contains the weights
+    # When the design is target_category and c provided, weight_fn gives us category_weights
+    # which are analogous to design$a for twoStage
+
     if(weight_code != 0) stop(weight_message)
     
     design$sampling = "target_and_cohort_categories_provided"
@@ -268,11 +266,10 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
   baseArgs = list(e = e[order(ord)],  ###DJDJ 
                   t = t[order(ord)],  ###DJDJ
                   r = r[order(ord)],  ###DJDJ 
-                  cohortCategory = design$cohortCategory[order(ord)], # "2017-06-12 09:28:47 PDT" GG
                   c = design$c[order(ord)],  ###DJDJ 
                   k = riskGroup$k[order(ord)],  ###DJDJ 
-                  weight = design$weight, # "2017-06-12 12:06:35 PDT" GG
                   K = riskGroup$K,
+                  category_weights = design$category_weights,
                   epsilon = riskGroup$epsilon,
                   ungrouped = riskGroup$ungrouped,
                   N = design$N,
@@ -280,7 +277,8 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
                   rSummary = rSummary,
                   nBootstraps = nBootstraps,
                   multicore = multicore,
-                  targetCategory = design$targetCategory, # "2017-06-12 09:28:47 PDT" GG
+                  cohort_category = design$c[order(ord)], # "2017-06-12 09:28:47 PDT" GG
+                  target_category = design$targetCategory, # "2017-06-12 09:28:47 PDT" GG
                   tStar = tStar,
                   verbose = verbose,
                   offendingRGs = offendingRGs
