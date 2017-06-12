@@ -6,17 +6,19 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
 
   # browser()
   
-  vecs = vector("list", 5)
+  vecs = vector("list", 6)
   vecs[[1]] = e
   vecs[[2]] = t
   vecs[[3]] = r
   if( "c" %in% names(design)) vecs[[4]] = design$c
   if( "k" %in% names(riskGroup)) vecs[[5]] = riskGroup$k
-  names(vecs) = c("e", "t", "r", "c", "k")
+  # "2017-06-12 09:28:47 PDT" GG added to handle weighted analysis
+  if( "cohortCategory" %in% names(design)) vecs[[6]] = design$cohortCategory
+  names(vecs) = c("e", "t", "r", "c", "k", "cohortCategory")
 
   # Vector checks:
   if(length(unique(sapply(vecs[sapply(vecs, function(vec) !is.null(vec))], length))) != 1) {
-    stop("e, t, r (and design$c, riskGroup$k if supplied) must all be the same length")
+    stop("e, t, r (and design$c, riskGroup$k, design$cohortCategory, design$targetCategory if supplied) must all be the same length")
   }
 
   if(!all(is.numeric(unlist(vecs[c("e", "t", "r", "k")])))) {
@@ -26,6 +28,8 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
   if( !is.null(vecs[["c"]]) && !is.character(vecs[["c"]])) {
     stop("design$c must be a character vector.")
   }
+  
+  # "2017-06-12 09:28:47 PDT" GG I need to add something about cohortCategory and targetCategory possible errors
 
   # New Tue Apr 26 15:16:04 PDT 2011 >>> 
   if( !all( vecs[["e"]] %in% c(0, 1, 2) ) )
@@ -44,6 +48,8 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
   r = vecs[["r"]]
   if( "c" %in% names(design)) design$c = vecs[["c"]]
   if( "k" %in% names(riskGroup)) riskGroup$k = vecs[["k"]]
+  # "2017-06-12 09:28:47 PDT" GG added to handle weighted analysis
+  if( "cohortCategory" %in% names(design)) design$cohortCategory = vecs[["cohortCategory"]]
   rm(vecs)
   ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -76,7 +82,20 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
 
     design$a = design$N / design$n
     design$sampling = "twoStage"
+  
+  # "2017-06-12 09:28:47 PDT" GG added to handle weighted analysis
+  } else if(is.list(design) && "targetCategory" %in% names(design) &&
+            "cohortCategory" %in% names(design)) {
+    # this code segment is for setting up weighted
+    # with cohort_category and target_category provided
+    weight_0 = weight_fn(cohort_category, target_category)
+    weight_code = weight_0$code
+    weight_message = weight_0$message
+    design$weight = unname(weight_0$weight)
     
+    if(weight_code != 0) stop(weight_message)
+    
+    design$sampling = "target_and_cohort_categories_provided"
   } else {
     stop(paste("Design must be either 'randomSample' or a list of c, N, and n",
                "to designate two stage sampling.", sep = "\n"))
@@ -244,11 +263,15 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
   }
   ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+  
+  # "2017-06-12 09:28:47 PDT" GG why do they need to be reordered again, weren't they alread done on lines 41-44?
   baseArgs = list(e = e[order(ord)],  ###DJDJ 
                   t = t[order(ord)],  ###DJDJ
                   r = r[order(ord)],  ###DJDJ 
+                  cohortCategory = design$cohortCategory[order(ord)], # "2017-06-12 09:28:47 PDT" GG
                   c = design$c[order(ord)],  ###DJDJ 
                   k = riskGroup$k[order(ord)],  ###DJDJ 
+                  weight = design$weight, # "2017-06-12 12:06:35 PDT" GG
                   K = riskGroup$K,
                   epsilon = riskGroup$epsilon,
                   ungrouped = riskGroup$ungrouped,
@@ -257,6 +280,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
                   rSummary = rSummary,
                   nBootstraps = nBootstraps,
                   multicore = multicore,
+                  targetCategory = design$targetCategory, # "2017-06-12 09:28:47 PDT" GG
                   tStar = tStar,
                   verbose = verbose,
                   offendingRGs = offendingRGs
