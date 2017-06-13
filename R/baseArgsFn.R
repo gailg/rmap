@@ -86,13 +86,17 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
     weight_0 = weight_fn(design$c, target_category)
     weight_code = weight_0$code
     weight_message = weight_0$message
+    if(weight_code != 0) stop(weight_message)
+    
     design$category_weights = weight_0$category_weights # "2017-06-12 14:07:48 PDT" GG 
     # When the design is twoStage, a contains the weights
     # When the design is target_category and c provided, weight_fn gives us category_weights
     # which are analogous to design$a for twoStage
+    design$weight = unname(design$category_weights[design$c]) # "2017-06-13 08:16:16 PDT" GG
+    # In the twoSample version, the weights get calculated twice 
+    # once in gammaHatFn and again in lambdaHatFn
+    # For weighted, I  do it just once, here 
 
-    if(weight_code != 0) stop(weight_message)
-    
     design$sampling = "target_and_cohort_categories_provided"
   } else {
     stop(paste("Design must be either 'randomSample' or a list of c, N, and n",
@@ -268,6 +272,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
                   r = r[order(ord)],  ###DJDJ 
                   c = design$c[order(ord)],  ###DJDJ 
                   k = riskGroup$k[order(ord)],  ###DJDJ 
+                  weight = design$weight[order(ord)], # "2017-06-13 08:16:16 PDT" GG
                   K = riskGroup$K,
                   category_weights = design$category_weights,
                   epsilon = riskGroup$epsilon,
