@@ -281,6 +281,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
                   n = design$n,
                   rSummary = rSummary,
                   nBootstraps = nBootstraps,
+                  N_bootstraps = nBootstraps,
                   multicore = multicore,
                   cohort_category = design$c[order(ord)], # "2017-06-12 09:28:47 PDT" GG
                   target_category = design$targetCategory, # "2017-06-12 09:28:47 PDT" GG
