@@ -1,4 +1,4 @@
-baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, multicore = FALSE, verbose = FALSE) {
+baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, confidenceLevel = 0.95, multicore = FALSE, verbose = FALSE) {
 
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ## Section 1: Checking vectors, and putting them in order of r.
@@ -295,6 +295,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
                   c = design$c[order(ord)],  ###DJDJ 
                   k = riskGroup$k[order(ord)],  ###DJDJ 
                   weight = design$weight[order(ord)], # "2017-06-13 08:16:16 PDT" GG
+                  confidence_level = confidenceLevel,
                   K = riskGroup$K,
                   category_weights = design$category_weights,
                   epsilon = riskGroup$epsilon,
