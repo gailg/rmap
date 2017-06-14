@@ -265,6 +265,28 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
   }
   ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+  N_in_risk_group = unlist(lapply(seq(1, riskGroup$K, by = 1), function(kkk){
+    sum(riskGroup$k == kkk)
+  }))
+  N_in_risk_group_message = paste(
+    "risk groups", 
+    paste(which(N_in_risk_group == 0), collapse = ", "),
+    "are empty")
+  N_nonzero_events = unlist(lapply(seq(1, riskGroup$K, by = 1), function(kkk){
+    e_inside_pi_hat = ifelse(t[riskGroup$k == kkk] > tStar, 0, e[riskGroup$k == kkk])
+    sum(e_inside_pi_hat > 0)
+  }))
+  
+  error_code = if( weight_code == 0 && all(N_in_risk_group > 0) ){
+    0
+  } else {
+    1
+  }
+  error_message = if( weight_code != 0 ){
+    weight_message
+  } else {
+    paste("weight ok but", N_in_risk_group_message)
+  }
   
   # "2017-06-12 09:28:47 PDT" GG why do they need to be reordered again, weren't they alread done on lines 41-44?
   baseArgs = list(e = e[order(ord)],  ###DJDJ 
@@ -276,9 +298,12 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, mu
                   K = riskGroup$K,
                   category_weights = design$category_weights,
                   epsilon = riskGroup$epsilon,
+                  error_code = error_code,
+                  error_message = error_message,
                   ungrouped = riskGroup$ungrouped,
                   N = design$N,
                   n = design$n,
+                  N_nonzero_events = N_nonzero_events,
                   rSummary = rSummary,
                   nBootstraps = nBootstraps,
                   N_bootstraps = nBootstraps,
