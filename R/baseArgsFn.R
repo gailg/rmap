@@ -96,6 +96,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     # In the twoSample version, the weights get calculated twice 
     # once in gammaHatFn and again in lambdaHatFn
     # For weighted, I  do it just once, here 
+    design$a = design$category_weights
 
     design$sampling = "target_and_cohort_categories_provided"
   } else {
