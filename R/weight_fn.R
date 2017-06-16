@@ -18,7 +18,7 @@ weight_fn = function(cohort_category, target_category){
       list(code = 2,
            message = target_not_cohort_message)
     } else if(length(cohort_not_target) > 0){
-      list(code = 3,
+      list(code = 0, # "2017-06-15 15:36:26 PDT" GG changed from code = 3;  allowing weights = 0
            message = cohort_not_target_message)
     } else {
       list(code = 0,
