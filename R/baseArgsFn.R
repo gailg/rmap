@@ -6,13 +6,14 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
 
   # browser()
   
-  vecs = vector("list", 5)
+  vecs = vector("list", 6)
   vecs[[1]] = e
   vecs[[2]] = t
   vecs[[3]] = r
   if( "c" %in% names(design)) vecs[[4]] = design$c
   if( "k" %in% names(riskGroup)) vecs[[5]] = riskGroup$k
-  names(vecs) = c("e", "t", "r", "c", "k")
+  if( "w" %in% names(design)) vecs[[6]] = design$w
+  names(vecs) = c("e", "t", "r", "c", "k", "w")
 
   # Vector checks:
   if(length(unique(sapply(vecs[sapply(vecs, function(vec) !is.null(vec))], length))) != 1) {
@@ -27,28 +28,24 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     stop("design$c must be a character vector.")
   }
   
-
   # New Tue Apr 26 15:16:04 PDT 2011 >>> 
   if( !all( vecs[["e"]] %in% c(0, 1, 2) ) )
     stop("every 'e' value must be 0, 1, or 2")
   # <<<
-
 
   ord = order(vecs$r)   ###DJDJ
   vecs = lapply(vecs, function(vec) vec[ord])
   # Now the vectors are ordered by r.
   # look at cleanUpDf in old code.
 
-  
   e = vecs[["e"]]
   t = vecs[["t"]]
   r = vecs[["r"]]
   if( "c" %in% names(design)) design$c = vecs[["c"]]
   if( "k" %in% names(riskGroup)) riskGroup$k = vecs[["k"]]
+  if( "w" %in% names(design)) design$w = vecs[["w"]]
   rm(vecs)
-  ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
- 
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ## Section 2: Design checks:
   
@@ -60,6 +57,8 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     design$n = structure(length(e), .Names = "A")
     design$c = rep("A", length(e))
     design$a = structure(1, .Names = "A")
+    design$weight = rep(1, length(e))
+    design$sampling = "randomSample"
 
   } else if(is.list(design) && "N" %in% names(design) &&
             "c" %in% names(design)) {
@@ -99,14 +98,16 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     design$a = design$category_weights
 
     design$sampling = "target_and_cohort_categories_provided"
+    
+  } else if( is.list(design) && "w" %in% names(design) ) {
+    design$sampling = "w_provided" # design$weight needs to be brought into the vecs
+    design$weight = design$w
   } else {
     stop(paste("Design must be either 'randomSample' or a list of c, N, and n",
                "to designate two stage sampling.", sep = "\n"))
   }
   ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     
-
-  
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ## Section 3: Model checks:
   
@@ -134,9 +135,6 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     stop("Please specify epsilon to be (0, 1].")
   }
 
-
-       
-  
   if(names(riskGroup) == "k") {
     ## riskGroup$k is given
     riskGroup$K = max(riskGroup$k)
@@ -201,27 +199,23 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
                "one observation with e = 1 for each risk group. "),
          collapse = "")
   }
-  # <<<
-  
   ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    
 
-  
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ## Section 4: rSummary checks:
   
   if(length(rSummary) == 1 && rSummary == "mean") {
 
     rSummary = sapply( 1:riskGroup$K, function(kkk) {
-      sum( design$a[ design$c[riskGroup$k == kkk] ] * r[riskGroup$k == kkk]) /
-        sum( design$a[design$c[riskGroup$k == kkk] ] )
+      sum( design$weight[riskGroup$k == kkk] * r[riskGroup$k == kkk]) /
+        sum( design$weight[riskGroup$k == kkk] )
     })
 
   } else if(length(rSummary) == 1 && rSummary == "median") {
 
     # FLAG: why does it need to be ordered?
     rSummary = sapply(1:riskGroup$K, function(kkk) {
-      www = design$a[design$c[riskGroup$k == kkk] ][order(r[riskGroup$k == kkk])]
+      www = design$weight[riskGroup$k == kkk][order(r[riskGroup$k == kkk])]
       sort(r[riskGroup$k == kkk])[cumsum(www) >= (sum(www) / 2)][1]
     })
 
@@ -244,9 +238,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
                "a numeric vector with one summary value for each risk group.", sep = "\n")) 
   }
   ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    
 
-  
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ## Section 5: bootstrap checks
   if(length(bootstrap) > 1) {
@@ -278,12 +270,16 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     sum(e_inside_pi_hat > 0)
   }))
   
-  error_code = if( weight_code == 0 && all(N_in_risk_group > 0) ){
+  error_code = if(design$sampling != "target_and_cohort_categories_provided"){
+    NULL
+  } else if( weight_code == 0 && all(N_in_risk_group > 0) ){
     0
   } else {
     1
   }
-  error_message = if( weight_code != 0 ){
+  error_message = if(design$sampling != "target_and_cohort_categories_provided"){
+    NULL
+  } else if( weight_code != 0 ){
     weight_message
   } else {
     paste("weight ok but", N_in_risk_group_message)
