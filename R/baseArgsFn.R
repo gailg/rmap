@@ -75,6 +75,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     design$n = structure(as.numeric(table(design$c)), .Names = names(table(design$c)))
 
     design$a = design$N / design$n
+    design$weight = design$a[ design$c ]
     design$sampling = "twoStage"
   
   # "2017-06-12 09:28:47 PDT" GG added to handle weighted analysis
@@ -306,6 +307,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
                   nBootstraps = nBootstraps,
                   N_bootstraps = nBootstraps,
                   multicore = multicore,
+                  sampling = design$sampling,
                   cohort_category = design$c[order(ord)], # "2017-06-12 09:28:47 PDT" GG
                   target_category = design$targetCategory, # "2017-06-12 09:28:47 PDT" GG
                   tStar = tStar,
