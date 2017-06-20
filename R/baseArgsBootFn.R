@@ -32,6 +32,8 @@ baseArgsBootFn = function(baseArgs) {
   NBoo = structure(sapply(cUni, function(c1){
     sum(baseArgs$c[indices] == c1)
   }), .Names = cUni)
+  aaa = NBoo / nBoo
+  weight = unname(aaa[tempDf$cBoo])
 
   baseArgsBoot = list(e = tempDf$eBoo,
        t = tempDf$tBoo,
@@ -40,6 +42,7 @@ baseArgsBootFn = function(baseArgs) {
        k = tempDf$kBoo,
        K = baseArgs$K,
        epsilon = baseArgs$epsilon,
+       weight = weight,
        tStar = baseArgs$tStar,
        ungrouped = baseArgs$ungrouped,
        N = NBoo,
