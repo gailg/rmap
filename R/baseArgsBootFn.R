@@ -55,6 +55,7 @@ baseArgsBootFn = function(baseArgs) {
   
   # Checks that there is at least one significant event (death from disease) in every k group:
   # New Tue Apr 26 15:15:14 PDT 2011 >>>
+  if(FALSE){  # "2017-06-20 12:40:57 PDT" GG I have other error messages in place in riskValidateInternalFn
   if (!all(tapply(baseArgsBoot$e, baseArgsBoot$k, function(e_k) any(e_k == 1)  ) ) ) {
     
     stop(paste("In at least one bootstrap sample, one of the risk groups had no",
@@ -64,6 +65,7 @@ baseArgsBootFn = function(baseArgs) {
                "the numbers of disease events is moderate for each group. You",
                "may also decide not to use the bootstrap to get confidence intervals.",
                sep = "\n"))
+  }
   }
   # <<<
 

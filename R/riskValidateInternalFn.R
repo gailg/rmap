@@ -9,10 +9,18 @@ riskValidateInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
   extraArgs$Sigma = Sigma
   piHatSummary = piHatSummaryFn(baseArgs, extraArgs)
   ChiSq = ChiSqFn(baseArgs, extraArgs)
-  AUC = AUC_Fn(baseArgs, extraArgs)
-  AUC_CI = AUC_CI_Fn(baseArgs, extraArgs)
-  SD = SD_Fn(baseArgs, extraArgs)
-  SD_CI = SD_CI_Fn(baseArgs, extraArgs)
+  concordance = concordance_fn(baseArgs)
+  roc = concordance$roc
+  concordance = concordance$concordance
+  sensitivity = roc$sensitivity
+  specificity = roc$specificity
+  one_minus_specificity = 1 - specificity
+  roc_df_0 = unique(data.frame(one_minus_specificity, sensitivity))
+  df_for_roc_plot = roc_df_0[order(roc_df_0$one_minus_specificity, roc_df_0$sensitivity), ]
+  if(FALSE){
+    ggplot(df_for_roc_plot, aes(x = one_minus_specificity, y = sensitivity)) +
+      geom_step()
+  }
   if(baseArgs$nBootstraps == 0){
     rv = list(gammaHat = gammaHat,
               piHat = piHat,
@@ -20,25 +28,59 @@ riskValidateInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
               piHatSummary = piHatSummary,
               ChiSq = ChiSq)
   } else {
-    sdBoot = sdBootRiskValidateInternalFn(baseArgs)
+    boo_0 = lapply(1:baseArgs$nBootstraps, function(booIndex){
+      baseArgsBoot = baseArgsBootFn(baseArgs)
+      concordance = concordance_fn(baseArgsBoot)$concordance
+      tStar - baseArgs$tStar
+      KKK = baseArgsBoot$K
+      k_boo = baseArgsBoot$k
+      t_boo = baseArgsBoot$t
+      e_boo = baseArgsBoot$e
+      N_in_riskGroup = unlist(lapply(seq(1, KKK, by = 1), function(kkk){
+        sum(k_boo == kkk)
+      }))
+      tau_length = lapply(seq(1, KKK, by = 1), function(kkk){
+        t_k = t_boo[k_boo == kkk]
+        e_k = e_boo[k_boo == kkk]
+        tau = sort(unique(t_k[e_k != 0 & t_k < tStar]))
+        length(tau)
+      })
+      tau_length
+      
+      # what happens when there are no tau?
+      piHat = if(any(N_in_riskGroup == 0) || tau_length == 0){
+        "error...at least one riskGroup or tau is empty"
+      } else {
+        piHatFn(baseArgsBoot)
+      }
+      list(concordance = concordance,
+           piHat = piHat)
+    })
+    concordance_boo = unlist(lapply(boo_0, `[[`, "concordance"))
+    concordance_sd = sd(concordance_boo)
+    concordance_ci_normal_theory = prob_CI_Fn(concordance, concordance_sd)
+    concordance_ci_percentile = percentile_ci_fn(baseArgs, concordance_boo)
+    concordance_summary = data.frame(100 * round(as.matrix(
+      data.frame(concordance, lower = concordance_ci_percentile["lower"], upper = concordance_ci_percentile["upper"])
+    ), 4))
+    rownames(concordance_summary) = NULL
     
-    #>>> DJ edit for v0.01-01 Thu May 12 09:58:35 PDT 2011
-    if(baseArgs$K == 1) {
-      CIBoot = prob_CI_Fn(piHat, sdBoot)
-    } else {
-      CIBoot = prob_CI_Fn(c(piHat, AUC, SD), sdBoot)
-    }
-    #>>>
+    piHat_boo_0 = lapply( boo_0, `[[`, "piHat")
+    piHat_boo = do.call(rbind, piHat_boo_0[!unlist(lapply(piHat_boo_0, is.character))])
+    piHat_sd = apply(piHat_boo, 2, sd)
+    piHat_ci = do.call(rbind, lapply(seq(1, baseArgs$K, by = 1), function(kkk){
+      percentile_ci_fn(baseArgs, piHat_boo[, kkk])
+    }))
+    piHat_ci
     
-    rownames(CIBoot) = names(sdBoot)
     piHatSummary = cbind(
       piHatSummary, 
-      sigmaBoot = sdBoot[1:baseArgs$K],
-      lowerBoot = CIBoot[1:baseArgs$K, 1], 
-      upperBoot = CIBoot[1:baseArgs$K, 2],
-      inBootCI = ifelse(CIBoot[1:baseArgs$K, 1] <= baseArgs$rSummary &
-        baseArgs$rSummary <= CIBoot[1:baseArgs$K, 2], "yes", "no"))
-    rv = list(gammaHat = gammaHat,
+      lowerBoot = piHat_ci[1:baseArgs$K, 1], 
+      upperBoot = piHat_ci[1:baseArgs$K, 2],
+      inBootCI = ifelse(piHat_ci[1:baseArgs$K, 1] <= baseArgs$rSummary &
+                          baseArgs$rSummary <= piHat_ci[1:baseArgs$K, 2], "yes", "no"))
+    rv = list(concordance_summary = concordance_summary,
+              gammaHat = gammaHat,
               piHat = piHat,
               Sigma = Sigma,
               piHatSummary = piHatSummary,
