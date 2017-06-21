@@ -44,13 +44,10 @@ weighted_rmap_fn = function(baseArgs){
   pi_sd = unlist(lapply(seq(1, baseArgs$K, by = 1), function(kkk){
     sd(pi_hat_boo[, kkk])
   }))
-  pi_in_ci = unlist(lapply(seq(1, baseArgs$K, by = 1), function(kkk){
-    if(pi_ci[kkk, ]$lower <= pi_hat[kkk] & pi_hat[kkk] <= pi_ci[kkk, ]$upper){
-      "yes"
-    } else {
-      "no"
-    }
-  }))
+  lower = pi_ci$lower
+  upper = pi_ci$upper
+  pi_in_ci = ifelse(lower <= baseArgs$rSummary & baseArgs$rSummary <= upper, "yes", "no")
+
   sigma_boo = apply(pi_hat_boo, 2, sd)
   gof_statistic = sum(gamma_hat * (pi_hat - r_bar)^2 / sigma_boo^2)
   p_value = davies(gof_statistic, lambda = gamma_hat)$Qq

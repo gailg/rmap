@@ -7,7 +7,22 @@ riskValidateInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
   extraArgs$piHat = piHat
   Sigma = SigmaFn(baseArgs, extraArgs)
   extraArgs$Sigma = Sigma
+  sigma = sqrt(sapply(baseArgs$K:(2 * baseArgs$K - 1), function(kkk) Sigma[kkk, kkk]) / sum(baseArgs$N))
+  piHatCIs = prob_CI_Fn(piHat, sigma)
+  lower = piHatCIs[, "lower"]
+  upper = piHatCIs[, "upper"]
+  in_ci = ifelse(lower <= baseArgs$rSummary & baseArgs$rSummary <= upper, "yes", "no")
+  
   piHatSummary = piHatSummaryFn(baseArgs, extraArgs)
+  
+  pi_summary = data.frame(round(as.matrix(data.frame(
+    gamma_hat = gammaHat,
+    r = baseArgs$rSummary,
+    pi_hat = piHat,
+    sd = sigma,
+    lower = lower,
+    upper = upper)), 4), in_ci)
+  
   ChiSq = ChiSqFn(baseArgs, extraArgs)
   concordance = concordance_fn(baseArgs)
   roc = concordance$roc
@@ -22,11 +37,10 @@ riskValidateInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
       geom_step()
   }
   if(baseArgs$nBootstraps == 0){
-    rv = list(gammaHat = gammaHat,
-              piHat = piHat,
-              Sigma = Sigma,
-              piHatSummary = piHatSummary,
-              ChiSq = ChiSq)
+    rv = list(concordance_summary = concordance_summary,
+              df_for_roc_plot = df_for_roc_plot,
+              gof = ChiSq,
+              pi_summary = pi_summary)
   } else {
     boo_0 = lapply(1:baseArgs$nBootstraps, function(booIndex){
       baseArgsBoot = baseArgsBootFn(baseArgs)
@@ -73,20 +87,17 @@ riskValidateInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
     }))
     piHat_ci
     
-    piHatSummary = cbind(
-      piHatSummary, 
+    pi_summary = cbind(
+      pi_summary, 
       lowerBoot = piHat_ci[1:baseArgs$K, 1], 
       upperBoot = piHat_ci[1:baseArgs$K, 2],
       inBootCI = ifelse(piHat_ci[1:baseArgs$K, 1] <= baseArgs$rSummary &
                           baseArgs$rSummary <= piHat_ci[1:baseArgs$K, 2], "yes", "no"))
     rv = list(concordance_summary = concordance_summary,
-              gammaHat = gammaHat,
-              piHat = piHat,
-              Sigma = Sigma,
-              piHatSummary = piHatSummary,
-              ChiSq = ChiSq)
+              df_for_roc_plot = df_for_roc_plot,
+              gof = ChiSq,
+              pi_summary = pi_summary)
   }
-  class(rv) = c("rv", class(rv))
   rv
 }
 
