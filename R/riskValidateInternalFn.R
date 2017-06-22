@@ -37,7 +37,7 @@ riskValidateInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
       geom_step()
   }
   if(baseArgs$nBootstraps == 0){
-    rv = list(concordance_summary = concordance_summary,
+    rv = list(concordance_summary = data.frame(concordance),
               df_for_roc_plot = df_for_roc_plot,
               gof = ChiSq,
               pi_summary = pi_summary)
