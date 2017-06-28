@@ -113,10 +113,8 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
   ## Section 3: Model checks:
   
   cum = cumsum(design$a[design$c])
-  ## ungrouped = FALSE
-  ## tStar = NA
 
-  riskGroupErrorTxt = "Model must be a list with one named element: either k, K, cutoffs, or ungrouped."
+  riskGroupErrorTxt = "Model must be a list with one named element: either k, K, cutoffs, or epsilon."
   
   if(!is.list(riskGroup)) {
     stop(riskGroupErrorTxt)
@@ -127,12 +125,12 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
   if(is.null(names(riskGroup))) {
     stop(riskGroupErrorTxt)
   }
-  if(!names(riskGroup) %in% c("k", "K", "cutoffs", "ungrouped")) {
+  if(!names(riskGroup) %in% c("k", "K", "cutoffs", "epsilon")) {
     stop(riskGroupErrorTxt)
   }
   
-  if( ("ungrouped" %in% names(riskGroup)) && ("epsilon" %in% names(riskGroup$ungrouped)) &&
-     ((riskGroup$ungrouped$epsilon <= 0) || (riskGroup$ungrouped$epsilon > 1)) )  {
+  if( "epsilon" %in% names(riskGroup)  &&
+     ((riskGroup$epsilon <= 0) || (riskGroup$epsilon > 1)) )  {
     stop("Please specify epsilon to be (0, 1].")
   }
 
@@ -173,13 +171,11 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     riskGroup$tStar = NA
     riskGroup$ungrouped = FALSE
  
-  } else { # riskGroup == "ungrouped"
+  } else { # names(riskGroup) == "epsilon"
 
     riskGroup$k = rep(1, length(e))
     riskGroup$K = 1
     riskGroup$cutoffs = NULL
-    riskGroup$epsilon = if("epsilon" %in% names(riskGroup$ungrouped)) riskGroup$ungrouped$epsilon else NA
-    riskGroup$tStar = if("tStar" %in% names(riskGroup$ungrouped)) riskGroup$ungrouped$tStar else NA
     riskGroup$ungrouped = TRUE
   }
 

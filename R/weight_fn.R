@@ -32,7 +32,7 @@ weight_fn = function(cohort_category, target_category){
       category_proportions = category_counts/length(this)
     })
     category_weights = category_proportions[[2]] / category_proportions[[1]]
-    weight = category_weights[ cohort_category ]
+    weight = unname(category_weights[ cohort_category ])
     list(category_weights = category_weights,
          code = message$code,
          message = message$message,
