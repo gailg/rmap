@@ -53,28 +53,28 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     # this code segment is for setting up oneStage
 
     design = list(sampling = "oneStage")
-    design$N = structure(length(e), .Names = "A")
+    design$N_two_stage = structure(length(e), .Names = "A")
     design$n = structure(length(e), .Names = "A")
     design$c = rep("A", length(e))
     design$a = structure(1, .Names = "A")
     design$weight = rep(1, length(e))
     design$sampling = "randomSample"
 
-  } else if(is.list(design) && "N" %in% names(design) &&
+  } else if(is.list(design) && "N_two_stage" %in% names(design) &&
             "c" %in% names(design)) {
     # this code segment is for setting up twoStage
 
-    if("n" %in% names(design)) stop("Please only give 'N' and 'c' elements in the design list.")
+    if("n" %in% names(design)) stop("Please only give 'N_two_stage' and 'c' elements in the design list.")
 
-    if(!all(sort(names(design$N)) == sort(unique(design$c)))) {
-      stop("names of design$N should correspond to the unique values in design$c")
+    if(!all(sort(names(design$N_two_stage)) == sort(unique(design$c)))) {
+      stop("names of design$N_two_stage should correspond to the unique values in design$c")
     }
 
-    if(any(is.null(design$N))) stop("No elements of design$N can be NULL")
+    if(any(is.null(design$N_two_stage))) stop("No elements of design$N_two_stage can be NULL")
 
     design$n = structure(as.numeric(table(design$c)), .Names = names(table(design$c)))
 
-    design$a = design$N / design$n
+    design$a = design$N_two_stage / design$n
     design$weight = design$a[ design$c ]
     design$sampling = "twoStage"
   
@@ -296,8 +296,8 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
                   error_code = error_code,
                   error_message = error_message,
                   ungrouped = riskGroup$ungrouped,
-                  N = design$N,
-                  n = design$n,
+                  N_two_stage = design$N_two_stage,
+                  n_two_stage = design$n,
                   N_nonzero_events = N_nonzero_events,
                   rSummary = rSummary,
                   nBootstraps = nBootstraps,

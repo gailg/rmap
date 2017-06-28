@@ -7,12 +7,12 @@ baseArgsBootFn = function(baseArgs) {
     indicesTwoStage = baseArgs$indicesTwoStage  
   } else {
     indices = suppressWarnings({
-      sample(1:sum(baseArgs$n), sum(baseArgs$N), replace = TRUE,
-             prob = (baseArgs$N / baseArgs$n )[baseArgs$c])
+      sample(1:sum(baseArgs$n_two_stage), sum(baseArgs$N_two_stage), replace = TRUE,
+             prob = (baseArgs$N_two_stage / baseArgs$n_two_stage )[baseArgs$c])
     })
 
                                         #oneStg = (df[indices, ])
-    keep = rbinom(sum(baseArgs$N), 1, (baseArgs$n / baseArgs$N )[baseArgs$c[indices]])
+    keep = rbinom(sum(baseArgs$N_two_stage), 1, (baseArgs$n_two_stage / baseArgs$N_two_stage )[baseArgs$c[indices]])
     indicesTwoStage = indices[as.logical(keep)]
   }
 
@@ -25,7 +25,7 @@ baseArgsBootFn = function(baseArgs) {
     kBoo = baseArgs$k[indicesTwoStage], stringsAsFactors = FALSE ) #DJ -> added stringsAsFactors=FALSE
   tempDf = tempDf[order(tempDf$kBoo),]                             #      based on Gail's version in 
                                                                    #      00-existing-functions-gail
-  cUni = names(baseArgs$N)
+  cUni = names(baseArgs$N_two_stage)
   nBoo = structure(sapply(cUni, function(c1){
     sum(tempDf$cBoo == c1)
   }), .Names = cUni)
@@ -45,8 +45,8 @@ baseArgsBootFn = function(baseArgs) {
        weight = weight,
        tStar = baseArgs$tStar,
        ungrouped = baseArgs$ungrouped,
-       N = NBoo,
-       n = nBoo,
+       N_two_stage = NBoo,
+       n_two_stage = nBoo,
        multicore = baseArgs$multicore,
        verbose = baseArgs$verbose,
        indices = indices,

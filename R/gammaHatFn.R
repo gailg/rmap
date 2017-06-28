@@ -1,7 +1,7 @@
 
 
 gammaHatFn = function(baseArgs) {
-  aaa = baseArgs$N / baseArgs$n
+  aaa = baseArgs$N_two_stage / baseArgs$n_two_stage
   aaaPerson = aaa[baseArgs$c]
   Nk = sapply(1:baseArgs$K, function(kkk) sum(aaaPerson[baseArgs$k==kkk]))
   Nk / sum(Nk)

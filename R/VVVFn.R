@@ -29,9 +29,9 @@ VVVFn = function(baseArgs = FALSE, extraArgs = FALSE) {
     ## V_k = sum(baseArgs$N)  * rbind(cbind( diag(squaresArray[1,1,]), diag(squaresArray[1,2,])),
     ##   cbind( diag(squaresArray[2,1,]), diag(squaresArray[2,2,])))
     V_k = if(MMM ==1) {
-      sum(baseArgs$N) * squaresArray[,,1]
+      sum(baseArgs$N_two_stage) * squaresArray[,,1]
     } else {
-      sum(baseArgs$N)  * rbind(cbind( diag(squaresArray[1,1,]), diag(squaresArray[1,2,])),
+      sum(baseArgs$N_two_stage)  * rbind(cbind( diag(squaresArray[1,1,]), diag(squaresArray[1,2,])),
                                cbind( diag(squaresArray[2,1,]), diag(squaresArray[2,2,])))
     }
     V_k

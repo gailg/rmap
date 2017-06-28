@@ -7,7 +7,7 @@ riskValidateInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
   extraArgs$piHat = piHat
   Sigma = SigmaFn(baseArgs, extraArgs)
   extraArgs$Sigma = Sigma
-  sigma = sqrt(sapply(baseArgs$K:(2 * baseArgs$K - 1), function(kkk) Sigma[kkk, kkk]) / sum(baseArgs$N))
+  sigma = sqrt(sapply(baseArgs$K:(2 * baseArgs$K - 1), function(kkk) Sigma[kkk, kkk]) / sum(baseArgs$N_two_stage))
   piHatCIs = prob_CI_Fn(piHat, sigma)
   lower = piHatCIs[, "lower"]
   upper = piHatCIs[, "upper"]

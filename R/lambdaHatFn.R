@@ -1,5 +1,5 @@
   lambdaHatFn = function(baseArgs) {
-    aaa = baseArgs$N / baseArgs$n
+    aaa = baseArgs$N_two_stage / baseArgs$n_two_stage
     tStar = baseArgs$tStar
     eventUni = 0:2
     structure(lapply(1:baseArgs$K, function(kkk) {

@@ -5,7 +5,7 @@ B2Fn = function(baseArgs = FALSE, extraArgs = FALSE) {
   lambdaHat = if("lambdaHat" %in% names(extraArgs)) extraArgs$lambdaHat else lambdaHatFn(baseArgs)
   uuu = if("uuu" %in% names(extraArgs)) extraArgs$uuu else uuuFn(baseArgs)
   
-  cUni = names(baseArgs$N)
+  cUni = names(baseArgs$N_two_stage)
   muHat = t(sapply(cUni, function(ccc) colMeans(uuu[baseArgs$c[order(baseArgs$k)] == ccc, ])))   ###DJDJ
                                         # Had to reorder based on the order of $k to get results consistent with rime 0.00.008
 
@@ -17,15 +17,15 @@ B2Fn = function(baseArgs = FALSE, extraArgs = FALSE) {
     uuT / nrow(uuu_c)
   }), .Names = cUni) 
 
-  omegaHat = baseArgs$N / sum(baseArgs$N)
+  omegaHat = baseArgs$N_two_stage / sum(baseArgs$N_two_stage)
 
-  pHat = baseArgs$n / baseArgs$N
+  pHat = baseArgs$n_two_stage / baseArgs$N_two_stage
 
   # FLAG! This is also really slow.  10/34 total seconds
-  PhiHatPart = apply(array(unlist(mapply(PhiHatFn, omegaHat, pHat, baseArgs$n, PhiHat, SIMPLIFY = FALSE)),
+  PhiHatPart = apply(array(unlist(mapply(PhiHatFn, omegaHat, pHat, baseArgs$n_two_stage, PhiHat, SIMPLIFY = FALSE)),
       c(ncol(uuu), ncol(uuu), length(cUni))), c(1,2), sum)
 
-  multiplier = omegaHat * ((1 - pHat)/pHat) * baseArgs$n / (baseArgs$n - 1)
+  multiplier = omegaHat * ((1 - pHat)/pHat) * baseArgs$n_two_stage / (baseArgs$n_two_stage - 1)
   muHatPart = vvTsumFn(muHat, multiplier)
   
   PhiHatPart - muHatPart

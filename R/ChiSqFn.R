@@ -14,7 +14,7 @@ ChiSqFn = function(baseArgs = FALSE, extraArgs = FALSE) {
   ## Pearson = sum(baseArgs$N) * yyy %*% solve(SigmaPi) %*% yyy
   ## Pearson_pval = 1 - pchisq(Pearson, baseArgs$K)
 
-  sigma = sqrt(sapply(1:baseArgs$K, function(kkk) SigmaPi[kkk, kkk]) / sum(baseArgs$N))
+  sigma = sqrt(sapply(1:baseArgs$K, function(kkk) SigmaPi[kkk, kkk]) / sum(baseArgs$N_two_stage))
   HosmerLemeshow = sum((piHat - baseArgs$rSummary)^2 / sigma^2 )
   gammaHat = extraArgs$gammaHat
   HosmerLemeshow = sum( gammaHat * (piHat - baseArgs$rSummary)^2 / sigma^2 )

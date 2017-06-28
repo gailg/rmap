@@ -6,7 +6,7 @@
 ##   with the same columns.
 
 rho_piHatNN_Fn = function(baseArgs) {
-  aaa = (baseArgs$N / baseArgs$n)[baseArgs$c]
+  aaa = (baseArgs$N_two_stage / baseArgs$n_two_stage)[baseArgs$c]
   GFn = ecdf2Stg(baseArgs$r, aaa)
   rho = sort(unique(baseArgs$r))
 
@@ -25,7 +25,7 @@ rho_piHatNN_Fn = function(baseArgs) {
       t = baseArgs$t[NN1],
       r = baseArgs$r[NN1],
       tStar = baseArgs$tStar,
-      design = list(N = tapply(aaa[NN1], names(aaa[NN1]), sum),
+      design = list(N_two_stage = tapply(aaa[NN1], names(aaa[NN1]), sum),
         c = baseArgs$c[NN1]),
       riskGroup = list(K = 1),
       rSummary = "mean",
