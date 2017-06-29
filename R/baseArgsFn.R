@@ -200,7 +200,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
 
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ## Section 4: rSummary checks:
-  
+  if(riskGroup$ungrouped) rSummary = "mean"
   if(length(rSummary) == 1 && rSummary == "mean") {
 
     rSummary = sapply( 1:riskGroup$K, function(kkk) {
