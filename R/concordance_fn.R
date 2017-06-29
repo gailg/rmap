@@ -11,7 +11,11 @@ concordance_fn = function(baseArgs){
   n_2_uni = 1:length(eee)
   aaa = 1/survival_fn(ttt[n_1_uni], survival_fit) * weight[n_1_uni]
   
-  b1 = as.numeric(ttt > t_star) / survival_fn(t_star, survival_fit)
+  b1 = if(any(ttt > t_star)){
+    as.numeric(ttt > t_star) / survival_fn(t_star, survival_fit)
+  } else {
+    0
+  }
   b2_numerator = as.numeric(ttt <= t_star & eee == 2)
   sss_ttt = survival_fn(ttt, survival_fit)
   b2 = ifelse(b2_numerator == 0, 0, b2_numerator/sss_ttt)
