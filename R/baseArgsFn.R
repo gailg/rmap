@@ -104,7 +104,7 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     design$sampling = "w_provided" # design$weight needs to be brought into the vecs
     design$weight = design$w
   } else {
-    stop(paste("Design must be either 'randomSample' or a list of c, N, and n",
+    stop(paste("Design must be either 'randomSample' or a list of c and N_two_stage",
                "to designate two stage sampling.", sep = "\n"))
   }
   ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
