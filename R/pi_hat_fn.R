@@ -1,3 +1,42 @@
+#' Weighted pi_hat
+#'
+#' This is the same algorithm as piHatFn for randomSample
+#' and two-stage sample, but weighted.
+#'
+#' @param baseArgs A list provided by \code{baseArgsFn}.
+#' The objects required here are
+#' \code{e}, \code{t},
+#' \code{weight}, \code{tStar}, \code{K}, \code{k}, and
+#' \code{N_nonzero_events}.
+#'
+#' @return A vector containing one estimated risk per
+#' risk group.
+#' @examples
+#' set.seed(1)
+#' NNN = 100
+#' N_bootstrap_reps = 10
+#' cutoffs = c(0, 0.40, 1)
+#' weighted_example = weighted_example_fn(NNN)
+#' cohort_sampling_probability_dictionary = weighted_example$cohort_sampling_probability_dictionary
+#' cohort_sample = weighted_example$cohort_sample
+#' target_sample = weighted_example$target_sample
+#' tStar = weighted_example$t_star
+#' which_model = "r_B"
+#' cohort_category = cohort_sample$category
+#' target_category = target_sample$category
+#' r = cohort_sample[[which_model]]
+#' e = cohort_sample$eee
+#' t = cohort_sample$ttt
+#' design = list(targetCategory = target_category, c = cohort_category)
+#' riskGroup = list(cutoffs = cutoffs)
+#' rSummary = "mean"
+#' bootstrap = N_bootstrap_reps
+#' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' pi_hat_fn(baseArgs)
+#'
+#' @export
+
+
 pi_hat_fn = function(baseArgs){
   eee = ifelse(baseArgs$t > baseArgs$tStar, 0, baseArgs$e)
   ttt = pmin(baseArgs$t, baseArgs$tStar)
@@ -27,4 +66,4 @@ pi_hat_fn = function(baseArgs){
       sum(lambda_hat[[1]] * the_product)
     }
   }))
-} 
+}
