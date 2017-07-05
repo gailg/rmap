@@ -4,7 +4,7 @@
 #'  grouped \code{rmap}.  This function computes \code{Der},  
 #'  the derivative of \code{c(gammaHat[1], ..., gamma[K-1], piHat)} 
 #'  with respect to \code{c(gammaHat[1], ..., gamma[K-1], lambdaHat)}. 
-#'  \code{Der is a matrix used in the delta method to compute 
+#'  \code{Der} is a matrix used in the delta method to compute 
 #'  \code{Sigma}, the covariance matrix for parameters 
 #'  \code{c(gammaHat[1], ..., gamma[K-1], piHat)}.
 #'  
