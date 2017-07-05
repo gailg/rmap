@@ -1,5 +1,18 @@
-
-
+#' Compute the block diagonal matrix given a list of matrices
+#' 
+#' @param boxes A list of boxes (matrices) to 
+#' combine to make the block diagonal matrix.
+#' 
+#' @return A block diagonal matrix.  Credit to the simex package for this algorithm.
+#' 
+#' @examples 
+#' a = matrix(1, 2, 2)
+#' b = matrix(2, 3, 3)
+#' c = matrix(3, 4, 5)
+#' BlockDiagFn(list(a, b, c))
+#' 
+#' @export
+#' 
 BlockDiagFn = function( boxes ) {
   # credit to simex package
   d.row = sapply(boxes, NROW)
