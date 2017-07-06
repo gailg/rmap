@@ -5,13 +5,12 @@
 #' @param sds A numeric vector of standard deviations.  The elements
 #' in this vector correspond to the elements in \code{ps} above
 #' 
-#' @export A matrix with two columns \code{lower} and \code{upper}
+#' @return A matrix with two columns \code{lower} and \code{upper}
 #' and a row for each element in \code{ps} and \code{sds}.
 #' 
 #' @examples 
 #' prob_CI_Fn(ps = 0.99, sds = 0.01)
 #' prob_CI_Fn(ps = c(0.98, 0.99), sds = c(0.01, 0.01))
-#' 
 #' set.seed(1)
 #' someCIs = prob_CI_Fn( ps = (1:99) / 100, sds = runif(99, 0.01, 0.05) )
 #' 

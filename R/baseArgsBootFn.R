@@ -1,3 +1,63 @@
+#' Like \code{baseArgsFn} but do it to a bootstrapped sample
+#' 
+#' @param baseArgs A list provided by \code{baseArgsFn}.
+#' This function calls either calls
+#' \code{gammaHatFn} and \code{lambdaHatFn} or uses values
+#' calculated by them
+#' so all objects requried by either of these functions are
+#' also required by \code{baseArgsBootFn}.  
+#' Also required here is \code{N_two_stage}
+#' \code{n_two_stage},
+#' \code{e}, \code{t}, \code{r}, \code{c}, \code{k},
+#' \code{K}, \code{epsilon}, \code{tStar},
+#' \code{ungrouped}, \code{multicore}, \code{verbose}
+#' (in other words, all parameters required in the calculation
+#' of the estimates of \code{pi} and \code{calibration}).
+#' 
+#' @param extraArgs A list of named elements which can contain
+#' \code{gammaHat}, \code{lambdaHat}, \code{piHat}, and \code{Sigma}.
+#' This argument gives access to intermediate values 
+#' previously calculated.
+#' 
+#' @return A list containing 
+#' \itemize{
+#' \item{Bootstrapped versions of: }{
+#'   \code{e}, \code{t}, \code{r}, \code{c}, and \code{k}.
+#'   \code{N_two_stage}, \code{n_two_stage};
+#' }
+#' \item{Values inherited from \code{baseArgs}: }{
+#'   \code{K}, \code{epsilon}, \code{tStar},
+#'   \code{ungrouped}, \code{multicore}, \code{verbose}
+#' }
+#' \item{Objects new to this function: }{
+#'   \code{weight} equal to NBoo / nBoo and used instead
+#'   of aaa in concordance calcuations;
+#'   \code{indices} and \code{indicesTwoStage} which 
+#'   are the indices from the bootstrapping and
+#'   included here for debugging and not used in other
+#'   \code{rmap} functions
+#'}
+#'}
+#'
+#' @examples 
+#' set.seed(1)
+#' sampleData1 = df_randomSample()
+#' baseArgs1 = baseArgsFn(
+#'   e = sampleData1$e, t = sampleData1$t, r = sampleData1$r, 
+#'   tStar = 10, design = "randomSample", riskGroup = list(K = 3),
+#'   rSummary = "median", bootstrap = FALSE)
+#' str(baseArgs1)
+#' str(baseArgsBootFn(baseArgs1))
+#' sampleData2 = df_randomSample_r1_r2(NTotal = 200)
+#' epsilon = nrow(sampleData2)^(-1/3)
+#' baseArgs2 = baseArgsFn(
+#'   e = sampleData2$e, t = sampleData2$t, r = sampleData2$r1, 
+#'   tStar = 10, design = "randomSample", riskGroup = list(epsilon = epsilon),
+#'   rSummary = "mean", bootstrap = 20, multicore = FALSE, verbose = TRUE)
+#' str(baseArgs2)
+#' str(baseArgsBootFn(baseArgs2))
+#'
+#' @export
 
 
 baseArgsBootFn = function(baseArgs) {

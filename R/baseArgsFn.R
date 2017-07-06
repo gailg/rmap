@@ -1,3 +1,139 @@
+#' \code{baseArgsFn}
+#' 
+#' This function translates arguments given by the user into a data structure 
+#' that is used internally throughout the \code{rmap} package.
+#' 
+#' @param e A vector of events for each subject in the dataset.  
+#' The event for one subject can either be a 
+#' \code{0} (censored), \code{1} (disease) or \code{2} (death from other causes).
+#' 
+#' @param t A vector of times until event for each subject in the dataset.  
+#' This is the time that the event \code{e} occurred.  
+#' This time must fall in the interval \code{[0, tStar)}, where \code{tStar} is 
+#' the duration of the study. 
+#' @param r A vector of risk values for each subject in the dataset.  
+#' This is the probability of disease, as predicted by a risk model.  
+#' The goal of the \code{rmap} package is to assess the validity of and
+#' calibration of this model.
+#' @param tStar A positive number equal to the duration of the the study.
+#' @param design One of the following choices
+#' \itemize{
+#' \item{\code{"randomSample"}: }{Using \code{design = "randomSample"}
+#'   signals to \code{rmap} that you obtained your data using a
+#'   random sample.
+#' }
+#' \item{\code{list(c = c, N_two_stage = N_two_stage)}: }{If your
+#'   design is a two-stage sample, name your two-stage sampling
+#'   categories with capital letters beginning with \code{"A"},
+#'   \code{"B"}, etc., let \code{c} be the vector of each subjects's
+#'   sampling category, and \code{N_two_stage} be a named vector
+#'   counting the number
+#'   of subjects from the first stage that fell into each category.
+#'   (For example, if the two categories were \code{"A"} and \code{"B"}, 
+#'   and there were \code{13} in the first stage who were categorized
+#'   to \code{"A"} and \code{42} to \code{"B"}, then define
+#'   \code{N_two_stage = c(A = 13, B = 42)}; you would of course have
+#'   much larger numbers than \code{13} and \code{42}).
+#'   Specify \code{design = list(c = c, N_two_stage = N_two_stage)}.
+#' }
+#' \item{\code{list(c = c, target_category = target_category)}: }{ If your
+#'   cohort sample does not match your target population and you have 
+#'   a sample from your target population and both samples contain 
+#'   relevant categories, label the categories beginning with \code{"A"},
+#'   \code{"B"}, etc, and let \code{c} be the vector of cohort subjects'
+#'   categories and \code{target_category} be the vector of target
+#'   subjects' categories, and specify 
+#'   \code{design = list(c = c, target_category = target_category)}.
+#' }
+#' }
+#' @param riskGroup Describes the way you want the subjects to be divided
+#' into risk groups. One of the following named lists:
+#' \itemize{
+#' \item{\code{list(K = k)}: }{You can manually assign risk groups using 
+#' an integer vector \code{k} containing risk group assignments for each 
+#' subject in the dataset.  Define \code{K} to be the total number of 
+#' risk groups.  Then your vector \code{k} is a risk group assignment  
+#' in \code{\{1, ..., K\}} for each subject in the dataset.  
+#' Subjects with risk group assignment \code{= 1} should have the smallest 
+#' assigned risks (\code{r}), and subjects with the risk group assignment 
+#' \code{= K} should have the highest assigned risks.
+#' }
+#' \item{\code{list(K = K)}: }{Define \code{K} to be a positive integer
+#' and let \code{rmap} divide your sample into \code{K} quantiles.  For 
+#' example, if \code{K = 4}, your risk groups will consist of \code{4}
+#' quartiles, the first group, \code{k = 1}, containing the subjects
+#' with the smallest risks \code{r}, the fourth group, \code{k = 4}, 
+#' containing the subjects with the largest risks.
+#' }
+#' \item{\code{list(cutoffs = cutoffs)}: }{Risk groups can also be 
+#' assigned to each subject in the dataset based on risk "cutoffs". 
+#' If you wished to create three risk groups, say all subjects having 
+#' an assigned risk between 0 and 0.2 to be in risk group 1, 
+#' all subjects with assigned risk between 0.2 and 0.5 to be in risk 
+#' group 2, and all subjects with assigned risk between 0.5 and 1 
+#' to be in risk group 3, define \code{cutoffs = c(0, 0.2, 0.5, 1)}.
+#' }
+#' \item{\code{list(epsilon = epsilon)}: }{The previous three 
+#' ways that the riskGroup argument was specified were ways to 
+#' group subjects for a grouped analysis. We can also validate 
+#' risk models using an ungrouped analysis. The calculations 
+#' require a small positive number, epsilon, specifying
+#' the  kernel neighborhoods used to calculate observed risk
+#' at each distinct assigned risk. Asymptotic theory suggests
+#' good behavior for \code{epsilon = N^(-1/3)}.
+#' }
+#' }
+#' @param rSummary A summary statistic for summarizing the 
+#' assigned risks for all subjects in a risk group.  The \code{rSummary} 
+#' can be calculated by the program or you may wish to provide one. 
+#' If you would like an ungrouped analysis 
+#' (\code{riskGroup = list(epsilon = epsilon)}), then 
+#' \code{rmap} will automatically use "mean" to summarize the 
+#' risk in each epsilon neighborhood.
+#' There are four options in specifying the rSummary: 
+#' \itemize{
+#' \item{\code{"mean"}: } {Summarize each risk group with
+#' code{mean(r)} over all values of \code{r} in that risk group.
+#' }
+#' \item{\code{"median"}: } {Summarize each risk group with
+#' code{median(r)} over all values of \code{r} in that risk group.
+#' }
+#' \item{\code{"midpoint"}: } {If 
+#' \code{riskGroup = list(cutoffs = c(0, 0.2, 0.5, 1))}, then the 
+#' \code{rSummary} would be assigned \code{c(0.1, 0.35, 0.75)}.
+#' }
+#' \item{A user supplied summary vector } {You may manually specify
+#' your own values for \code{rSummary}.
+#' To use this option, define \code{rSummary} to be a 
+#' numeric vector of length \code{K} specifying your summary statistic
+#' for each risk group.
+#' }
+#' }
+#' @param bootstrap Either a single integer number, 
+#' describing the number of bootstraps or \code{FALSE} 
+#' to turn off bootstrapping.
+#' @param multicore Currently not used.
+#' A logical value. If multicore = TRUE and
+#' (\code{riskGroup = list(epsilon = epsilon)}) and bootstrap 
+#' is not set to FALSE), multiple processors are used to 
+#' compute the bootstraps.
+#' @param verbose Currently not used.
+#' If verbose = TRUE and
+#' (\code{riskGroup = list(epsilon = epsilon)}) and bootstrap 
+#' is not set to FALSE), progress of the calculation will be 
+#' output during the calculations of the nearest neighbor and 
+#' the bootstrap nearest neighbor.  Such output is useful for 
+#' checking the progress of these calculations which can require 
+#' a long time depending on the number of observations and the number
+#' of distinct assigned risks.
+#' 
+
+#' @return A list containing
+#' \code{e}, \code{t}, \code{r}, \code{c}, \code{k}, \code{weight},
+
+#' @export
+
+
 baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, confidenceLevel = 0.95, multicore = FALSE, verbose = FALSE) {
 
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
