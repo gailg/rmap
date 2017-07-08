@@ -483,32 +483,32 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
   }
   
   # "2017-06-12 09:28:47 PDT" GG why do they need to be reordered again, weren't they alread done on lines 41-44?
-  baseArgs = list(e = e[order(ord)],  ###DJDJ 
-                  t = t[order(ord)],  ###DJDJ
-                  r = r[order(ord)],  ###DJDJ 
-                  c = design$c[order(ord)],  ###DJDJ 
-                  k = unname(riskGroup$k[order(ord)]),  ###DJDJ 
-                  weight = unname(design$weight[order(ord)]), # "2017-06-13 08:16:16 PDT" GG
-                  confidence_level = confidenceLevel,
-                  K = riskGroup$K,
-                  category_weights = design$category_weights,
-                  epsilon = riskGroup$epsilon,
-                  error_code = error_code,
-                  error_message = error_message,
-                  ungrouped = riskGroup$ungrouped,
-                  N_two_stage = design$N_two_stage,
-                  n_two_stage = design$n,
-                  N_nonzero_events = N_nonzero_events,
-                  rSummary = rSummary,
-                  nBootstraps = nBootstraps,
-                  N_bootstraps = nBootstraps,
-                  multicore = multicore,
-                  sampling = design$sampling,
-                  cohort_category = design$c[order(ord)], # "2017-06-12 09:28:47 PDT" GG
-                  target_category = design$targetCategory, # "2017-06-12 09:28:47 PDT" GG
-                  tStar = tStar,
-                  verbose = verbose,
-                  offendingRGs = offendingRGs
+  baseArgs = list(
+    c = design$c[order(ord)],  
+    category_weights = design$category_weights,
+    confidence_level = confidenceLevel,
+    e = e[order(ord)], 
+    epsilon = riskGroup$epsilon,
+    error_code = error_code,
+    error_message = error_message,
+    K = riskGroup$K,
+    k = unname(riskGroup$k[order(ord)]),  
+    multicore = multicore,
+    N_bootstraps = nBootstraps,
+    nBootstraps = nBootstraps,
+    N_nonzero_events = N_nonzero_events,
+    N_two_stage = design$N_two_stage,
+    n_two_stage = design$n,
+    offendingRGs = offendingRGs,
+    r = r[order(ord)], 
+    rSummary = rSummary,
+    sampling = design$sampling,
+    t = t[order(ord)],  
+    target_category = design$targetCategory, 
+    tStar = tStar,
+    ungrouped = riskGroup$ungrouped,
+    verbose = verbose,
+    weight = unname(design$weight[order(ord)])
     )
 
   class(baseArgs) = c("baseArgs", class(baseArgs))
