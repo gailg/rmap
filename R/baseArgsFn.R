@@ -127,9 +127,73 @@
 #' a long time depending on the number of observations and the number
 #' of distinct assigned risks.
 #' 
-
 #' @return A list containing
-#' \code{e}, \code{t}, \code{r}, \code{c}, \code{k}, \code{weight},
+#' \itemize{
+#' \item{\code{c}: }{Equal to the input \code{c} if two-stage sampling
+#'   or weighted sampling, and equal to a vector of all \code{"A"}s if
+#'   random sampling. A character vector of length \code{N}.
+#' }
+#' \item{\code{category_weights}: }{zachariah
+#' }
+#' \item{\code{cohort_category}: }{The same as \code{c} and will be removed shortly.
+#' }
+#' \item{\code{confidence_level}: }{zachariah
+#' }
+#' \item{\code{e}: }{Equal to the input \code{e}.
+#' }
+#' \item{\code{epsilon}: }{Equal to the input \code{epsilon} 
+#' if \code{riskGroup = list(epsilon = epsilon)}.  Otherwise equal to \code{NA}
+#' }
+#' \item{\code{error_code}: }{zachariah
+#' }
+#' \item{\code{error_message}: }{zachariah
+#' }
+#' \item{\code{k}: }{A vector of length \code{N} indicating the
+#' risk group membership of each subject.  
+#' If \code{ungrouped = TRUE}, this is a vector of all \code{1}'s.
+#' If \code{ungrouped = FALSE}, this vector was either specified
+#' by the user (\riskGroup = list{k = k}) or calculated
+#' by \code{baseArgsFn}. 
+#' Each element in this vector is in \code{\{1, ..., K\}}.
+#' }
+#' \item{\code{K}: }{A positive integer equal to the number
+#' of risk groups.  If \code{ungrouped = TRUE}, this is equal to \code{1}.
+#' }
+#' \item{\code{multicore}: }{zachariah
+#' }
+#' \item{\code{nBootstraps}: }{zachariah
+#' }
+#' \item{\code{N_bootstraps}: }{zachariah
+#' }
+#' \item{\code{N_two_stage}: }{A named vector with one element
+#'   for each sampling category. 
+#' }
+#' \item{\code{n_two_stage}: }{zachariah
+#' }
+#' \item{\code{N_nonzero_events}: }{zachariah
+#' }
+#' \item{\code{offendingRGs}: }{zachariah
+#' }
+#' \item{\code{r}: }{Equal to the input \code{r}.
+#' }
+#' \item{\code{rSummary}: }{zachariah
+#' }
+#' \item{\code{sampling}: }{zachariah
+#' }
+#' \item{\code{t}: }{Equal to the input \code{t}.
+#' }
+#' \item{\code{tStar}: }{Equal to the input \code{tStar}.
+#' }
+#' \item{\code{target_category}: }{zachariah
+#' }
+#' \item{\code{ungrouped}: }{Equal to \code{TRUE} if
+#'   \code{riskGroup = list(epsilon = epsilon)} was chosen.
+#' }
+#' \item{\code{verbose}: }{zachariah
+#' }
+#' \item{\code{weight}: }{zachariah
+#' }
+#' }
 
 #' @export
 
@@ -423,8 +487,8 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
                   t = t[order(ord)],  ###DJDJ
                   r = r[order(ord)],  ###DJDJ 
                   c = design$c[order(ord)],  ###DJDJ 
-                  k = riskGroup$k[order(ord)],  ###DJDJ 
-                  weight = design$weight[order(ord)], # "2017-06-13 08:16:16 PDT" GG
+                  k = unname(riskGroup$k[order(ord)]),  ###DJDJ 
+                  weight = unname(design$weight[order(ord)]), # "2017-06-13 08:16:16 PDT" GG
                   confidence_level = confidenceLevel,
                   K = riskGroup$K,
                   category_weights = design$category_weights,
