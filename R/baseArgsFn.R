@@ -131,13 +131,21 @@
 #' \itemize{
 #' \item{\code{c}: }{Equal to the input \code{c} if two-stage sampling
 #'   or weighted sampling, and equal to a vector of all \code{"A"}s if
-#'   random sampling. A character vector of length \code{N}.
+#'   random sampling. A character vector of length \code{N}. 
 #' }
-#' \item{\code{category_weights}: }{zachariah
+#' \item{\code{category_weights}: }{Equal to \code{NULL} 
+#'   for random sampling and two-stage sampling. For weighted sampling, 
+#'   a named vector (analogous to 
+#'   \code{N_two_stage / n_two_stage}) with one element for each
+#'   sampling category counting the number of subjects in the 
+#'   \code{target_category / c}. (A better name for \code{c}
+#'   would be \code{cohort_category} when in the universe of 
+#'   weighted sampling.)
 #' }
 #' \item{\code{cohort_category}: }{The same as \code{c} and will be removed shortly.
 #' }
-#' \item{\code{confidence_level}: }{zachariah
+#' \item{\code{confidence_level}: }{Equal to the input 
+#'   \code{confidenceLevel}.
 #' }
 #' \item{\code{e}: }{Equal to the input \code{e}.
 #' }
@@ -152,23 +160,38 @@
 #' risk group membership of each subject.  
 #' If \code{ungrouped = TRUE}, this is a vector of all \code{1}'s.
 #' If \code{ungrouped = FALSE}, this vector was either specified
-#' by the user (\riskGroup = list{k = k}) or calculated
+#' by the user (\code{riskGroup = list{k = k}}) or calculated
 #' by \code{baseArgsFn}. 
 #' Each element in this vector is in \code{\{1, ..., K\}}.
 #' }
 #' \item{\code{K}: }{A positive integer equal to the number
 #' of risk groups.  If \code{ungrouped = TRUE}, this is equal to \code{1}.
 #' }
-#' \item{\code{multicore}: }{zachariah
+#' \item{\code{multicore}: }{A logical value equal to the input 
+#' \code{multicore}
 #' }
-#' \item{\code{nBootstraps}: }{zachariah
+#' \item{\code{nBootstraps}: }{Equal to \code{N_bootstraps}.
 #' }
-#' \item{\code{N_bootstraps}: }{zachariah
+#' \item{\code{N_bootstraps}: }{An integer describing the 
+#' number of bootstraps, where \code{0} indicates no bootstraps.
 #' }
-#' \item{\code{N_two_stage}: }{A named vector with one element
-#'   for each sampling category. 
+#' \item{\code{N_two_stage}: }{A named integer vector with one element
+#'   for each sampling category counting the number of subjects in the
+#'   first stage of a two-stage sampling design.  For
+#'   random sampling, (\code{design = "randomSample"}), 
+#'   \code{N_two_stage = N}. For weighted design
+#'   (\code{design = list(c = c, target_category = target_category)}),
+#'   this variable is not used and
+#'   \code{N_two_stage = NULL}.
 #' }
-#' \item{\code{n_two_stage}: }{zachariah
+#' \item{\code{n_two_stage}: }{A named integer vector with one element
+#'   for each sampling category counting the number of subjects in the
+#'   second stage of a two-stage sampling design.  For
+#'   random sampling, (\code{design = "randomSample"}), 
+#'   \code{N_two_stage = N}. For weighted design
+#'   (\code{design = list(c = c, target_category = target_category)}),
+#'   this variable is not used and
+#'   \code{N_two_stage = NULL}.
 #' }
 #' \item{\code{N_nonzero_events}: }{zachariah
 #' }
@@ -176,7 +199,15 @@
 #' }
 #' \item{\code{r}: }{Equal to the input \code{r}.
 #' }
-#' \item{\code{rSummary}: }{zachariah
+#' \item{\code{rSummary}: }{If \code{ungrouped = FALSE}, 
+#' \code{rSummary} is a vector of risk summaries, one for 
+#'   each risk group.  This vector can be given by the 
+#'   user or calculated by \code{baseArgsFn} using 
+#'   method \code{"mean"}, \code{"median"}, or 
+#'   \code{"midpoint"}.  If \code{ungrouped = TRUE}, 
+#'   \code{rSummary} is the forced to be the mean of 
+#'   the code{r} values in each epsilon 
+#'   neighborhood.
 #' }
 #' \item{\code{sampling}: }{zachariah
 #' }
@@ -189,7 +220,8 @@
 #' \item{\code{ungrouped}: }{Equal to \code{TRUE} if
 #'   \code{riskGroup = list(epsilon = epsilon)} was chosen.
 #' }
-#' \item{\code{verbose}: }{zachariah
+#' \item{\code{verbose}: }{A logical equal to the input
+#'   \code{verbose}.
 #' }
 #' \item{\code{weight}: }{zachariah
 #' }
