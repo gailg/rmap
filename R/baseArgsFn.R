@@ -152,10 +152,6 @@
 #' \item{\code{epsilon}: }{Equal to the input \code{epsilon} 
 #' if \code{riskGroup = list(epsilon = epsilon)}.  Otherwise equal to \code{NA}
 #' }
-#' \item{\code{error_code}: }{zachariah
-#' }
-#' \item{\code{error_message}: }{zachariah
-#' }
 #' \item{\code{k}: }{A vector of length \code{N} indicating the
 #' risk group membership of each subject.  
 #' If \code{ungrouped = TRUE}, this is a vector of all \code{1}'s.
@@ -209,13 +205,20 @@
 #'   the code{r} values in each epsilon 
 #'   neighborhood.
 #' }
-#' \item{\code{sampling}: }{zachariah
+#' \item{\code{sampling}: }{A string equal to one of
+#'   \code{"randomSample"}, \code{"twoStage"},
+#'   \code{"weighted"}
 #' }
 #' \item{\code{t}: }{Equal to the input \code{t}.
 #' }
 #' \item{\code{tStar}: }{Equal to the input \code{tStar}.
 #' }
-#' \item{\code{target_category}: }{zachariah
+#' \item{\code{target_category}: }{If
+#'   \code{sampling = "weighted"}, the same as
+#'   \code{target_category} in the input
+#'   \code{design = list(c = c, target_category = target_category)}.
+#'   For \code{sampling = "randomSampling"} or
+#'   \code{sampling = "twoStage"}, \code{target_category = NULL}.
 #' }
 #' \item{\code{ungrouped}: }{Equal to \code{TRUE} if
 #'   \code{riskGroup = list(epsilon = epsilon)} was chosen.
@@ -223,7 +226,13 @@
 #' \item{\code{verbose}: }{A logical equal to the input
 #'   \code{verbose}.
 #' }
-#' \item{\code{weight}: }{zachariah
+#' \item{\code{weight}: }{A vector of length \code{N} equal
+#'   to the weight to assign to each subject.  For 
+#'   \code{sampling = "randomSampling"}, \code{weight = 1}.
+#'   For \code{sampling = "twoStage"}, \code{weight} is equal to
+#'   \code{aaa} in the formulas (\code{N_two_stage/n_two_stage}).
+#'   For \code{sampling = "weighted"}, \code{weight} is determined by 
+#'   \code{c} and \code{category_weights}.
 #' }
 #' }
 
@@ -330,11 +339,11 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     # For weighted, I  do it just once, here 
     design$a = design$category_weights
 
-    design$sampling = "target_and_cohort_categories_provided"
-    
-  } else if( is.list(design) && "w" %in% names(design) ) {
-    design$sampling = "w_provided" # design$weight needs to be brought into the vecs
-    design$weight = design$w
+    design$sampling = "weighted"
+  #   
+  # } else if( is.list(design) && "w" %in% names(design) ) {
+  #   design$sampling = "w_provided" # design$weight needs to be brought into the vecs
+  #   design$weight = design$w
   } else {
     stop(paste("Design must be either 'randomSample' or a list of c and N_two_stage",
                "to designate two stage sampling.", sep = "\n"))

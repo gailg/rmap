@@ -16,7 +16,7 @@ rmap = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap){
     list(df_for_risk_plot = df_for_risk_plot,
          risk_plot = risk_plot)
   } else{
-    rv = if(baseArgs$sampling == "target_and_cohort_categories_provided"){
+    rv = if(baseArgs$sampling == "weighted"){
       weighted_rmap_fn(baseArgs)
     } else {
       riskValidateInternalFn(baseArgs)
