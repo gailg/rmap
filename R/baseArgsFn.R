@@ -189,9 +189,10 @@
 #'   this variable is not used and
 #'   \code{N_two_stage = NULL}.
 #' }
-#' \item{\code{N_nonzero_events}: }{zachariah
-#' }
-#' \item{\code{offendingRGs}: }{zachariah
+#' \item{\code{N_nonzero_events}: }{An integer vector of 
+#'   length \code{K} counting the number events in each
+#'   risk group that occurred before \code{tStar}
+#'   and were not censored.
 #' }
 #' \item{\code{r}: }{Equal to the input \code{r}.
 #' }
@@ -538,7 +539,6 @@ baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, co
     N_nonzero_events = N_nonzero_events,
     N_two_stage = design$N_two_stage,
     n_two_stage = design$n,
-    offendingRGs = offendingRGs,
     r = r[order(ord)], 
     rSummary = rSummary,
     sampling = design$sampling,
