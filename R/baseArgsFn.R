@@ -236,7 +236,89 @@
 #'   \code{c} and \code{category_weights}.
 #' }
 #' }
-
+#' @examples
+#' ################################################# randomSample grouped
+#' options(digits = 3)
+#' set.seed(1)
+#' randomSample = df_randomSample(100)
+#' xxx = randomSample
+#' e = xxx$e
+#' t = xxx$t
+#' r = xxx$r
+#' tStar = 10
+#' design = "randomSample"
+#' riskGroup = list(K = 2)
+#' rSummary = "mean"
+#' bootstrap = 20
+#' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' baseArgs
+#' ################################################# randomSample grouped
+#' options(digits = 3)
+#' set.seed(1)
+#' randomSample = df_randomSample(100)
+#' xxx = randomSample
+#' e = xxx$e
+#' t = xxx$t
+#' r = xxx$r
+#' tStar = 10
+#' design = "randomSample"
+#' epsilon = nrow(xxx)^(-1/3)
+#' riskGroup = list(epsilon = epsilon)
+#' rSummary = "mean"
+#' bootstrap = 20
+#' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' baseArgs
+#' ################################################# twoStage grouped
+#' set.seed(1)
+#' twoStageSample = df_twoStage(200)
+#' xxx = twoStageSample$d
+#' e = xxx$e
+#' t = xxx$t
+#' r = xxx$r
+#' N = twoStageSample$N
+#' design = list(N_two_stage = N, c = xxx$c)
+#' riskGroup = list(K = 2)
+#' rSummary = "mean"
+#' bootstrap = 100
+#' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' baseArgs
+#' ################################################# twoStage ungrouped
+#' set.seed(1)
+#' twoStageSample = df_twoStage(200)
+#' xxx = twoStageSample$d
+#' e = xxx$e
+#' t = xxx$t
+#' r = xxx$r
+#' N = twoStageSample$N
+#' design = list(N_two_stage = N, c = xxx$c)
+#' epsilon = nrow(xxx)^(-1/3)
+#' riskGroup = list(epsilon = epsilon)
+#' rSummary = "mean"
+#' bootstrap = 100
+#' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' baseArgs
+#' ################################################# weighted grouped
+#' set.seed(1)
+#' NNN = 200
+#' N_bootstrap_reps = 100
+#' cutoffs = c(0, 0.20, 1)
+#' weighted_example = weighted_example_fn(NNN)
+#' cohort_sampling_probability_dictionary = weighted_example$cohort_sampling_probability_dictionary
+#' cohort_sample = weighted_example$cohort_sample
+#' target_sample = weighted_example$target_sample
+#' tStar = weighted_example$t_star
+#' which_model = "r_B" 
+#' cohort_category = cohort_sample$category
+#' target_category = target_sample$category
+#' r = cohort_sample[[which_model]]
+#' e = cohort_sample$eee
+#' t = cohort_sample$ttt
+#' design = list(targetCategory = target_category, c = cohort_category)
+#' riskGroup = list(cutoffs = cutoffs)
+#' rSummary = "mean"
+#' bootstrap = N_bootstrap_reps
+#' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap) 
+#' baseArgs
 #' @export
 
 
