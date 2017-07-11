@@ -15,7 +15,7 @@
 #' \code{gammaHatFn} and \code{lambdaHatFn} or uses values
 #' calculated by them
 #' so all objects requried by either of these functions are
-#' also required by \code{uuuFn}.  Also required here is
+#' also required by \code{SigmaFn}.  Also required here is
 #' \code{N_two_stage}.
 #' 
 #' @param extraArgs A list of named elements which can contain

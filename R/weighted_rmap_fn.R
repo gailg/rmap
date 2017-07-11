@@ -8,34 +8,46 @@
 #'
 #' @return A list containing the elements
 #' \itemize{
-#'   \item{\code{concordance_summary}: }{ A one-row data.frame
-#'   containing the concordance estimate and the lower and upper
-#'   limits of the confidence interval for concordance.
+#'   \item{\code{concordance_summary}: }{
+#'   A named vector containing the concordance estimate and the upper
+#'   and lower limits of a confidence interval with confidence level
+#'   \code{confidence_level}.
 #'   }
-#'   \item{\code{df_for_roc_plot}: }{ A data.frame containing the
-#'   columns \code{one_minus_specificity} and \code{sensitivity}
-#'   which when plotted give the roc plot.
+#'   \item{\code{df_for_roc_plot}: }{
+#'   A data.frame containing columns \code{one_minus_specificity} and
+#'   \code{sensitivity} that can be used to produce an roc plot.
 #'   }
-#'   \item{\code{gof}: } {A one-row data.frame containing
-#'   the goodness-of-fit-statistic and its p_value for testing
-#'   if the risk model fits the observed data.
+#'   \item{\code{gof}: }{
+#'   A named vector containing the Hosmer-Lemeslow goodness of fit
+#'   statistic and its p_value for testing if the data fit the risk 
+#'   model.
 #'   }
-#'   \item{\code{pi_summary}: }{ A data.drame containing
-#'   \code{K} rows and the columns
-#'   \code{gamma_hat} (an estimate of the probability of
-#'   falling into each risk group),
-#'   \code{r} (the summary statistic, as determined by\code{rSummary}
-#'   of the assigned risk of each group),
-#'   \code{pi_hat} (the estimated probability of getting the disease
-#'   before the end of the study \code{t_star},
-#'   \code{sd} (the estimated standard deviation of \code{pi_hat}),
-#'   \code{lower} (the lower bound of the bootstrap percentile
-#'   confidence interval),
-#'   \code{upper} (the upper bound of the bootstrap percentile
-#'   confidence interval),
-#'   \code{in_ci} (the character string \code{"yes"} or \code{"no"}
-#'   indicateing whether or not \code{r} falls in the confidence
-#'   interval.
+#'   \item{\code{pi_summary}: }{A data.frame containing 
+#'   \code{K} rows and the columns:
+#'   \itemize{
+#'   \item{\code{gamma_hat}: }{An estimate of the probability of
+#'   falling into each risk group.
+#'   }
+#'   \item{\code{r}: }{A summary of the assigned risk 
+#'   values falling into each risk group
+#'   which summary determined by\code{rSummary}.
+#'   }
+#'   \item{\code{pi_hat}: }{The estimated probability of getting the disease
+#'   before the end of the study \code{t_star} in each risk group.
+#'   }
+#'   \item{\code{sd}: } {The estimated bootstrap standard deviation of \code{pi_hat}.
+#'   }
+#'   \item{\code{lowerBoot}: } {The lower bound of the bootstrap percentile
+#'   confidence interval.
+#'   }
+#'   \item{\code{upperBoot}: } {The upper bound of the bootstrap percentile
+#'   confidence interval.
+#'   }
+#'   \item{\code{in_ci}: } {The character string \code{"yes"} or \code{"no"}
+#'   indicating whether or not \code{r} falls in the 
+#'   confidence interval.
+#'   }
+#'   }
 #'   }
 #' }
 #' @examples
@@ -121,17 +133,16 @@ weighted_rmap_fn = function(baseArgs){
   sigma_boo = apply(pi_hat_boo, 2, sd)
   gof_statistic = sum(gamma_hat * (pi_hat - r_bar)^2 / sigma_boo^2)
   p_value = davies(gof_statistic, lambda = gamma_hat)$Qq
-  gof = data.frame(gof_statistic = gof_statistic, p_value = p_value)
-  concordance_summary = data.frame(100 * round(as.matrix(
+  gof = c(statistic = gof_statistic, p_value = p_value)
+  concordance_summary = unlist(data.frame(100 * round(as.matrix(
     data.frame(concordance, lower = concordance_ci["lower"], upper = concordance_ci["upper"])
-  ), 4))
-  row.names(concordance_summary) = NULL
+  ), 4)))
   pi_summary = cbind(
     round(as.matrix(cbind(data.frame(gamma_hat, r = r_bar, pi_hat, sd = pi_sd), pi_ci)), 4),
     data.frame(in_ci = pi_in_ci))
 
   list(
-    concordance_summary = concordance_summary,
+    concordance_summary = unlist(concordance_summary),
     df_for_roc_plot = df_for_roc_plot,
     gof = gof,
     pi_summary = pi_summary)

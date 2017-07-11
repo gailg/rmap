@@ -51,7 +51,7 @@ ChiSqFn = function(baseArgs = FALSE, extraArgs = FALSE) {
 
   ## c(Pearson = Pearson, Pearson_pval = Pearson_pval,
   ##   HosmerLemeshow = HosmerLemeshow, HL_pval = HL_pval)
-  c(HosmerLemeshow = HosmerLemeshow, HL_pval = HL_pval)
+  c(statistic = HosmerLemeshow, p_value = HL_pval)
 }
 
 # Wed Mar 16 11:05:14 PDT 2011
