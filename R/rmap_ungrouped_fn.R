@@ -35,8 +35,8 @@ rmap_ungrouped_fn = function(baseArgs){
       }
       pi_hat_nn_try      
     })
-    bootstraps = gather_fn(bootstraps_raw, all_rho = estimate[, "rho"])
-    bootstraps_interpolated = t(apply(bootstraps, 1, interpolateOneBsFn, estimate[, "rho"]))
+    bootstraps = gather_fn(bootstraps_raw, estimate[, "rho"])
+    bootstraps_interpolated = t(apply(bootstraps, 1, interpolate_one_bootstrap_fn, estimate[, "rho"]))
     confidence_level = baseArgs$confidence_level
     prob_lower = (1 - confidence_level)/2
     prob_upper = 1 - prob_lower
