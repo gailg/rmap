@@ -322,7 +322,9 @@
 #' @export
 
 
-baseArgsFn = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, confidenceLevel = 0.95, multicore = FALSE, verbose = FALSE) {
+baseArgsFn = function(
+  e, t, r, tStar, design, riskGroup, rSummary, bootstrap, confidenceLevel = 0.95, 
+  multicore = FALSE, verbose = FALSE) {
 
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ## Section 1: Checking vectors, and putting them in order of r.

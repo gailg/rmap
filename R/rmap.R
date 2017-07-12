@@ -1,18 +1,16 @@
-rmap = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap){
-  baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, multicore = FALSE, verbose = FALSE) 
-  
+rmap = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, 
+                confidenceLevel = 0.95, multicore = FALSE, verbose = FALSE){
+  baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap, 
+                        confidenceLevel, multicore, verbose)
   if( baseArgs$ungrouped ) {
-    rvu = riskValidateUngroupedInternalFn(baseArgs)
-    dimnames(rvu$PNN$est) = list(NULL, c("assigned_risk", "observed_risk"))
-    dimnames(rvu$PNN$confBand) = list(NULL, c("lower", "upper"))
-    df_for_risk_plot = data.frame(100 * cbind(rvu$PNN$est, rvu$PNN$confBand))
+    df_for_risk_plot_0 = rmap_ungrouped_fn(baseArgs)
+    df_for_risk_plot = 100 * df_for_risk_plot_0
     risk_plot = ggplot(df_for_risk_plot, aes(x = assigned_risk, y = observed_risk, ymin = lower, ymax = upper)) +
       geom_line() +
       geom_ribbon(alpha = 0.3) +
       geom_abline(slope = 1, intercept = 0, color = "red", linetype = 2) +
       xlim(0,100) + ylim(0, 100) +
       xlab("Assigned Risks (%)") + ylab("Observed Risks (%)")
-    
     list(df_for_risk_plot = df_for_risk_plot,
          risk_plot = risk_plot)
   } else{
