@@ -1,7 +1,9 @@
-#' The weighted version of rmap
+#' \code{rmap_weighted_fn}
+#' 
+#' The weighted version of rmap.
 #'
 #' @param baseArgs A list provided by \code{baseArgsFn}.
-#' The objects required to run \code{weighted_rmap_fn} are
+#' The objects required to run \code{rmap_weighted_fn} are
 #' \code{e}, \code{t}, \code{r}, \code{c}, \code{k} \code{weight},
 #' \code{K}, \code{N_bootstraps},
 #' \code{N_nonzero_events}, \code{rSummary}, \code{tStar}
@@ -71,7 +73,7 @@
 #' rSummary = "mean"
 #' bootstrap = N_bootstrap_reps
 #' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
-#' look = weighted_rmap_fn(baseArgs)
+#' look = rmap_weighted_fn(baseArgs)
 #' df_for_roc_plot = look$df_for_roc_plot
 #' ggplot(df_for_roc_plot, aes(x = one_minus_specificity, y = sensitivity)) +
 #' geom_step() +
@@ -84,7 +86,7 @@
 #' @export
 
 
-weighted_rmap_fn = function(baseArgs){
+rmap_weighted_fn = function(baseArgs){
   concordance = concordance_fn(baseArgs)
   roc = concordance$roc
   concordance = concordance$concordance

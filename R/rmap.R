@@ -15,7 +15,7 @@ rmap = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap,
          risk_plot = risk_plot)
   } else{
     rv = if(baseArgs$sampling == "weighted"){
-      weighted_rmap_fn(baseArgs)
+      rmap_weighted_fn(baseArgs)
     } else {
       riskValidateInternalFn(baseArgs)
     }

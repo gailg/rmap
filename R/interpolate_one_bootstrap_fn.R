@@ -50,7 +50,8 @@
 #' bootstraps_raw
 #' bootstraps = gather_fn(bootstraps_raw, rho_uni = estimate[, "rho"])
 #' bootstraps
-#' bootstraps_interpolated = t(apply(bootstraps, 1, interpolateOneBsFn, estimate[, "rho"]))
+#' bootstraps_interpolated = t(apply(
+#'   bootstraps, 1, interpolate_one_bootstrap_fn, estimate[, "rho"]))
 #' bootstraps_interpolated
 #' 
 #' @export
