@@ -418,6 +418,7 @@ baseArgsFn = function(
     # When the design is twoStage, a contains the weights
     # When the design is target_category and c provided, weight_fn gives us category_weights
     # which are analogous to design$a for twoStage
+    design$a = design$category_weights[design$c]
     design$weight = unname(design$category_weights[design$c]) # "2017-06-13 08:16:16 PDT" GG
     # In the twoSample version, the weights get calculated twice 
     # once in gammaHatFn and again in lambdaHatFn

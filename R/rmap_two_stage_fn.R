@@ -1,9 +1,9 @@
-#' \code{riskValidateInternalFn}
+#' \code{rmap_two_stage_fn}
 #' 
 #' The workhorse for grouped \code{rmap}
 #' 
 #' @param baseArgs A list provided by \code{baseArgsFn}.
-#'   The objects required to run \code{riskValidateInternalFn}
+#'   The objects required to run \code{rmap_two_stage_fn}
 #'   are \code{e}, \code{t}, \code{r}
 #'   \code{c}, \code{confidence_level}
 #'   \code{e}, 
@@ -81,7 +81,7 @@
 #' rSummary = "mean"
 #' bootstrap = 20
 #' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
-#' rv = riskValidateInternalFn(baseArgs)
+#' rv = rmap_two_stage_fn(baseArgs)
 #' with(rv, list(concordance_summary = concordance_summary,
 #'               gof = gof,
 #'               pi_summary = pi_summary))
@@ -99,13 +99,13 @@
 #' rSummary = "mean"
 #' bootstrap = 100
 #' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
-#' rv = riskValidateInternalFn(baseArgs)
+#' rv = rmap_two_stage_fn(baseArgs)
 #' with(rv, list(concordance_summary = concordance_summary,
 #'               gof = gof,
 #'               pi_summary = pi_summary))
 #' @export
 
-riskValidateInternalFn = function(baseArgs = FALSE, extraArgs = FALSE) {
+rmap_two_stage_fn = function(baseArgs = FALSE, extraArgs = FALSE) {
   gammaHat = gammaHatFn(baseArgs)
   lambdaHat = lambdaHatFn(baseArgs)
   extraArgs = list(gammaHat = gammaHat,

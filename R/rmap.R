@@ -17,7 +17,7 @@ rmap = function(e, t, r, tStar, design, riskGroup, rSummary, bootstrap,
     rv = if(baseArgs$sampling == "weighted"){
       rmap_weighted_fn(baseArgs)
     } else {
-      riskValidateInternalFn(baseArgs)
+      rmap_two_stage_fn(baseArgs)
     }
     
     df_for_roc_plot = rv$df_for_roc_plot
