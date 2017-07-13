@@ -384,6 +384,7 @@ baseArgsFn = function(
     design$c = rep("A", length(e))
     design$a = structure(1, .Names = "A")
     design$weight = rep(1, length(e))
+    names(design$weight) = design$c
     design$sampling = "randomSample"
 
   } else if(is.list(design) && "N_two_stage" %in% names(design) &&
@@ -419,7 +420,7 @@ baseArgsFn = function(
     # When the design is target_category and c provided, weight_fn gives us category_weights
     # which are analogous to design$a for twoStage
     design$a = design$category_weights[design$c]
-    design$weight = unname(design$category_weights[design$c]) # "2017-06-13 08:16:16 PDT" GG
+    design$weight = design$category_weights[design$c] # "2017-06-13 08:16:16 PDT" GG
     # In the twoSample version, the weights get calculated twice 
     # once in gammaHatFn and again in lambdaHatFn
     # For weighted, I  do it just once, here 
@@ -632,7 +633,7 @@ baseArgsFn = function(
     tStar = tStar,
     ungrouped = riskGroup$ungrouped,
     verbose = verbose,
-    weight = unname(design$weight[order(ord)])
+    weight = design$weight[order(ord)]
     )
 
   class(baseArgs) = c("baseArgs", class(baseArgs))
