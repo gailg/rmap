@@ -427,10 +427,10 @@ baseArgsFn = function(
     design$a = design$category_weights
 
     design$sampling = "weighted"
-  #   
-  # } else if( is.list(design) && "w" %in% names(design) ) {
-  #   design$sampling = "w_provided" # design$weight needs to be brought into the vecs
-  #   design$weight = design$w
+
+  } else if( is.list(design) && "w" %in% names(design) ) {
+    design$sampling = "w_provided" # design$weight needs to be brought into the vecs
+    design$weight = design$w
   } else {
     stop(paste("Design must be either 'randomSample' or a list of c and N_two_stage",
                "to designate two stage sampling.", sep = "\n"))
@@ -440,7 +440,7 @@ baseArgsFn = function(
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   ## Section 3: Model checks:
   
-  cum = cumsum(design$a[design$c])
+  cum = cumsum(design$weight)
 
   riskGroupErrorTxt = "Model must be a list with one named element: either k, K, cutoffs, or epsilon."
   
@@ -474,7 +474,7 @@ baseArgsFn = function(
 
     if(length(riskGroup$K) > 1) stop("riskGroup$K should be a length-1 integer indicating the number of risk groups.")
 
-    riskGroup$k = apply(sapply(seq(0, sum(design$a[design$c]),
+    riskGroup$k = apply(sapply(seq(0, sum(design$weight),
       length.out = riskGroup$K + 1)[-1],
       function(tile) cum <= tile), 1, function(row) min(which(row)))
     ## riskGroup$K is given    
@@ -513,17 +513,17 @@ baseArgsFn = function(
   #  stop("There must be at least one disease event in every risk group")
 
   # New Tue May  3 12:17:57 PDT 2011
-  offendingRGs = which(! tapply(e, riskGroup$k, function(e_k) any(e_k == 1)  ))
-  if(length(offendingRGs > 0)) {
-    stop(paste("\nFor the following risk groups: ",
-               paste(offendingRGs, collapse = " "), "\n",
-               "there were no observations for which e = 1 (disease events) \n",
-               "piHat for each of these risk groups is 0, but no \n",
-               "confidence intervals can be created.  You may wish to \n",
-               "restructure your risk groups so that there is at least \n",
-               "one observation with e = 1 for each risk group. "),
-         collapse = "")
-  }
+  # offendingRGs = which(! tapply(e, riskGroup$k, function(e_k) any(e_k == 1)  ))
+  # if(length(offendingRGs > 0)) {
+  #   stop(paste("\nFor the following risk groups: ",
+  #              paste(offendingRGs, collapse = " "), "\n",
+  #              "there were no observations for which e = 1 (disease events) \n",
+  #              "piHat for each of these risk groups is 0, but no \n",
+  #              "confidence intervals can be created.  You may wish to \n",
+  #              "restructure your risk groups so that there is at least \n",
+  #              "one observation with e = 1 for each risk group. "),
+  #        collapse = "")
+  # }
   ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
   ##<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
