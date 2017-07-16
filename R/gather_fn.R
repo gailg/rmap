@@ -49,12 +49,6 @@
 #' baseArgs$t = ifelse(t > tStar, tStar, t)
 #' estimate = pi_hat_nn_fn(baseArgs)
 #' estimate
-#' bootstraps_raw = lapply(1:baseArgs$N_bootstraps, function(n_bootstrap) {
-#'   baseArgsBoot = baseArgsBootFn(baseArgs)
-#'   pi_hat_nn_fn(baseArgsBoot)
-#' })
-#' bootstraps_raw
-#' gather_fn(bootstraps_raw, rho_uni = estimate[, "rho"])
 #'
 #' @export
 gather_fn = function(bootstraps_raw, rho_uni) {
