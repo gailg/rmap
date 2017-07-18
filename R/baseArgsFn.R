@@ -1,4 +1,4 @@
-#' \code{baseArgsFn}
+#' Provide the \code{baseArgs} for analyzing a data set
 #' 
 #' This function translates arguments given by the user into a data structure 
 #' that is used internally throughout the \code{rmap} package.
@@ -140,9 +140,7 @@
 #'   sampling category counting the number of subjects in the 
 #'   \code{target_category / c}. (A better name for \code{c}
 #'   would be \code{cohort_category} when in the universe of 
-#'   weighted sampling.)
-#' }
-#' \item{\code{cohort_category}: }{The same as \code{c} and will be removed shortly.
+#'   weighted sampling.) Not required outside of \code{rmap}.
 #' }
 #' \item{\code{confidence_level}: }{Equal to the input 
 #'   \code{confidenceLevel}.
@@ -152,6 +150,9 @@
 #' \item{\code{epsilon}: }{Equal to the input \code{epsilon} 
 #' if \code{riskGroup = list(epsilon = epsilon)}.  Otherwise equal to \code{NA}
 #' }
+#' \item{\code{K}: }{A positive integer equal to the number
+#' of risk groups.  If \code{ungrouped = TRUE}, this is equal to \code{1}.
+#' }
 #' \item{\code{k}: }{A vector of length \code{N} indicating the
 #' risk group membership of each subject.  
 #' If \code{ungrouped = TRUE}, this is a vector of all \code{1}'s.
@@ -160,13 +161,11 @@
 #' by \code{baseArgsFn}. 
 #' Each element in this vector is in \code{\{1, ..., K\}}.
 #' }
-#' \item{\code{K}: }{A positive integer equal to the number
-#' of risk groups.  If \code{ungrouped = TRUE}, this is equal to \code{1}.
-#' }
+
 #' \item{\code{multicore}: }{A logical value equal to the input 
 #' \code{multicore}
 #' }
-#' \item{\code{nBootstraps}: }{Equal to \code{N_bootstraps}.
+#' \item{\code{nBootstraps}: }{Equal to \code{N_bootstraps}. Currently used just in baseArgsFn
 #' }
 #' \item{\code{N_bootstraps}: }{An integer describing the 
 #' number of bootstraps, where \code{0} indicates no bootstraps.
@@ -613,7 +612,7 @@ baseArgsFn = function(
   # "2017-06-12 09:28:47 PDT" GG why do they need to be reordered again, weren't they alread done on lines 41-44?
   baseArgs = list(
     c = design$c[order(ord)],  
-    category_weights = design$category_weights,
+    # category_weights = design$category_weights,
     confidence_level = confidenceLevel,
     e = e[order(ord)], 
     epsilon = riskGroup$epsilon,
@@ -621,7 +620,7 @@ baseArgsFn = function(
     k = unname(riskGroup$k[order(ord)]),  
     multicore = multicore,
     N_bootstraps = nBootstraps,
-    nBootstraps = nBootstraps,
+    # nBootstraps = nBootstraps,
     N_nonzero_events = N_nonzero_events,
     N_two_stage = design$N_two_stage,
     n_two_stage = design$n,

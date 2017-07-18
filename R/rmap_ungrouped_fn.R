@@ -1,3 +1,10 @@
+#' The workhorse for the ungrouped part of \code{rmap}
+#' 
+#' Provide the plot and the data for an attribute
+#' diagram using an
+#' epsilon kernel nearest neighbor estimate of outcome
+#' probabilty for each distinct value of assigned risk
+#' 
 rmap_ungrouped_fn = function(baseArgs){
   e = baseArgs$e
   t = baseArgs$t

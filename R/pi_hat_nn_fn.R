@@ -1,7 +1,7 @@
 #' A pi_hat for each distinct assigned risk
 #' 
 #' An epsilon kernel nearest neighbor estimate of outcome
-#' probabilty for each distinct alue of assigned risk
+#' probabilty for each distinct value of assigned risk
 #' 
 #' @param baseArgs A list provided by \code{baseArgsFn}.
 #' The objects required to run \code{pi_hat_nn_fn} are

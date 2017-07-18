@@ -1,4 +1,4 @@
-#' \code{base_args_boot_fn}
+#' A bootstrap sample version of \code{baseArgsFn}
 #' 
 #' Obtain a bootstrap sample from \code{baseArgs} and
 #' create the objects needed to run \code{concordance_fn}
@@ -55,17 +55,172 @@
 #' A bootstrap version of \code{baseArgs$weight},
 #' gotten by samplng first from the full population 
 #' using \code{N_two_stage} or the target population 
-#' (using \code{target_category}).
+#' (using \code{target_category}), then sampling to obtain 
+#' the second stage sample or cohort sample,
+#' then calculating the appropriate weights.
 #' }
 #' }
-
-base_args_boot = list(
-
-
-
-  verbose = baseArgs$verbose,
-  weight = weight_boo)
-
+#' @examples 
+#' #-------------------------------------------------- A weighted example
+#' set.seed(1)
+#' # I tried to choose a small number producing no errors from baseArgsFn
+#' NNN = 48 
+#' N_bootstrap_reps = 3
+#' cutoffs = c(0, 0.20, 1)
+#' weighted_example = weighted_example_fn(NNN)
+#' cohort_sampling_probability_dictionary = 
+#'      weighted_example$cohort_sampling_probability_dictionary
+#' cohort_sample = weighted_example$cohort_sample
+#' target_sample = weighted_example$target_sample
+#' tStar = weighted_example$t_star
+#' which_model = "r_B" 
+#' cohort_category = cohort_sample$category
+#' target_category = target_sample$category
+#' r = round(cohort_sample[[which_model]], 2)
+#' e = cohort_sample$eee
+#' t = cohort_sample$ttt
+#' cohort_sample
+#' design = list(targetCategory = target_category, c = cohort_category)
+#' epsilon = nrow(cohort_sample)^(-1/3)
+#' riskGroup = list(epsilon = epsilon)
+#' rSummary = "mean"
+#' bootstrap = N_bootstrap_reps
+#' baseArgs = 
+#'   baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap) 
+#' baseArgs
+#' # The pi_hat part of rmap requires times truncated at tStar
+#' e = baseArgs$e
+#' t = baseArgs$t
+#' tStar = baseArgs$tStar
+#' baseArgs$e = ifelse(t > tStar, 0, e)
+#' baseArgs$t = ifelse(t > tStar, tStar, t)
+#' base_args_boot = base_args_boot_fn(baseArgs)
+#' base_args_boot
+#' # The next part shows how I use base_args_boot inside pi_hat_nn_fn
+#' aaa = base_args_boot$weight
+#' GFn = ecdf_two_stage(base_args_boot$r, aaa)
+#' rho = sort(unique(base_args_boot$r))
+#' NNs = t(sapply(rho, function(rho1) {
+#'   abs(GFn(base_args_boot$r) - GFn(rho1)) < base_args_boot$epsilon
+#' }))
+#' look = ifelse(NNs, 1, 0)
+#' dimnames(look) = list(1:nrow(NNs),1:ncol(NNs))
+#' # look(NNs) ia a matrix with J = (number of unique r) rows 
+#' # and N columns
+#' # The j-th row of look(NNs) shows the neighborhood for the tau[j]
+#' # A 1(TRUE) in the n-th column says the n-th subject lands in
+#' # this neighborhood
+#' look
+#' # Examine the jjj-th neighborhood jjj = 1
+#' jjj = 1
+#' NN1 = NNs[jjj, ]
+#' NN1 
+#' e = base_args_boot$e[NN1]
+#' t = base_args_boot$t[NN1]
+#' r = base_args_boot$r[NN1]
+#' k = rep(1, length(e))
+#' weight = base_args_boot$weight[NN1]
+#' # The data associated with the jjj-th neighborhood
+#' data.frame(e, t, r, k, weight)
+#' tStar = base_args_boot$tStar
+#' riskGroup = list(k = k)
+#' rSummary = "mean"
+#' bootstrap = FALSE
+#' design = if(base_args_boot$sampling == "weighted"){
+#'   list(w = weight)
+#' } else {
+#'   N_two_stage = tapply(aaa[NN1], names(aaa[NN1]), sum)
+#'   c = base_args_boot$c[NN1]
+#'   design = list(N_two_stage = N_two_stage, c = c)
+#' }
+#' design
+#' # This call to baseArgsFn gets the data ready for a call to pi_hat_fn
+#' base_args_bootNN1 = 
+#'   baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' base_args_bootNN1
+#' pi_hat_fn(base_args_bootNN1)
+#' 
+#' #------------------------------------------- A two-stage sample example
+#' options(digits = 5)
+#' set.seed(9)
+#' NNN = 31
+#' twoStageSample = df_twoStage(NNN)
+#' xxx = twoStageSample$d
+#' row.names(xxx) = NULL
+#' nrow(xxx)
+#' xxx
+#' e = xxx$e
+#' t = xxx$t
+#' r = round(xxx$r, 2)
+#' N = twoStageSample$N
+#' design = list(N_two_stage = N, c = xxx$c)
+#' epsilon = nrow(xxx)^(-1/3)
+#' riskGroup = list(epsilon = epsilon)
+#' rSummary = "mean"
+#' bootstrap = 100
+#' set.seed(1)
+#' baseArgs = 
+#'   baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' list(design = design,
+#'      baseArgs_N_two_stage = baseArgs$N_two_stage, 
+#'      baseArgs_n_two_stage = baseArgs$n_two_stage,
+#'      N_two_stage_over_n_two_stage = 
+#'        baseArgs$N_two_stage/baseArgs$n_two_stage,
+#'      baseArgs_weight = baseArgs$weight)
+#' e = baseArgs$e
+#' t = baseArgs$t
+#' tStar = baseArgs$tStar
+#' baseArgs$e = ifelse(t > tStar, 0, e)
+#' baseArgs$t = ifelse(t > tStar, tStar, t)
+#' base_args_boot = base_args_boot_fn(baseArgs)
+#' base_args_boot
+#' # And this is an example of how I use the base_args_boot
+#' baseArgs$design
+#' aaa = base_args_boot$weight
+#' GFn = ecdf_two_stage(base_args_boot$r, aaa)
+#' rho = sort(unique(base_args_boot$r))
+#' NNs = t(sapply(rho, function(rho1) {
+#'   abs(GFn(base_args_boot$r) - GFn(rho1)) < base_args_boot$epsilon
+#' }))
+#' look = ifelse(NNs, 1, 0)
+#' dimnames(look) = list(1:nrow(NNs),1:ncol(NNs))
+#' # look(NNs) ia a matrix with J = (number of unique r) rows 
+#' # and N columns
+#' # The j-th row of look(NNs) shows the neighborhood for the tau[j]
+#' # A 1(TRUE) in the n-th column says the n-th subject lands in 
+#' # this neighborhood
+#' look
+#' # Examine the jjj-th neighborhood jjj = 1
+#' jjj = 1
+#' NN1 = NNs[jjj, ]
+#' NN1 
+#' e = base_args_boot$e[NN1]
+#' t = base_args_boot$t[NN1]
+#' r = base_args_boot$r[NN1]
+#' k = rep(1, length(e))
+#' weight = base_args_boot$weight[NN1]
+#' # The data associated with the jjj-th neighborhood
+#' data.frame(e, t, r, k, weight)
+#' tStar = base_args_boot$tStar
+#' riskGroup = list(k = k)
+#' rSummary = "mean"
+#' bootstrap = FALSE
+#' design = if(base_args_boot$sampling == "weighted"){
+#'   list(w = weight)
+#' } else {
+#'   N_two_stage = tapply(aaa[NN1], names(aaa[NN1]), sum)
+#'   c = base_args_boot$c[NN1]
+#'   design = list(N_two_stage = N_two_stage, c = c)
+#' }
+#' design
+#' table(design$c)
+#' # This call to baseArgsFn gets the data ready for a call to pi_hat_fn
+#' base_args_bootNN1 = 
+#'   baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' base_args_bootNN1
+#' pi_hat_fn(base_args_bootNN1)
+#' 
+#' @export
 base_args_boot_fn = function(baseArgs) {
   if(baseArgs$sampling == "weighted"){
     N_c = length(baseArgs$c)
