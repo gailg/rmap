@@ -31,12 +31,12 @@
 #' 
 #' aaa = (baseArgs$N_two_stage / baseArgs$n_two_stage)[baseArgs$c]
 #' aaa
-#' G_Fn = ecdf2Stg(r, aaa)
+#' G_Fn = ecdf_two_stage(r, aaa)
 #' plot(G_Fn_unweighted, col = rgb(0, 0, 1, 0.7), cex = 0.5) # small blue
 #' plot(G_Fn, add = TRUE, col = rgb(1, 0, 0, 0.3))           # light red
 #' @export
 #'   
-ecdf2Stg = function (x, aaa) 
+ecdf_two_stage = function (x, aaa) 
 {
     x <- sort(x)
     n <- length(x)

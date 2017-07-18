@@ -43,6 +43,15 @@
 #' baseArgs$t = ifelse(t > tStar, tStar, t)
 #' estimate = pi_hat_nn_fn(baseArgs)
 #' estimate
+#' bootstraps_raw = lapply(1:baseArgs$N_bootstraps, function(n_bootstrap){
+#'   base_args_boot = base_args_boot_fn(baseArgs)
+#'   pi_hat_nn_fn(base_args_boot)
+#' })
+#' bootstraps_raw
+#' gathered = gather_fn(bootstraps_raw, estimate[, "rho"])
+#' gathered
+#' interpolated = t(apply(gathered, 1, interpolate_one_bootstrap_fn, estimate[, "rho"]))
+#' interpolated
 #' 
 #' @export
 

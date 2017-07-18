@@ -34,7 +34,7 @@
 #'   e = d$d$e, t = d$d$t, r = d$d$r, tStar = 10,
 #'   design = list(c = d$d$c, N_two_stage = d$N), riskGroup = list(K = 2),
 #'   rSummary = "median", bootstrap = FALSE)
-#' ph1 = piHatFn(baseArgs)
+#' ph1 = pi_hat_fn(baseArgs)
 #' ph1
 #' Sigma1 = SigmaFn(baseArgs)
 #' Sigma1
@@ -44,7 +44,7 @@
 #'   e = d$e, t = d$t, r = d$r, tStar = 10,
 #'   design = "randomSample", riskGroup = list(K = 3),
 #'   rSummary = "median", bootstrap = FALSE)
-#' ph2 = piHatFn(baseArgs)
+#' ph2 = pi_hat_fn(baseArgs)
 #' ph2
 #' Sigma2 = SigmaFn(baseArgs)
 #' Sigma2

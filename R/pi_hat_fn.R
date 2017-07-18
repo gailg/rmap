@@ -1,7 +1,18 @@
-#' Weighted pi_hat
+#' pi_hat_fn
 #'
-#' This is the same algorithm as piHatFn for randomSample
-#' and two-stage sample, but weighted.
+#' For estimating the outcome probability for each risk group
+#' defined by \code{baseArgs$k}.  Uses \code{baseArgs$weight
+#' which \code{baseArgsFn} provides for all three 
+#' kinds of sampling: random sampling, two-stage sampling,
+#' and weighted sampling.  This functionreplaces 
+#' \code{piHatFn} which called \code{lambdaHatFn} which
+#' throws an error if there are no non-zero events. 
+#' \code{pi_hat_fn} allows an estimate to be zero. 
+#' \code{Sigma} requires just \code{lambdaFn} 
+#' (and not \code{piHatFn}) and therefore for calculating
+#' theoretical variances, 
+#' rmap requires at least one nonzero event in each 
+#' risk group.
 #'
 #' @param baseArgs A list provided by \code{baseArgsFn}.
 #' The objects required here are

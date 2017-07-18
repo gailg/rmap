@@ -1,3 +1,71 @@
+#' \code{base_args_boot_fn}
+#' 
+#' Obtain a bootstrap sample from \code{baseArgs} and
+#' create the objects needed to run \code{concordance_fn}
+#' and \code{pi_hat_fn}
+#' 
+#' @param baseArgs A list provided by \code{baseArgsFn}.
+#' 
+#' @return A list containing 
+#' \itemize{
+#' \item{\code{boot_code}: }{An integer equal to 0
+#' provided there are no errors because of empty cohort
+#' categories or empty risk groups.
+#' }
+#' \item{\code{boot_message}: }{A character string 
+#' that tries to explain the source of the error.
+#' Not used.
+#' }
+#' \item{\code{c}: }{
+#' A bootstrap version of \code{baseArgs$c}
+#' }
+#' \item{\code{e}: }{
+#' A bootstrap version of \code{baseArgs$e}
+#' }
+#' \item{\code{epsilon}: }{
+#' Equal to \code{baseArgs$epsilon}
+#' }
+#' \item{\code{K}: }{
+#' Equal to \code{baseArgs$K}
+#' }
+#' \item{\code{k}: }{
+#' A bootstrap version of \code{baseArgs$k}
+#' }
+#' \item{\code{N_nonzero_events}: }{An integer vector of 
+#' length \code{K} counting the number events in each
+#' risk group that occurred before \code{tStar}
+#' and were not censored.
+#' }
+#' \item{\code{r}: }{
+#' A bootstrap version of \code{baseArgs$r}
+#' }
+#' \item{\code{sampling}: }{
+#' Equal to \code{baseArgs$sampling}
+#' }
+#' \item{\code{t}: }{
+#' A bootstrap version of \code{baseArgs$t}
+#' }
+#' \item{\code{tStar}: }{
+#' Equal to \code{baseArgs$tStar}
+#' }
+#' \item{\code{verbose}: }{
+#' Equal to \code{baseArgs$verbose}
+#' }
+#' \item{\code{weight}: }{
+#' A bootstrap version of \code{baseArgs$weight},
+#' gotten by samplng first from the full population 
+#' using \code{N_two_stage} or the target population 
+#' (using \code{target_category}).
+#' }
+#' }
+
+base_args_boot = list(
+
+
+
+  verbose = baseArgs$verbose,
+  weight = weight_boo)
+
 base_args_boot_fn = function(baseArgs) {
   if(baseArgs$sampling == "weighted"){
     N_c = length(baseArgs$c)
