@@ -5,6 +5,19 @@
 #' and \code{pi_hat_fn}
 #' 
 #' @param baseArgs A list provided by \code{baseArgsFn}.
+#' Objects requred by \code{base_args_boot_fn} are
+#' \code{c},
+#' \code{e},
+#' \code{epsilon},
+#' \code{K},
+#' \code{k},
+#' \code{N_two_stage},
+#' \code{n_two_stage},
+#' \code{r},
+#' \code{sampling},
+#' \code{t},
+#' \code{target_category},
+#' \code{tStar}
 #' 
 #' @return A list containing 
 #' \itemize{

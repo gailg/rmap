@@ -18,7 +18,7 @@
 #' \code{rho} an ordered vector of distinct assigned risks
 #' and \code{pi_hat} the corresponding
 #' epsilon kernel nearest neighbor
-#' estimate of outcome probability
+#' estimate of outcome probability.
 #' 
 #' @examples 
 #' set.seed(1)

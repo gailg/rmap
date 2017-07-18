@@ -1,7 +1,7 @@
 #' pi_hat_fn
 #'
 #' For estimating the outcome probability for each risk group
-#' defined by \code{baseArgs$k}.  Uses \code{baseArgs$weight
+#' defined by \code{baseArgs$k}.  Uses \code{baseArgs$weight}
 #' which \code{baseArgsFn} provides for all three 
 #' kinds of sampling: random sampling, two-stage sampling,
 #' and weighted sampling.  This functionreplaces 
