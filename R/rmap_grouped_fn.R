@@ -49,6 +49,7 @@
 #' \item{\code{summary}: }{A list containing
 #' \itemize{
 #' \item{\code{pi_estimate}: }{A data.frame containing 
+#' \code{K} rows, one for each risk group and the following columns:
 #' \itemize{
 #' \item{\code{gamma_hat}: }{The weighted proportion of subjects
 #' in each risk group.
@@ -61,30 +62,54 @@
 #' }
 #' }
 #' }
-#' \item{\code{pi_sd_theory}: }{A data.frame containing
-#' \code{sd},
-#' \code{lower},
-#' \code{upper},
-#' and \code{in_ci}.
+#' \item{\code{pi_sd_theory}: }{A data.frame containing \code{K}
+#' rows and the following columns:
+#' \itemize{
+#' \item{\code{sd}: }{The estimated standard deviation of the 
+#' estimate \code{pi_hat} in each risk group
+#' obtained by asymptotic theory.
+#' }
+#' \item{\code{lower}: }{The lower bound of a confidence interval
+#' for the outcome probability in each risk group.
+#' }
+#' \item{\code{upper}: }{The upper bound of the confidence interval.
+#' }
+#' \item{\code{in_ci}: }{A character "yes" or "no" indicating
+#' if \code{pi_estimate$r} falls
+#' in the confidence interval.
+#' }
+#' }
 #' }
 #' \item{\code{pi_sd_boot}: }{A data.frame containing
-#' \code{sd_boot},
-#' \code{lower},
-#' \code{upper},
-#' and \code{in_ci_boot}
+#' \itemize{
+#' \item{\code{sd_boot}: }{The bootstrap estimate of teh
+#' standard deviation of the \code{pi_hat}.
+#' }
+#' \item{\code{lower}: }{The lower bound of the bootstrap percentile
+#' confidence interval.
+#' }
+#' \item{\code{upper}: }{The upper bound of the bootstrap percentile
+#' confidence interval.
+#' }
+#' \item{\code{in_ci_boot}: }{A character "yes" or "no" indicating if 
+#' \code{pi_estimate$r} falls in the bootstrap confidence interval.
+#' }
+#' }
 #' }
 #' \item{\code{gof_theory}: }{A data.frame containing
-#' \code{statistic},
-#' and \code{p_value}
+#' \code{statistic}, the chi-square goodness of fit test statistic 
+#' using  \code{sd} the asymptotic-theory version of the estimate of
+#' standard deviation, and \code{p_value} its p-value.
 #' }
 #' \item{\code{gof_boot}: }{A data.frame containing
-#' \code{statistic},
-#' and \code{p_value}
+#' \code{statistic}, the chi-square goodness of fit test statistic
+#' using \code{sd_boot} the bootstrap version of the estimate of 
+#' standard deviation, and \code{p_value} its p-value.
 #' }
-#' \item{\code{concordance_summary}: }{A data.frame containing
-#' \code{concordance},
-#' \code{lower},
-#' and \code{upper}
+#' \item{\code{concordance_summary}: }{A data.frame containing the 
+#' the concordance estimate 
+#' \code{concordance}, together with \code{lower} and \code{upper},
+#' the lower and upper bounds of a confidence interval for concordance.
 #' }
 #' }
 #' }
@@ -93,7 +118,8 @@
 #' #-------------------------------------------------- A random sample example
 #' set.seed(1)
 #' tStar = 10
-#' randomSample = df_randomSample(100)
+#' NNN = 100
+#' randomSample = df_randomSample(NNN)
 #' xxx = randomSample
 #' e = xxx$e
 #' t = xxx$t
@@ -109,10 +135,55 @@
 #' grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
 #'              top = "rmap_grouped on a random sample")
 #' rmap_1$summary
-#' 
+#' #-------------------------------------------------- A weighted sample example
+#' set.seed(2)
+#' tStar = 10
+#' NNN = 400
+#' N_bootstrap_reps = 100
+#' cutoffs = c(0, 0.20, 1)
+#' weighted_example = weighted_example_fn(NNN)
+#' cohort_sampling_probability_dictionary = 
+#'    weighted_example$cohort_sampling_probability_dictionary
+#' cohort_sample = weighted_example$cohort_sample
+#' target_sample = weighted_example$target_sample
+#' tStar = weighted_example$t_star
+#' which_model = "r_B" 
+#' cohort_category = cohort_sample$category
+#' target_category = target_sample$category
+#' r = cohort_sample[[which_model]]
+#' e = cohort_sample$eee
+#' t = cohort_sample$ttt
+#' design = list(targetCategory = target_category, c = cohort_category)
+#' riskGroup = list(cutoffs = cutoffs)
+#' rSummary = "mean"
+#' bootstrap = N_bootstrap_reps
+#' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' rmap_2 = rmap_grouped_fn(baseArgs)
+#' plots = rmap_2$plots
+#' grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
+#'              top = "rmap_grouped on a weighted sample")
+#' rmap_2$summary
+#' #-------------------------------------------------- A two-stage sample example
+#' set.seed(3)
+#' tStar = 10
+#' NNN = 300
+#' twoStageSample = df_twoStage(NNN)
+#' xxx = twoStageSample$d
+#' e = xxx$e
+#' t = xxx$t
+#' r = xxx$r
+#' N = twoStageSample$N
+#' design = list(N_two_stage = N, c = xxx$c)
+#' riskGroup = list(K = 3)
+#' rSummary = "mean"
+#' bootstrap = 100
+#' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
+#' rmap_3 = rmap_grouped_fn(baseArgs)
+#' plots = rmap_3$plots
+#' grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
+#'              top = "rmap_grouped on a two-stage sample")
+#' rmap_3$summary
 #' @export
-
-
 
 rmap_grouped_fn = function(baseArgs){
   pi_estimate = pi_estimate_fn(baseArgs)$pi_estimate
@@ -126,7 +197,7 @@ rmap_grouped_fn = function(baseArgs){
   } else {
     pi_sd_theory_fn(baseArgs, extraArgs)$pi_sd_theory
   }
-  gof_theory = if(is.null(pi_sd_theory) || pi_sd_theory$sd < baseArgs$small_number){
+  gof_theory = if(is.null(pi_sd_theory) || any(pi_sd_theory$sd < baseArgs$small_number)){
     NULL
   } else {
     sigma = pi_sd_theory$sd

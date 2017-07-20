@@ -25,7 +25,8 @@
 #' \item{\code{pi_sd_boot}: }{A data.frame containing \code{K} rows,
 #' one for each risk group, and the following columns:
 #' \itemize{
-#' \item{\code{sd_boot}: }{The estimated standard deviation of the estimate
+#' \item{\code{sd_boot}: }{The bootstrap estimate of teh
+#' standard deviation of the \code{pi_hat}.
 #' \code{pi_hat}.
 #' }
 #' \item{\code{lower}: }{The lower limit of the confidence interval for
