@@ -9,8 +9,8 @@
 #' @param baseArgs A list provided by \code{baseArgsFn}.
 #' The objects required here are
 #' \code{c}
-#' \code{K}, \code{k},
-#' \code{N_two_stage}, and \code{n_two_stage}
+#' \code{K}, \code{k}, and
+#' \code{weight}.
 #' 
 #' @return A numeric vector with one element for each risk group.  
 #' The \code{k}-th element of this vector is the proportion of 

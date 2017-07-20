@@ -49,10 +49,9 @@
 #' }
 #' 
 #' @param baseArgs A list provided by \code{baseArgsFn}.
-#' The objects requried to run \code{pi_hat_nn_fn} are
+#' The objects requried to run \code{rmap_ungrouped} are
 #' \code{c},
 #' \code{e},
-#' \code{epsilon},
 #' \code{confidence_level},
 #' \code{e},
 #' \code{epsilon},
@@ -63,7 +62,6 @@
 #' \code{N_two_stage},
 #' \code{n_two_stage},
 #' \code{r},
-#' \code{r}
 #' \code{sampling},
 #' \code{t},
 #' \code{target_category},
