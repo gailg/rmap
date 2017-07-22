@@ -186,6 +186,13 @@
 #' @export
 
 rmap_grouped_fn = function(baseArgs){
+  concordance_estimate = concordance_estimate_fn(baseArgs)
+  concordance_summary = c(concordance = concordance_estimate$concordance)
+  df_for_roc_plot = concordance_estimate$df_for_roc_plot
+  roc_plot = ggplot(df_for_roc_plot, aes(x = one_minus_specificity, y = sensitivity)) + 
+    geom_step() + 
+    geom_abline(slope = 1, intercept = 0, color = "red", linetype = 2) 
+  
   pi_estimate = pi_estimate_fn(baseArgs)$pi_estimate
   gamma_hat = pi_estimate$gamma_hat
   r_bar = pi_estimate$r
@@ -203,33 +210,45 @@ rmap_grouped_fn = function(baseArgs){
     sigma = pi_sd_theory$sd
     gof_fn(gamma_hat, r_bar, pi_hat, sigma)
   }
-  ppp  = pi_sd_boot_fn(baseArgs)
-  pi_sd_boot = ppp$pi_sd_boot
-  concordance_ci = ppp$concordance_ci
-  sigma = pi_sd_boot$sd_boot
-  gof_boot = if(any(pi_sd_boot$sd_boot < baseArgs$small_number)){
-    NULL
+  if(baseArgs$N_bootstraps == 0){
+    pi_sd_boot = NULL
+    gof_boot = NULL
   } else {
-    gof_fn(gamma_hat, r_bar, pi_hat, sigma)
+    ppp  = pi_sd_boot_fn(baseArgs)
+    pi_sd_boot = ppp$pi_sd_boot
+    concordance_ci = ppp$concordance_ci
+    sigma = pi_sd_boot$sd_boot
+    gof_boot = if(any(pi_sd_boot$sd_boot < baseArgs$small_number)){
+      NULL
+    } else {
+      gof_fn(gamma_hat, r_bar, pi_hat, sigma)
+    }
+    concordance_summary = c(concordance_summary, concordance_ci)
   }
-  concordance_estimate = concordance_estimate_fn(baseArgs)
-  concordance_summary = c(concordance = concordance_estimate$concordance,
-                          concordance_ci)
-  df_for_roc_plot = concordance_estimate$df_for_roc_plot
-  roc_plot = ggplot(df_for_roc_plot, aes(x = one_minus_specificity, y = sensitivity)) + 
-    geom_step()
   sd_part = if(baseArgs$sampling == "weighted"){
-    pi_sd_boot[, c("lower", "upper")]
+    if(is.null(pi_sd_boot)){
+      NULL
+    } else {
+      pi_sd_boot[, c("lower", "upper")]
+    }
   } else {
     pi_sd_theory[, c("lower", "upper")]
   }
-  df_for_risk_plot = 100 * cbind(pi_estimate[, c("r", "pi_hat")], sd_part)
-  risk_plot = ggplot(df_for_risk_plot, aes(x = r, y = pi_hat, ymin = lower, ymax = upper)) +
+  df_for_risk_plot = if(is.null(sd_part)){
+    100 * pi_estimate[, c("r", "pi_hat")]
+  } else {
+    100 * cbind(pi_estimate[, c("r", "pi_hat")], sd_part)
+  }
+  risk_plot = 
+    ggplot(df_for_risk_plot, aes(x = r, y = pi_hat, ymin = lower, ymax = upper)) +
     geom_point() +
-    geom_errorbar(aes(ymin = df_for_risk_plot$lower, ymax = df_for_risk_plot$upper), width = 2) +
     geom_abline(slope = 1, intercept = 0, color = "red", linetype = 2) +
     xlim(0,100) + ylim(0, 100) +
     xlab("Assigned Risk (%)") + ylab("Observed Risk (%)")
+  if("lower" %in% names(df_for_risk_plot) && "upper" %in% names(df_for_risk_plot)){
+    risk_plot = risk_plot + 
+      geom_errorbar(aes(ymin = df_for_risk_plot$lower, ymax = df_for_risk_plot$upper), width = 2) 
+  }
   plots = list(
     df_for_roc_plot = concordance_estimate$df_for_roc_plot,
     roc_plot = roc_plot,
