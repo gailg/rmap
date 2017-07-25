@@ -286,7 +286,7 @@ base_args_boot_fn = function(baseArgs) {
     paste(which(N_in_risk_group == 0), collapse = ", "),
     "are empty")
   N_nonzero_events = unlist(lapply(seq(1, baseArgs$K, by = 1), function(kkk){
-    e_inside_pi_hat = ifelse(t_boo[k_boo == kkk] > tStar, 0, e_boo[k_boo == kkk])
+    e_inside_pi_hat = ifelse(t_boo[k_boo == kkk] > baseArgs$tStar, 0, e_boo[k_boo == kkk])
     sum(e_inside_pi_hat > 0)
   }))
   boot_code = if( weight_code == 0 && all(N_in_risk_group > 0) ) {
