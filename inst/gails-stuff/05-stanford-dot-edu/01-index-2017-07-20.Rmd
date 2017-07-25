@@ -33,7 +33,7 @@ plots. `rmap` handles random samples, two-stage sample designs, and weighted sam
 
 # Data preparation {#data-preparation}
 
-You need a data set, containing say $N$ people, and for the $n$-th person, you have the following data:
+You need a data set, containing, say $N$ people, and for the $n$-th person, you have the following data:
 
 ## `e`
 
@@ -95,30 +95,36 @@ If your installation was successful, you should see the message
 
 # Reading in data {#reading-in-data}
 
-If you saved your data from excel as a CSV (comma separated value) file in your working directory, your next step is to read this CSV file into R.  To practice reading in my example file "data_set_score_statistics.csv", place this file in your working directory and enter the following lines to R. Your result to `head(x)` should look like my output below.
+If your data is an excel file with columns `e`, `t`, and `r`, save it as a CSV (comma separated value) file into your working directory. For practice you can download my excel file here, put it any your working directory, and try out the following commands.
 
 
-```{r eval = FALSE}
-x = read.csv(
-    file = "datafRandomSample.csv",
-    stringsAsFactors = FALSE)
-head(x)
+```{r eval = TRUE}
+xxx = read.csv(file = "random_sample_example.csv", stringsAsFactors = FALSE)
+head(xxx)
 ```
 
+If you got the same results I above, you are in business.  Next try the following.  Don't worry about the meanings yet.  I will discuss the details below, but I hope the following shows the scope of what `rmap` can do.
 
-
-
-```{r eval = FALSE}
+```{r}
 library(rmap)
-set.seed(42)
-df1 = df_randomSample(KKK = 4)
-x = rmap_random_sample = df1[, c("e", "t", "r", "k")]
-head(x)
-riskValidate(e = x$e, t = x$t, r = x$r, 
-             design = "randomSample",
-             riskGroup = list(k = x$k),
-                          rSummary = "mean",
-                          bootstrap = FALSE, rvpar = rvparFn(col = "darkgreen"))
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+design = "random_sample"
+risk_group = list(K = 4)
+r_summary = "mean"
+N_bootstraps = 100
+confidence_level = 0.95
+N_cores = 1
+verbose = FALSE
+set.seed(1)
+rmap_1 = rmap(e, t, r, t_star, design, risk_group, r_summary, 
+              N_bootstraps, confidence_level, N_cores, verbose)
+plots = rmap_1$plots
+grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
+             top = "rmap_grouped on a random sample")
+rmap_1$summary
 ```
 
 [TOP](#top)

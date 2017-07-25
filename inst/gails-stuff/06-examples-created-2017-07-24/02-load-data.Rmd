@@ -1,0 +1,227 @@
+---
+title: "02-load-data"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 4.5, fig.width = 6.5, tidy=FALSE)
+```
+
+
+"2017-07-24 19:51:36 PDT"
+
+`r getwd()`  
+
+`r Sys.time()`
+
+
+```{r message = FALSE, warning = FALSE}
+library(rmap)
+blue = rainbow(24, s = 0.5, v = .8, alpha = .8)[16]
+gray = rainbow(24, s = 0.5, v = .4, alpha = .3)[16]
+```
+
+
+
+# Random Sample
+
+```{r random_sample_grouped, fig.height = 3.5, fig.width = 7}
+library(rmap)
+load("random_sample_example.RData")
+xxx = random_sample_example
+head(xxx)
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+design = "random_sample"
+risk_group = list(K = 4)
+r_summary = "mean"
+N_bootstraps = 100
+confidence_level = 0.95
+N_cores = 1
+verbose = FALSE
+set.seed(1)
+rmap_1 = rmap(e, t, r, t_star, design, risk_group, r_summary, 
+              N_bootstraps, confidence_level, N_cores, verbose)
+plots = rmap_1$plots
+grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
+             top = "rmap_grouped on a random sample")
+rmap_1$summary
+```
+
+
+```{r random_sample_ungrouped, fig.height = 3.5, fig.width = 5}
+epsilon = nrow(xxx)^(-1/3)
+risk_group = list(epsilon = epsilon)
+set.seed(2)
+rmap_2 = rmap(e, t, r, t_star, design, risk_group, r_summary, 
+              N_bootstraps, confidence_level, N_cores, verbose)
+plots = rmap_2$plots
+grid.arrange(plots$risk_plot, top = "rmap_ungrouped on a random sample")
+```
+
+# Two-stage sample
+
+```{r two_stage_sample_grouped, fig.height = 3.5, fig.width = 7}
+library(rmap)
+load("two_stage_sample_example.RData")
+xxx = two_stage_sample_example
+head(xxx)
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+load("N_first_stage.RData")
+N_first_stage
+category = xxx$category
+design = list(N_first_stage = N_first_stage, category = category)
+risk_group = list(K = 3)
+r_summary = "mean"
+N_bootstraps = 100
+confidence_level = 0.95
+N_cores = 1
+verbose = FALSE
+set.seed(3)
+rmap_3 = rmap(e, t, r, t_star, design, risk_group, r_summary, 
+              N_bootstraps, confidence_level, N_cores, verbose)
+plots = rmap_3$plots
+grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
+             top = "rmap_grouped on a two-stage sample")
+rmap_3$summary
+```
+
+```{r two_stage_sample_ungrouped, fig.height = 3.5, fig.width = 5}
+epsilon = nrow(xxx)^(-1/3)
+risk_group = list(epsilon = epsilon)
+set.seed(4)
+rmap_4 = rmap(e, t, r, t_star, design, risk_group, r_summary, 
+              N_bootstraps, confidence_level, N_cores, verbose)
+plots = rmap_4$plots
+grid.arrange(plots$risk_plot, top = "rmap_ungrouped on a two-stage sample")
+```
+
+
+
+# Weighted
+
+```{r weighted_grouped, fig.height = 3.5, fig.width = 7}
+library(rmap)
+load("weighted_example_cohort_sample.RData")
+xxx = weighted_example_cohort_sample
+head(xxx)
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+load("weighted_example_target_sample.RData")
+head(weighted_example_target_sample)
+target_category = weighted_example_target_sample$category
+category = xxx$category
+design = list(target_category = target_category, category = category)
+cutoffs = c(0, 0.20, 1)
+risk_group = list(cutoffs = cutoffs)
+r_summary = "mean"
+N_bootstraps = 100
+confidence_level = 0.95
+N_cores = 1
+verbose = FALSE
+set.seed(5)
+rmap_5 = rmap(e, t, r, t_star, design, risk_group, r_summary, 
+              N_bootstraps, confidence_level, N_cores, verbose)
+plots = rmap_5$plots
+grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
+             top = "rmap_grouped on a weighted sample")
+rmap_5$summary
+```
+
+```{r weighted_ungrouped, fig.height = 3.5, fig.width = 5}
+epsilon = nrow(xxx)^(-1/3)
+risk_group = list(epsilon = epsilon)
+set.seed(6)
+rmap_6 = rmap(e, t, r, t_star, design, risk_group, r_summary, 
+              N_bootstraps, confidence_level, N_cores, verbose)
+plots = rmap_6$plots
+grid.arrange(plots$risk_plot, top = "rmap_ungrouped on a weighted sample")
+```
+
+# Comparing two risk models using composite plots
+
+```{r comparing, fig.height = 7, fig.widthe = 7}
+load("two_model_comparison_example.RData")
+xxx = two_model_comparison_example
+head(xxx)
+e = xxx$e
+t = xxx$t
+r1 = xxx$r1
+r2 = xxx$r2
+t_star = 10
+design = "random_sample"
+risk_group = list(K = 4)
+r_summary = "mean"
+N_bootstrap = 0
+rmap_7 = rmap(e, t, r1, t_star, design, risk_group, r_summary, N_bootstraps)
+rmap_8 = rmap(e, t, r2, t_star, design, risk_group, r_summary, N_bootstraps)
+epsilon = nrow(xxx)^(-1/3)
+risk_group = list(epsilon = epsilon)
+N_bootstraps = 100
+rmap_9 = rmap(e, t, r1, t_star, design, risk_group, r_summary, N_bootstraps)
+rmap_10 = rmap(e, t, r1, t_star, design, risk_group, r_summary, N_bootstraps)
+rmap_7$summary
+rmap_8$summary
+```
+
+```{r fig.height = 3.5, fig.width = 4}
+model_1 = rmap_7$plots$df_for_roc_plot
+model_2 = rmap_8$plots$df_for_roc_plot
+model_1$model = rep("Model 1", nrow(model_1))
+model_2$model = rep("Model 2", nrow(model_2))
+df = rbind(model_1, model_2) 
+head(df)
+ggplot(df, aes(x = one_minus_specificity, y = sensitivity, color = model)) +
+  geom_step() + 
+  geom_abline(slope = 1, intercept = 0, color = "gray", linetype = 2) +
+  scale_color_manual(values = c("blue", "red")) +
+  theme(legend.title = element_blank()) +
+  theme(legend.position = c(0.2, 0.9)) +
+  ggtitle("ROC plots for assigned risk Models 1 and 2")
+```
+
+```{r fig.height = 5, fig.width = 7}
+p1 = rmap_7$plots$risk_plot + ggtitle("Model 1")
+p2 = rmap_8$plots$risk_plot + ggtitle("Model 2")
+p3 = rmap_9$plots$risk_plot
+p4 = rmap_10$plots$risk_plot
+grobs = lapply(list(p1, p2, p3, p4), `+`, 
+               theme(axis.title = element_blank(),
+                     plot.title = element_text(hjust = 0.5)))
+space = .5
+grid.arrange(grobs[[1]] + theme( axis.text.x = element_blank(),
+                                 plot.margin = unit(c(space,0,0,space), "cm")),
+             grobs[[2]] + theme( axis.text = element_blank(),
+                                 plot.margin = unit(c(space,space,0,0), "cm")),
+             grobs[[3]] + theme( plot.margin = unit(c(0,0,space,space), "cm")), 
+             grobs[[4]] + theme( axis.text.y = element_blank(),
+                                 plot.margin = unit(c(0,space,space,0), "cm")), 
+             left = "Observed Risks (%)",
+             bottom = "Assigned Risks (%)",
+             top = "Attribute and Individualized Attribute Diagrams for Models 1 and 2",
+             ncol = 2)
+```
+
