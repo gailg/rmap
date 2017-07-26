@@ -92,10 +92,10 @@ pi_sd_boot_fn = function(baseArgs){
   upper = pi_ci$upper
   pi_in_ci = ifelse(lower <= baseArgs$rSummary & baseArgs$rSummary <= upper, "yes", "no")
   sigma = apply(pi_hat_boo, 2, sd)
-  pi_sd_boot = data.frame(sd_boot = sigma, 
+  pi_sd_boot = data.frame(sd = sigma, 
                           lower = lower, 
                           upper = upper, 
-                          in_ci_boot = pi_in_ci)
+                          in_ci = pi_in_ci)
   list(pi_sd_boot = pi_sd_boot,
        concordance_ci = concordance_ci)
 }

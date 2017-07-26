@@ -187,7 +187,7 @@
 
 rmap_grouped_fn = function(baseArgs){
   concordance_estimate = concordance_estimate_fn(baseArgs)
-  concordance_summary = c(concordance = concordance_estimate$concordance)
+  concordance_summary = c(estimate = concordance_estimate$concordance)
   df_for_roc_plot = concordance_estimate$df_for_roc_plot
   roc_plot = ggplot(df_for_roc_plot, aes(x = one_minus_specificity, y = sensitivity)) + 
     geom_step() + 
@@ -217,7 +217,7 @@ rmap_grouped_fn = function(baseArgs){
     ppp  = pi_sd_boot_fn(baseArgs)
     pi_sd_boot = ppp$pi_sd_boot
     concordance_ci = ppp$concordance_ci
-    sigma = pi_sd_boot$sd_boot
+    sigma = pi_sd_boot$sd
     gof_boot = if(any(pi_sd_boot$sd_boot < baseArgs$small_number)){
       NULL
     } else {
@@ -253,13 +253,15 @@ rmap_grouped_fn = function(baseArgs){
     df_for_roc_plot = concordance_estimate$df_for_roc_plot,
     roc_plot = roc_plot,
     risk_plot = risk_plot)
-  summary = list(pi_estimate = pi_estimate,
-                 pi_sd_theory = pi_sd_theory,
-                 pi_sd_boot = pi_sd_boot,
-                 gof_theory = gof_theory,
-                 gof_boot = gof_boot,
-                 concordance_summary = concordance_summary
+  numerical_summaries = list(
+    concordance = concordance_summary,
+    gof_asymptotic = gof_theory,
+    gof_bootstrap = gof_boot,
+    grouped_estimates = pi_estimate,
+    grouped_asymptotic_sds = pi_sd_theory,
+    grouped_bootstrap_sds = pi_sd_boot
+
   )
   list(plots = plots,
-       summary = summary)
+       numerical_summaries = numerical_summaries)
 }
