@@ -20,7 +20,7 @@ fontsize: 12pt
 <A NAME="top"> </A>
 ```{r global_options, include=FALSE}
 require(knitr)
-opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 2.5, fig.width = 7, tidy=FALSE)
 ```
 
 # Introduction {#introduction}
@@ -107,43 +107,53 @@ If you got the same results I above, you are in business.
 
 # A first look at `rmap`
 
-Next try the following.  Don't worry about the meaning of each line.  I will discuss the details below, but I hope the following shows you the scope of what `rmap` can do... ROC plots, grouped and ungrouped attribute diagrams, goodness of fit statistics, concordance estimates and confidence intervals.
-
-```{r}
+```{r message = FALSE}
+library(grid)
 library(rmap)
 e = xxx$e
 t = xxx$t
 r = xxx$r
 t_star = 10
-design = "random_sample"
-risk_group = list(K = 4)
-r_summary = "mean"
+rmap_1 = rmap_simplest_example(e, t, r, t_star)
+grid.arrange(rmap_1$roc_plot, rmap_1$grouped_risk_plot, 
+             ncol = 2, 
+             top = "A very simple example of rmap in action")
+```
+
+# And if you wish to add an ungrouped summary
+
+```{r fig.height = 5, fig.width = 7}
+set.seed(1)
+rmap_2 = rmap_ungrouped_too(e, t, r, t_star)
+the_message = paste("The function rmap_ungrouped_too,",
+                    "which produces the same results",
+                    "as the simple example above",
+                    "but ungrouped has been added", sep = "\n")
+grid.arrange(textGrob(the_message),  rmap_2$grouped_risk_plot, 
+             rmap_2$roc_plot, rmap_2$ungrouped_risk_plot,
+             ncol = 2)
+```
+
+The functions `rmap_simplest_example` and `rmap_ungrouped_too` are wrapper functions that call `rmap` the main function of the `rmap` package.  For example the following lines either appear in `rmap_ungrouped_too` or are defined by default, and they show an example of the kind of input required by `rmap`.
+
+```{r eval = FALSE}
+K = 4
 N_bootstraps = 100
+design = "random_sample"
+risk_group = list(K = K)
+r_summary = "mean"
 confidence_level = 0.95
 N_cores = 1
 verbose = FALSE
-set.seed(1)
 grouped = rmap(e, t, r, t_star, design, risk_group, r_summary, 
-              N_bootstraps, confidence_level, N_cores, verbose)
-epsilon = nrow(xxx)^(-1/3)
+               N_bootstraps, confidence_level, N_cores, verbose)
+epsilon = length(e)^(-1/3)
 risk_group = list(epsilon = epsilon)
-set.seed(2)
 ungrouped = rmap(e, t, r, t_star, design, risk_group, r_summary, 
-              N_bootstraps, confidence_level, N_cores, verbose)
-roc_plot = grouped$plots$roc_plot
-grouped_risk_plot = grouped$plots$risk_plot
-ungrouped_risk_plot = ungrouped$plots$risk_plot
+                 N_bootstraps, confidence_level, N_cores, verbose)
 ```
 
-```{r fig.height = 3.5, fig.width = 3.5}
-grid.arrange(roc_plot, top = "ROC plot")
-```
 
-```{r fig.height = 3.5, fig.width = 7}
-grid.arrange(grouped_risk_plot, ungrouped_risk_plot, ncol = 2,
-             top = "Grouped and ungrouped attribute diagrams")
-grouped$numerical_summaries
-```
 
 [TOP](#top)
 

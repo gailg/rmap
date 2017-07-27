@@ -1,5 +1,5 @@
 rmap = function(e, t, r, t_star, design, risk_group, r_summary, N_bootstraps, 
-                confidence_level = 0.95, multicore = FALSE, verbose = FALSE){
+                confidence_level = 0.95, N_cores = 0, verbose = FALSE){
   tStar = t_star
   riskGroup = risk_group
   rSummary = r_summary
