@@ -1,4 +1,4 @@
-rmap_simplest_example = function(e, t, r, t_star, K = 4, N_bootstraps = 100){
+rmap_random_sample = function(e, t, r, t_star, K = 4, N_bootstraps = 100){
   design = "random_sample"
   risk_group = list(K = K)
   r_summary = "mean"

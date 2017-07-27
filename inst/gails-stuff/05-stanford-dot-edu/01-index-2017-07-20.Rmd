@@ -26,9 +26,29 @@ opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 2.5, fig.width = 7, tidy=F
 # Introduction {#introduction}
 
 Personal predictive models use an individual's personal covariates to assign him/her a probability of developing a specific disease within a specified future time period `[0, t_star]` and before a prespecified competing risk.  Predictive models are often evaluated by comparing their assigned risks to outcome incidences among participants in a cohort study.  Performance of such models can be evaluated using two criteria: calibration and concordance. Model calibration (also called goodness-of-fit) measures how well the model-assigned risks agree
-with persons' subsequent observed outcomes. `rmap` offers a grouped goodness-of-fit test and grouped and ungrouped attribute diagrams. Concordance (also called the area under the ROC curve) measures how well a model separates positive and negative outcomes.`rmap` offers estimation and confidence intervals for the concordance as well as ROC  
-plots. `rmap` handles random samples, two-stage sample designs, and weighted sample designs.
+with persons' subsequent observed outcomes. `rmap` offers a grouped goodness-of-fit test and grouped and ungrouped attribute diagrams. Concordance (also called the area under the ROC curve) measures how well a model separates positive and negative outcomes.`rmap` offers estimation and confidence intervals for the concordance as well as ROC plots. `rmap` handles random samples, two-stage sample designs, and weighted sample designs.
 
+For you to see `rmap in action, I show here a very simple call to `rmap` on a simulated random sample.
+
+
+```{r message = FALSE, echo = FALSE, fig.height = 6, fig.widht = 7}
+library(rmap)
+xxx = read.csv(file = "random_sample_example.csv", stringsAsFactors = FALSE)
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+rmap_2 = rmap_ungrouped_too(e, t, r, t_star)
+the_message = paste("Estimate concordance and produce ROC plots,",
+                    "(below),",
+                    "test for goodness of fit,",
+                    "and produce grouped and ungrouped", 
+                    "attribute diagrams", 
+                    "(right)",sep = "\n")
+grid.arrange(textGrob(the_message),  rmap_2$grouped_risk_plot, 
+             rmap_2$roc_plot, rmap_2$ungrouped_risk_plot,
+             ncol = 2)
+```
 [TOP](#top)
 
 # Data preparation {#data-preparation}
@@ -105,11 +125,10 @@ head(xxx)
 
 If you got the same results I above, you are in business.  
 
-# A first look at `rmap`
-
-```{r message = FALSE}
+```{r message = FALSE, eval = FALSE}
 library(grid)
 library(rmap)
+xxx = read.csv(file = "random_sample_example.csv", stringsAsFactors = FALSE)
 e = xxx$e
 t = xxx$t
 r = xxx$r
@@ -122,7 +141,7 @@ grid.arrange(rmap_1$roc_plot, rmap_1$grouped_risk_plot,
 
 # And if you wish to add an ungrouped summary
 
-```{r fig.height = 5, fig.width = 7}
+```{r eval = FALSE, fig.height = 5, fig.width = 7}
 set.seed(1)
 rmap_2 = rmap_ungrouped_too(e, t, r, t_star)
 the_message = paste("The function rmap_ungrouped_too,",
@@ -134,7 +153,8 @@ grid.arrange(textGrob(the_message),  rmap_2$grouped_risk_plot,
              ncol = 2)
 ```
 
-The functions `rmap_simplest_example` and `rmap_ungrouped_too` are wrapper functions that call `rmap` the main function of the `rmap` package.  For example the following lines either appear in `rmap_ungrouped_too` or are defined by default, and they show an example of the kind of input required by `rmap`.
+
+The functions `rmap_simplest_example` and `rmap_ungrouped_too` are wrapper functions that call `rmap` the main function of the `rmap` package.  For example the following lines either appear in `rmap_ungrouped_too` or are defined by default, and they show an example of the kind of input required by `rmap`. In the following sections, I describe `rmap` inputs and outputs and then proceed to some examples.
 
 ```{r eval = FALSE}
 K = 4
