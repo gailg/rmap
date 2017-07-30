@@ -1,6 +1,7 @@
-rmap_random_sample = function(e, t, r, t_star, K, N_bootstraps){
-  design = "random_sample"
-  risk_group = list(K = K)
+rmap_weighted_sample = function (
+  e, t, r, category, target_category, t_star, cutoffs, N_bootstraps){
+  design = list(target_category = target_category, category = category)
+  risk_group = list(cutoffs = cutoffs)
   r_summary = "mean"
   confidence_level = 0.95
   N_cores = 1
@@ -11,6 +12,7 @@ rmap_random_sample = function(e, t, r, t_star, K, N_bootstraps){
   risk_group = list(epsilon = epsilon)
   individual = rmap_individual(e, t, r, t_star, design, risk_group,
                                N_bootstraps, confidence_level, N_cores, verbose)
+  
   list(rmap_answers = rmap_answers,
        individual = individual)
 }

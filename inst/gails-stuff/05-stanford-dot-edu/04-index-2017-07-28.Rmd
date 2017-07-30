@@ -20,7 +20,7 @@ fontsize: 12pt
 <A NAME="top"> </A>
 ```{r global_options, include=FALSE}
 require(knitr)
-opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 2.5, fig.width = 7, tidy=FALSE)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 7, tidy=FALSE)
 ```
 
 # Introduction {#introduction}
@@ -30,18 +30,25 @@ with persons' subsequent observed outcomes. `rmap` offers a grouped goodness-of-
 
 Below is a very simple call to an `rmap` function on a simulated random sample. `rmap can estimate concordance, produce ROC plots, test for grouped goodness-of-fit, and produce grouped and ungrouped attribute diagrams.
 
-
-```{r message = FALSE, echo = TRUE, fig.height = 5, fig.widht = 7}
+```{r message = FALSE, eval = TRUE, fig.height = 5, fig.width = 7}
 library(rmap)
-xxx = read.csv(file = "random_sample_example.csv", stringsAsFactors = FALSE)
+xxx = read.csv(file = "random_sample_example.csv", 
+               stringsAsFactors = FALSE)
 e = xxx$e
 t = xxx$t
 r = xxx$r
 t_star = 10
-rmap_2 = rmap_random_sample_ungrouped_too(e, t, r, t_star)
-the_message = paste("The package rmap in action",sep = "\n")
-grid.arrange(textGrob(the_message),  rmap_2$grouped_risk_plot, 
-             rmap_2$roc_plot, rmap_2$ungrouped_risk_plot,
+K = 4
+N_bootstraps = 100
+set.seed(1)
+the_random_sample = rmap_random_sample(e, t, r, t_star, K, N_bootstraps)
+rmap_answers = the_random_sample$rmap_answers
+individual = the_random_sample$individual
+the_message = paste("rmap_random_sample", sep = "\n")
+grid.arrange(textGrob(the_message), 
+             pretty_risk_plot_fn(rmap_answers), 
+             pretty_roc_plot_fn(rmap_answers), 
+             pretty_individual_risk_plot_fn(individual),
              ncol = 2)
 ```
 
@@ -126,7 +133,9 @@ For your convenience, if you have a sample from the target population with the c
 
 # `rmap` inputs
 
-`rmap` must be called with the following arguments
+The example in the introduction calls the function `rmap_random_sample_fn`.  This function is simply a "wrapper" function in which I decided which options in `rmap` I to allow when you call this function.  Use this function only if your design is a ranodm sample, you wish risk groups to be defined using quantiles, the assigned risks of each risk group to be summarized using their mean, and the confidence level of confidence intervals (eg the concordance) to be 0.95.  To specify other options such as other designs and other ways to define risk groups, you need to manipulate the inputs of the workhorse functions: `rmap`. 
+
+The following details the inputs to `rmap`.
 
 ## `e`, `t`, `r` 
 
@@ -184,6 +193,8 @@ If you would like `rmap` to output extra information to show the progress of the
 
 # Explaining `rmap` output
 
+The example in the introduction called the wrapper function `rmap_random_sample_individual_to_fn`. And then "pretty plotting" functions were called on the output to produce the plots and summary statistics that were displayed.  If you are happy enough with these default plots, you can stop here. If you would like to customize your plots or dig into some of the results not given in the plots or understand in more detail the summaries shown, I detail below the output from `rmap`.
+
 ## Grouped `rmap` output 
 
 Grouped `rmap` output is broken down into two objects: `numerical_summaries` and `plots`.  
@@ -227,147 +238,121 @@ If you have a random sample, and you are happy enough using assigned risk quanti
 
 
 
-```{r}
-rmap_random_sample_individual_too = function(e, t, r, t_star, K = 4, N_bootstraps = 100){
-  design = "random_sample"
-  risk_group = list(K = K)
-  r_summary = "mean"
-  confidence_level = 0.95
-  N_cores = 1
-  verbose = FALSE
-  rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, 
-                 N_bootstraps, confidence_level, N_cores, verbose)
-  individual = if(N_bootstraps > 0){
-    epsilon = length(e)^(-1/3)
-    risk_group = list(epsilon = epsilon)
-    rmap_individual(e, t, r, t_star, design, risk_group, r_summary, 
-         N_bootstraps, confidence_level, N_cores, verbose)
-  } else {
-    NULL
-  }
-  list(rmap_answers = rmap_answers,
-       individual = individual)
-}
-pretty_roc_plot = function(rmap_answers){
-  numerical_summaries = rmap_answers$numerical_summaries
-  concordance_annotation_just_estimate = 
-    paste0("Concordance = ",
-           round(numerical_summaries$concordance["estimate"] * 100, 1),
-           "%")
-  concordance_annotation = if("lower" %in% names(numerical_summaries$concordance)){
-    paste0(concordance_annotation_just_estimate,
-           ", CI = (",
-           round(numerical_summaries$concordance["lower"] * 100, 1),
-           "%, ",
-           round(numerical_summaries$concordance["upper"] * 100, 1), 
-           "%)")
-  } else {
-    concordance_annotation_just_estimate
-  }
 
-  roc_plot = rmap_answers$plot$roc_plot +
-    xlab("1 - Specificity") + ylab("Sensitivity") +
-    labs(title = "ROC Plot",
-         subtitle = concordance_annotation)
-  roc_plot
-}
-pretty_risk_plot = function(rmap_answers){
-  numerical_summaries = rmap_answers$numerical_summaries
-  risk_annotation = paste0("GOF = ", 
-                           round(numerical_summaries$gof_asymptotic["statistic"], 4),
-                           ", P-Value = ", 
-                           round(numerical_summaries$gof_asymptotic["p_value"], 4))
-  rmap_answers$plots$risk_plot +
-    labs(title = "Attribute Diagram",
-         subtitle = risk_annotation)
-  
-}
-
-pretty_individual_risk_plot = function(individual){
-  individual$risk_plot +
-    labs(title = "Individualized Attribute Diagram",
-         subtitle = " ")
-}
-```
-
-```{r fig.height = 3, fig.width = 7}
-library(rmap)
-xxx = read.csv(file = "random_sample_example.csv", stringsAsFactors = FALSE)
-e = xxx$e
-t = xxx$t
-r = xxx$r
-t_star = 10
-rmap_1 = rmap_random_sample(e, t, r, t_star)
-grid.arrange(rmap_1$roc_plot, rmap_1$grouped_risk_plot, 
-             ncol = 2, 
-             top = "A very simple example of rmap in action")
-```
 
 or `rmap_random_sample_ungrouped_too` if you wish to include an ungrouped attribute diagram.
 
-```{r eval = FALSE, fig.height = 5, fig.width = 7}
+```{r eval = TRUE, fig.height = 5, fig.width = 7}
 library(rmap)
-xxx = read.csv(file = "random_sample_example.csv", stringsAsFactors = FALSE)
+xxx = read.csv(file = "random_sample_example.csv", 
+               stringsAsFactors = FALSE)
 e = xxx$e
 t = xxx$t
 r = xxx$r
 t_star = 10
+K = 4
+N_bootstraps = 100
 set.seed(1)
-rmap_2 = rmap_random_sample_individual_too(e, t, r, t_star)
-rmap_answers = rmap_2$rmap_answers
-individual = rmap_2$individual
-the_message = paste("rmap_random_sample_individual_too plots", sep = "\n")
-grid.arrange(textGrob(the_message), pretty_risk_plot(rmap_answers), 
-             pretty_roc_plot(rmap_answers), pretty_individual_risk_plot(individual),
+the_random_sample = rmap_random_sample(e, t, r, t_star, K, N_bootstraps)
+rmap_answers = the_random_sample$rmap_answers
+individual = the_random_sample$individual
+the_message = paste("rmap_random_sample", sep = "\n")
+grid.arrange(textGrob(the_message), 
+             pretty_risk_plot_fn(rmap_answers), 
+             pretty_roc_plot_fn(rmap_answers), 
+             pretty_individual_risk_plot_fn(individual),
              ncol = 2)
 ```
 
-Each of the functions `rmap_random_sample` and `rmap_random_sample_ungrouped_too` is a wrapper function.  You can see what is inside the definition of a function just by sending to R the name of the function, without trailing parentheses or inputs.  (I won't actually evaluate the next command here because even the simpler one is quite long
-
-```{r eval = FALSE}
-rmap_random_sample
-```
 
 # A weighted cohort example
 
-```{r}
+```{r eval = TRUE}
 library(rmap)
-xxx = read.csv("weighted_example_cohort_sample.csv", stringsAsFactors = FALSE)
+xxx = read.csv("weighted_example_cohort_sample.csv", 
+               stringsAsFactors = FALSE)
 head(xxx)
 e = xxx$e
 t = xxx$t
 r = xxx$r
 t_star = 10
-target_sample = read.csv("weighted_example_target_sample.csv", stringsAsFactors = FALSE)
+target_sample = read.csv("weighted_example_target_sample.csv", 
+                         stringsAsFactors = FALSE)
 head(target_sample)
 target_category = target_sample$category
 category = xxx$category
-design = list(target_category = target_category, category = category)
 cutoffs = c(0, 0.20, 1)
+N_bootstraps = 100
+set.seed(1)
+the_weighted_sample = rmap_weighted_sample(
+  e, t, r, category, target_category, t_star, cutoffs, N_bootstraps)
+rmap_answers = the_weighted_sample$rmap_answers
+individual = the_weighted_sample$individual
+the_message = paste("rmap_weighted_sample", sep = "\n")
+grid.arrange(textGrob(the_message), 
+             pretty_risk_plot_fn(rmap_answers), 
+             pretty_roc_plot_fn(rmap_answers), 
+             pretty_individual_risk_plot_fn(individual),
+             ncol = 2)
+```
+
+Each of the functions `rmap_random_sample` and rmap_weighted_sample_fn is a wrapper function.  You can see what is inside the definition of a function just by sending to R the name of the function, without trailing parentheses or inputs.  By examining how I constructed these wrapper functions, you see how you can create your own customized calls to `rmap`.
+
+```{r}
+rmap_weighted_sample
+```
+
+If I didn't have `rmap_weighted_sample_fn`, this is how I would get the same results
+
+```{r}
+library(rmap)
+xxx = read.csv("weighted_example_cohort_sample.csv", 
+               stringsAsFactors = FALSE)
+head(xxx)
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+target_sample = read.csv("weighted_example_target_sample.csv", 
+                         stringsAsFactors = FALSE)
+head(target_sample)
+target_category = target_sample$category
+category = xxx$category
+set.seed(1)
+design = list(target_category = target_category, category = category)
 risk_group = list(cutoffs = cutoffs)
 r_summary = "mean"
-N_bootstraps = 100
 confidence_level = 0.95
 N_cores = 1
 verbose = FALSE
-set.seed(1)
-grouped = rmap(e, t, r, t_star, design, risk_group, r_summary, 
-              N_bootstraps, confidence_level, N_cores, verbose)
-
-numerical_summaries = grouped$numerical_summaries
-plots = rmap_3$plots
-grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
-             top = "rmap_grouped on a weighted sample")
-epsilon = nrow(xxx)^(-1/3)
+rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, 
+                    N_bootstraps, confidence_level, N_cores, verbose)
+epsilon = length(e)^(-1/3)
 risk_group = list(epsilon = epsilon)
-set.seed(6)
-rmap_6 = rmap(e, t, r, t_star, design, risk_group, r_summary, 
-              N_bootstraps, confidence_level, N_cores, verbose)
-plots = rmap_6$plots
+individual = rmap_individual(e, t, r, t_star, design, risk_group,
+                             N_bootstraps, confidence_level, N_cores, verbose)
+the_message = paste("doing it without calling rmap_weighted_etc", sep = "\n")
+grid.arrange(textGrob(the_message), 
+             pretty_risk_plot_fn(rmap_answers), 
+             pretty_roc_plot_fn(rmap_answers), 
+             pretty_individual_risk_plot_fn(individual),
+             ncol = 2)
 ```
 
-
-```{r}
-
+```{r fig.height = 3, fig.width = 7, echo = FALSE, eval = FALSE}
+library(rmap)
+xxx = read.csv(file = "random_sample_example.csv", 
+               stringsAsFactors = FALSE)
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+K = 4
+N_bootstraps = 100
+rmap_answers = rmap_random_sample(e, t, r, t_star, K, N_bootstraps)
+grid.arrange(pretty_roc_plot_fn(rmap_answers), 
+             pretty_risk_plot_fn(rmap_answers), 
+             ncol = 2, 
+             top = "A very simple example of rmap in action")
 ```
 
