@@ -1,4 +1,4 @@
-#' The risk estimation part of \code{rmap_grouped_fn}
+#' The risk estimation part of \code{rmap_fn}
 #' 
 #' For each risk group, produce \code{gamma_hat}, \code{r}, and \code{pi_hat}.
 #' 

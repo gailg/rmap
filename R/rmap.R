@@ -3,5 +3,5 @@ rmap = function(e, t, r, t_star, design, risk_group, r_summary, N_bootstraps,
   baseArgs = base_args_fn(
     e, t, r, t_star, design, risk_group, r_summary, N_bootstraps, 
     confidence_level, N_cores, verbose)
-  rmap_grouped_fn(baseArgs)
+  rmap_fn(baseArgs)
 }

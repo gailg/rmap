@@ -1,4 +1,4 @@
-#' The bootstrap part of \code{rmap_grouped_fn}
+#' The bootstrap part of \code{rmap_fn}
 #' 
 #' For each risk group, 
 #' calculate the bootstrap variance of the outcome probability estimate

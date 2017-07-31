@@ -1,4 +1,4 @@
-#' The theoretical variance part of \code{rmap_grouped_fn}
+#' The theoretical variance part of \code{rmap_fn}
 #' 
 #' For each risk group, 
 #' calculate the variance of the outcome probability estimate
