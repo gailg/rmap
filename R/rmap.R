@@ -258,9 +258,9 @@
 #' rmap_answers$numerical_summaries
 #' head(rmap_answers$plots$df_for_roc_plot)
 #' rmap_answers$plots$roc_plot
-#' pretty_roc_plot_fn(rmap_answers)
+#' pretty_roc_plot(rmap_answers)
 #' rmap_answers$plots$risk_plot
-#' pretty_risk_plot_fn(rmap_answers)
+#' pretty_risk_plot(rmap_answers)
 #' #------------------------------------------------- two-stage sample
 #' data(two_stage_sample_example)
 #' xxx = two_stage_sample_example

@@ -3,14 +3,12 @@ rmap_random_sample = function(e, t, r, t_star, K, N_bootstraps){
   risk_group = list(K = K)
   r_summary = "mean"
   confidence_level = 0.95
-  N_cores = 1
-  verbose = FALSE
   rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, 
-                      N_bootstraps, confidence_level, N_cores, verbose)
+                      N_bootstraps, confidence_level)
   epsilon = length(e)^(-1/3)
   risk_group = list(epsilon = epsilon)
   individual = rmap_individual(e, t, r, t_star, design, risk_group,
-                               N_bootstraps, confidence_level, N_cores, verbose)
+                               N_bootstraps, confidence_level)
   list(rmap_answers = rmap_answers,
        individual = individual)
 }

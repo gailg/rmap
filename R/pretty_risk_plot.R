@@ -1,4 +1,4 @@
-pretty_risk_plot_fn = function(rmap_answers){
+pretty_risk_plot = function(rmap_answers){
   numerical_summaries = rmap_answers$numerical_summaries
   gof = if( !is.null(numerical_summaries$gof_asymptotic) ){
     numerical_summaries$gof_asymptotic

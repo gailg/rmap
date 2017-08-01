@@ -1,4 +1,4 @@
-pretty_roc_plot_fn = function(rmap_answers){
+pretty_roc_plot = function(rmap_answers){
   numerical_summaries = rmap_answers$numerical_summaries
   concordance_annotation_just_estimate = 
     paste0("Concordance = ",
