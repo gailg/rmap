@@ -25,7 +25,7 @@
 #' r = cohort_sample[[which_model]]
 #' e = cohort_sample$eee
 #' t = cohort_sample$ttt
-#' design = list(targetCategory = target_category, c = cohort_category)
+#' design = list(target_category = target_category, c = cohort_category)
 #' riskGroup = list(cutoffs = cutoffs)
 #' rSummary = "mean"
 #' bootstrap = N_bootstrap_reps

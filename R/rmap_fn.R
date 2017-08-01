@@ -31,21 +31,6 @@
 #' 
 #' @return A list containing
 #' \itemize{
-#' \item{\code{plots}: }{A list containing 
-#' \itemize{
-#' \item{\code{df_for_roc_plot}: }{A data.frame containing the columns
-#' \code{one_minus_specificity} and \code{sensitivity}, which can be plotted
-#' to produce an roc plot.
-#' }
-#' \item{\code{roc_plot}: }{An roc plot.
-#' }
-#' \item{\code{risk_plot}: }{An attribute diagram showing 
-#' for each risk group the estimate 
-#' \code{pi_hat} of the outcome probability at each summary of 
-#' assigned risk.
-#' }
-#' }
-#' }
 #' \item{\code{summary}: }{A list containing
 #' \itemize{
 #' \item{\code{pi_estimate}: }{A data.frame containing 
@@ -113,6 +98,21 @@
 #' }
 #' }
 #' }
+#' \item{\code{plots}: }{A list containing 
+#' \itemize{
+#' \item{\code{df_for_roc_plot}: }{A data.frame containing the columns
+#' \code{one_minus_specificity} and \code{sensitivity}, which can be plotted
+#' to produce an roc plot.
+#' }
+#' \item{\code{roc_plot}: }{An roc plot.
+#' }
+#' \item{\code{risk_plot}: }{An attribute diagram showing 
+#' for each risk group the estimate 
+#' \code{pi_hat} of the outcome probability at each summary of 
+#' assigned risk.
+#' }
+#' }
+#' }
 #' }
 #' @examples 
 #' #-------------------------------------------------- A random sample example
@@ -153,7 +153,7 @@
 #' r = cohort_sample[[which_model]]
 #' e = cohort_sample$eee
 #' t = cohort_sample$ttt
-#' design = list(targetCategory = target_category, c = cohort_category)
+#' design = list(target_category = target_category, c = cohort_category)
 #' riskGroup = list(cutoffs = cutoffs)
 #' rSummary = "mean"
 #' bootstrap = N_bootstrap_reps

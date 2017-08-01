@@ -93,7 +93,7 @@
 #' e = cohort_sample$eee
 #' t = cohort_sample$ttt
 #' cohort_sample
-#' design = list(targetCategory = target_category, c = cohort_category)
+#' design = list(target_category = target_category, c = cohort_category)
 #' epsilon = nrow(cohort_sample)^(-1/3)
 #' riskGroup = list(epsilon = epsilon)
 #' rSummary = "mean"

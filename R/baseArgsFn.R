@@ -312,7 +312,7 @@
 #' r = cohort_sample[[which_model]]
 #' e = cohort_sample$eee
 #' t = cohort_sample$ttt
-#' design = list(targetCategory = target_category, c = cohort_category)
+#' design = list(target_category = target_category, c = cohort_category)
 #' riskGroup = list(cutoffs = cutoffs)
 #' rSummary = "mean"
 #' bootstrap = N_bootstrap_reps
@@ -342,7 +342,7 @@ baseArgsFn = function(
 
   # Vector checks:
   if(length(unique(sapply(vecs[sapply(vecs, function(vec) !is.null(vec))], length))) != 1) {
-    stop("e, t, r (and design$c, riskGroup$k, design$cohortCategory, design$targetCategory if supplied) must all be the same length")
+    stop("e, t, r (and design$category, riskGroup$k if supplied) must all be the same length")
   }
 
   if(!all(is.numeric(unlist(vecs[c("e", "t", "r", "k")])))) {
@@ -350,7 +350,7 @@ baseArgsFn = function(
   }
 
   if( !is.null(vecs[["c"]]) && !is.character(vecs[["c"]])) {
-    stop("design$c must be a character vector.")
+    stop("design$category must be a character vector.")
   }
   
   # New Tue Apr 26 15:16:04 PDT 2011 >>> 
@@ -405,15 +405,14 @@ baseArgsFn = function(
     design$sampling = "twoStage"
   
   # "2017-06-12 09:28:47 PDT" GG added to handle weighted analysis
-  } else if(is.list(design) && "targetCategory" %in% names(design) &&
+  } else if(is.list(design) && "target_category" %in% names(design) &&
             "c" %in% names(design)) {
     # this code segment is for setting up weighted
     # with target_category and c provided
-    weight_0 = weight_fn(design$c, target_category)
+    weight_0 = weight_fn(design$c, design$target_category)
     weight_code = weight_0$code
     weight_message = weight_0$message
     if(weight_code != 0) stop(weight_message)
-    
     design$category_weights = weight_0$category_weights # "2017-06-12 14:07:48 PDT" GG 
     # When the design is twoStage, a contains the weights
     # When the design is target_category and c provided, weight_fn gives us category_weights
@@ -424,9 +423,7 @@ baseArgsFn = function(
     # once in gammaHatFn and again in lambdaHatFn
     # For weighted, I  do it just once, here 
     design$a = design$category_weights
-
     design$sampling = "weighted"
-
   } else if( is.list(design) && "w" %in% names(design) ) {
     design$sampling = "w_provided" # design$weight needs to be brought into the vecs
     design$weight = design$w
@@ -628,7 +625,7 @@ baseArgsFn = function(
     rSummary = rSummary,
     sampling = design$sampling,
     t = t[order(ord)],  
-    target_category = design$targetCategory, 
+    target_category = design$target_category, 
     tStar = tStar,
     ungrouped = riskGroup$ungrouped,
     verbose = verbose,
