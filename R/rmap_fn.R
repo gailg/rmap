@@ -133,8 +133,8 @@
 #' rmap_1 = rmap_fn(baseArgs)
 #' plots = rmap_1$plots
 #' grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
-#'              top = "rmap_grouped on a random sample")
-#' rmap_1$summary
+#'              top = "rmap_fn on a random sample")
+#' rmap_1$numerical_summaries
 #' #-------------------------------------------------- A weighted sample example
 #' set.seed(2)
 #' tStar = 10
@@ -262,6 +262,6 @@ rmap_fn = function(baseArgs){
     grouped_bootstrap_sds = pi_sd_boot
 
   )
-  list(plots = plots,
-       numerical_summaries = numerical_summaries)
+  list(numerical_summaries = numerical_summaries,
+       plots = plots)
 }
