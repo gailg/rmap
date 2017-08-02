@@ -211,14 +211,14 @@ rmap_fn = function(baseArgs){
     gof_fn(gamma_hat, r_bar, pi_hat, sigma)
   }
   if(baseArgs$N_bootstraps == 0){
-    pi_sd_boot = NULL
+    grouped_bootstrap_sds = NULL
     gof_boot = NULL
   } else {
-    ppp  = pi_sd_boot_fn(baseArgs)
-    pi_sd_boot = ppp$pi_sd_boot
+    ppp  = grouped_bootstrap_sds_fn(baseArgs)
+    grouped_bootstrap_sds = ppp$grouped_bootstrap_sds
     concordance_ci = ppp$concordance_ci
-    sigma = pi_sd_boot$sd
-    gof_boot = if(any(pi_sd_boot$sd_boot < baseArgs$small_number)){
+    sigma = grouped_bootstrap_sds$sd
+    gof_boot = if(any(grouped_bootstrap_sds$sd_boot < baseArgs$small_number)){
       NULL
     } else {
       gof_fn(gamma_hat, r_bar, pi_hat, sigma)
@@ -226,10 +226,10 @@ rmap_fn = function(baseArgs){
     concordance_summary = c(concordance_summary, concordance_ci)
   }
   sd_part = if(baseArgs$sampling == "weighted"){
-    if(is.null(pi_sd_boot)){
+    if(is.null(grouped_bootstrap_sds)){
       NULL
     } else {
-      pi_sd_boot[, c("lower", "upper")]
+      grouped_bootstrap_sds[, c("lower", "upper")]
     }
   } else {
     grouped_asymptotic_sds[, c("lower", "upper")]
@@ -259,7 +259,7 @@ rmap_fn = function(baseArgs){
     gof_bootstrap = gof_boot,
     grouped_estimates = grouped_estimates,
     grouped_asymptotic_sds = grouped_asymptotic_sds,
-    grouped_bootstrap_sds = pi_sd_boot
+    grouped_bootstrap_sds = grouped_bootstrap_sds
   )
   list(numerical_summaries = numerical_summaries,
        plots = plots)

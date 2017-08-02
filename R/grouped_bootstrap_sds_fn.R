@@ -6,7 +6,7 @@
 #' outcome probability.
 #' 
 #' @param baseArgs A list provided by \code{baseArgsFn}.  The objects
-#' required by \code{pi_sd_boot_fn} are 
+#' required by \code{grouped_bootstrap_sds_fn} are 
 #' \code{c}
 #' \code{e},
 #' \code{K}, \code{k},
@@ -22,7 +22,7 @@
 #' 
 #' @return A list containing
 #' \itemize{
-#' \item{\code{pi_sd_boot}: }{A data.frame containing \code{K} rows,
+#' \item{\code{grouped_bootstrap_sds}: }{A data.frame containing \code{K} rows,
 #' one for each risk group, and the following columns:
 #' \itemize{
 #' \item{\code{sd_boot}: }{The bootstrap estimate of teh
@@ -58,10 +58,10 @@
 #' rSummary = "mean"
 #' bootstrap = 100
 #' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
-#' pi_sd_boot_fn(baseArgs)
+#' grouped_bootstrap_sds_fn(baseArgs)
 #' 
 #' @export
-pi_sd_boot_fn = function(baseArgs){
+grouped_bootstrap_sds_fn = function(baseArgs){
   random_seeds = sample(1:1e8, baseArgs$N_bootstraps, replace = FALSE)
   boo_0 = lapply(1:baseArgs$N_bootstraps, function(n_bootstrap){
     set.seed(random_seeds[n_bootstrap])
@@ -92,10 +92,10 @@ pi_sd_boot_fn = function(baseArgs){
   upper = pi_ci$upper
   pi_in_ci = ifelse(lower <= baseArgs$rSummary & baseArgs$rSummary <= upper, "yes", "no")
   sigma = apply(pi_hat_boo, 2, sd)
-  pi_sd_boot = data.frame(sd = sigma, 
+  grouped_bootstrap_sds = data.frame(sd = sigma, 
                           lower = lower, 
                           upper = upper, 
                           in_ci = pi_in_ci)
-  list(pi_sd_boot = pi_sd_boot,
+  list(grouped_bootstrap_sds = grouped_bootstrap_sds,
        concordance_ci = concordance_ci)
 }
