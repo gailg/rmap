@@ -187,13 +187,12 @@
 #' @export
 
 rmap_fn = function(baseArgs){
-  concordance_estimate = concordance_estimate_fn(baseArgs)
+  concordance_estimate = concordance_fn(baseArgs)
   concordance_summary = c(estimate = concordance_estimate$concordance)
   df_for_roc_plot = concordance_estimate$df_for_roc_plot
   roc_plot = ggplot(df_for_roc_plot, aes(x = one_minus_specificity, y = sensitivity)) + 
     geom_step() + 
     geom_abline(slope = 1, intercept = 0, color = "red", linetype = 2) 
-  
   pi_estimate = pi_estimate_fn(baseArgs)$pi_estimate
   gamma_hat = pi_estimate$gamma_hat
   r_bar = pi_estimate$r
@@ -251,7 +250,7 @@ rmap_fn = function(baseArgs){
       geom_errorbar(aes(ymin = df_for_risk_plot$lower, ymax = df_for_risk_plot$upper), width = 2) 
   }
   plots = list(
-    df_for_roc_plot = concordance_estimate$df_for_roc_plot,
+    df_for_roc_plot = df_for_roc_plot,
     roc_plot = roc_plot,
     risk_plot = risk_plot)
   numerical_summaries = list(
@@ -261,7 +260,6 @@ rmap_fn = function(baseArgs){
     grouped_estimates = pi_estimate,
     grouped_asymptotic_sds = pi_sd_theory,
     grouped_bootstrap_sds = pi_sd_boot
-
   )
   list(numerical_summaries = numerical_summaries,
        plots = plots)

@@ -101,9 +101,12 @@ concordance_fn = function(baseArgs){
   specificity = unlist(lapply(ccc, function(this_c){
     sum( bbb[risk <= this_c] )
   })) / sum(bbb)
-  roc = list(ccc = ccc,
-             sensitivity = sensitivity,
-             specificity = specificity)
+  one_minus_specificity = 1 - specificity
+  roc_df_0 = unique(data.frame(one_minus_specificity, sensitivity))
+  df_for_roc_plot = roc_df_0[order(roc_df_0$one_minus_specificity, roc_df_0$sensitivity), ]
+  # roc = list(ccc = ccc,
+  #            sensitivity = sensitivity,
+  #            specificity = specificity)
   list(concordance = concordance,
-       roc = roc)
+       df_for_roc_plot = df_for_roc_plot)
 }

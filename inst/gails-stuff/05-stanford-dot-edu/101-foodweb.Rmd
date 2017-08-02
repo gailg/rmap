@@ -28,22 +28,22 @@ opts_chunk$set(eval = TRUE, echo = FALSE, fig.height = 10, fig.width = 10, tidy=
 "2017-06-23 12:05:27 PDT"
 
 
-```{r message = FALSE, warning = FALSE, fig.height = 12}
+```{r message = FALSE, warning = FALSE, fig.height = 15}
 library(mvbutils)
 
 library(rmap)
 
-foodweb(where = "package:rmap", rprune = "rmap",
+foodweb(where = "package:rmap", rprune = "rmap", color.lines = FALSE,
         descendents = TRUE, ancestors = FALSE)
 ```
 
 ```{r fig.height = 7}
-foodweb(where = "package:rmap", rprune = "rmap_grouped_fn",
+foodweb(where = "package:rmap", rprune = "rmap_grouped_fn", color.lines = FALSE,
         descendents = TRUE, ancestors = FALSE)
 ```
 
 ```{r fig.height = 5}
-foodweb(where = "package:rmap", rprune = "rmap_individual",
+foodweb(where = "package:rmap", rprune = "rmap_individual", color.lines = FALSE,
         descendents = TRUE, ancestors = FALSE)
 ```
 
