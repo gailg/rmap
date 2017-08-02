@@ -145,12 +145,13 @@ $(document).ready(function () {
 <li><a href="#confidence_level"><span class="toc-section-number">6.7</span> <code>confidence_level</code></a></li>
 </ul></li>
 <li><a href="#rmap_individual-inputs"><span class="toc-section-number">7</span> <code>rmap_individual</code> inputs</a><ul>
-<li><a href="#n_cores"><span class="toc-section-number">7.1</span> <code>N_cores</code></a></li>
-<li><a href="#verbose"><span class="toc-section-number">7.2</span> <code>verbose</code></a></li>
+<li><a href="#epsilon"><span class="toc-section-number">7.1</span> <code>epsilon</code></a></li>
+<li><a href="#n_cores"><span class="toc-section-number">7.2</span> <code>N_cores</code></a></li>
+<li><a href="#verbose"><span class="toc-section-number">7.3</span> <code>verbose</code></a></li>
 </ul></li>
 <li><a href="#explaining-rmap-output"><span class="toc-section-number">8</span> Explaining <code>rmap</code> output</a><ul>
-<li><a href="#grouped-rmap-output"><span class="toc-section-number">8.1</span> Grouped <code>rmap</code> output</a></li>
-<li><a href="#ungrouped-rmap-output"><span class="toc-section-number">8.2</span> Ungrouped <code>rmap</code> output</a></li>
+<li><a href="#rmap-output"><span class="toc-section-number">8.1</span> <code>rmap</code> output</a></li>
+<li><a href="#rmap_individual-output"><span class="toc-section-number">8.2</span> <code>rmap_individual</code> output</a></li>
 </ul></li>
 <li><a href="#a-random-sample-example"><span class="toc-section-number">9</span> A random sample example</a></li>
 <li><a href="#a-weighted-cohort-example"><span class="toc-section-number">10</span> A weighted cohort example</a></li>
@@ -161,11 +162,10 @@ $(document).ready(function () {
 <p><A NAME="top"> </A></p>
 <div id="introduction" class="section level1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
-<p>Personal predictive models use an individual’s personal covariates to assign him/her a probability of developing a specific disease within a specified future time period <code>[0, t_star]</code> and before a prespecified competing risk. Predictive models are often evaluated by comparing their assigned risks to outcome incidences among participants in a cohort study. Performance of such models can be evaluated using two criteria: calibration and concordance. Model calibration (also called goodness-of-fit) measures how well the model-assigned risks agree with persons’ subsequent observed outcomes. <code>rmap</code> offers a grouped goodness-of-fit test and grouped and individualized attribute diagrams. Concordance (also called the area under the ROC curve) measures how well a model separates positive and negative outcomes.<code>rmap</code> offers estimation and confidence intervals for the concordance as well as ROC plots. <code>rmap</code> handles random samples, two-stage sample designs, and weighted sample designs.</p>
-<p>Below is a very simple call to an <code>rmap</code> function on a simulated random sample. The display shows <code>rmap</code> in action, estimating concordance, producing ROC plots, testing for grouped goodness-of-fit, and producing grouped and individualized attribute diagrams.</p>
+<p>Personal predictive models use an individual’s covariates to assign him/her a probability of developing a specific disease or outcome within a specified future time period <code>[0, t_star]</code> and before a specified competing risk. Predictive models are often evaluated by comparing their assigned risks to outcome occurence among participants in a longitudinal cohort study. Performance of such models can be evaluated using two criteria: calibration and concordance. Model calibration (also called goodness-of-fit) measures how well the model-assigned risks agree with persons’ subsequent observed outcomes. <code>rmap</code> offers a grouped goodness-of-fit test and grouped and individualized attribute diagrams. Concordance (also called the area under the ROC curve) measures how well a model separates or discriminates positive and negative outcomes.<code>rmap</code> offers estimation and confidence intervals for the concordance as well as ROC plots. <code>rmap</code> handles samples of participants that were obtained by random sampling, two-stage sample designs, and weighted designs.</p>
+<p>Below is a simple call to an <code>rmap</code> function on a simulated random sample. The display shows <code>rmap</code> in action, estimating concordance, producing ROC plots, testing for grouped goodness-of-fit, and producing grouped and individualized attribute diagrams.</p>
 <pre class="r"><code>library(rmap)
-xxx = read.csv(file = &quot;random_sample_example.csv&quot;, 
-               stringsAsFactors = FALSE)
+xxx = read.csv(file = &quot;random_sample_example.csv&quot;, stringsAsFactors = FALSE)
 e = xxx$e
 t = xxx$t
 r = xxx$r
@@ -205,27 +205,28 @@ if(&quot;rmap&quot; %in% rownames(installed.packages())){
 </div>
 <div id="data-preparation" class="section level1">
 <h1><span class="header-section-number">3</span> Data preparation</h1>
-<p>You need a data set, containing, say <span class="math inline">\(N\)</span> people, and for the <span class="math inline">\(n\)</span>-th person, you have the following data:</p>
+<p>You need a data set, containing, say <code>N</code> people, and for the <code>n</code>-th person, you have the following data:</p>
 <div id="e" class="section level2">
 <h2><span class="header-section-number">3.1</span> <code>e</code></h2>
-<p>The event for the subject. Record <code>e = 1</code> if the outcome of interest was observed to occur before being censored and before the competing event, <code>e = 2</code> if the competing risk, such as death from other causes, was observed to occur before before the outcome, and before being censored, and <code>0</code> if censored before outcome and competing risk. Acceptable values are <code>0, 1, 2</code>.</p>
+<p>The event for the subject. Record <code>e = 1</code> if the outcome of interest was observed to occur before being censored and before the competing event. Record <code>e = 2</code> if the competing risk was observed to occur before before the outcome and before being censored. And record <code>0</code> if the subject was censored before outcome and competing risk. Acceptable values are <code>0, 1, 2</code>.</p>
 </div>
 <div id="t" class="section level2">
 <h2><span class="header-section-number">3.2</span> <code>t</code></h2>
-<p>The time until the event <code>e</code>. Mathematically speaking, let <code>t_1</code> be time until outcome, <code>t_2</code> time until competing risk, <code>t_0</code> time until censoring . Then <code>t</code> is the minimum of <code>t_1</code>, <code>t_2</code>, <code>t_0</code>, and <code>e</code> records which of the events occurred first. Acceptable values are positive real numbers.</p>
+<p>The time until the event <code>e</code>. Mathematically speaking, let <code>t1</code> be time until outcome, <code>t2</code> time until competing risk, <code>t0</code> time until censoring . Then <code>t</code> is the minimum of <code>t1</code>, <code>t2</code>, <code>t0</code>, and <code>e</code> records which of the events occurred first. Acceptable values are positive real numbers (that can exceed <code>t_star</code> the right endpoint of the time period of interest).</p>
 </div>
 <div id="r" class="section level2">
 <h2><span class="header-section-number">3.3</span> <code>r</code></h2>
-<p>The risk assigned by the personal predictive model. This is the probability of outcome occuring before the competing risk and before <code>t_star</code>. Acceptable values are real numbers between <code>0</code> and <code>1</code>, including <code>0</code> and <code>1</code>.</p>
+<p>The risk assigned by the personal predictive model. This is the probability of the outcome of interest occuring before the competing risk and before <code>t_star</code>. Acceptable values are real numbers between <code>0</code> and <code>1</code>, including <code>0</code> and <code>1</code>.</p>
 </div>
 <div id="category-optional" class="section level2">
 <h2><span class="header-section-number">3.4</span> <code>category</code> (optional)</h2>
-<p>If your data were obtained by two-stage sampling, this is the two-stage category indicating which two-stage category the person fell into. (See <code>N_first_stage</code> below.) If your data are a cohort sample whose relevant covariates do not match your target population, and you would like to weight your cohort samples based on covariate information from a target population, <code>category</code> records which covariate category the (cohort) person fell into. (See <code>N_target</code> below.)</p>
+<p>If your data were obtained by two-stage sampling, this is the two-stage category indicating which two-stage category the person fell into. (See <code>N_first_stage</code> below.) If your data are a cohort sample whose covariates suspected to be related to risk do not match those of your target population, and you would like to weight your cohort samples based on covariate information from a target population, <code>category</code> records which covariate category the (cohort) person fell into. (See <code>design</code> with with option <code>list(category = category, target_category = target_category</code> below.)</p>
 </div>
 </div>
 <div id="reading-in-data" class="section level1">
 <h1><span class="header-section-number">4</span> Reading in data</h1>
 <p>If your data is an excel file with columns <code>e</code>, <code>t</code>, <code>r</code>, and possibly <code>category</code>, save it as a CSV (comma separated value) file into your working directory. For practice you can download my excel file here, put it into your working directory, and try out the following commands.</p>
+<p><a href="random_sample_example.csv" class="uri">random_sample_example.csv</a></p>
 <pre class="r"><code>xxx = read.csv(file = &quot;random_sample_example.csv&quot;, stringsAsFactors = FALSE)
 head(xxx)</code></pre>
 <pre><code>##   e    t      r
@@ -241,18 +242,18 @@ head(xxx)</code></pre>
 <h1><span class="header-section-number">5</span> Other data you may need</h1>
 <div id="n_first_stage" class="section level2">
 <h2><span class="header-section-number">5.1</span> <code>N_first_stage</code></h2>
-<p>If you obtained your data using a two-stage sample, you obtained a random sample of your population (the first stage sample), recording easy-to-obtain information that places subjects into two or more categories. And then you oversampled or undersampled these categories to obtain the <code>N</code> people whose values of <code>e</code>, <code>t</code>, <code>r</code>, and <code>category</code> you have recorded. <code>N_first_stage</code> counts the number of people from the first stage sample that fell in each category. If your categories were A and B, and in the first stage <code>472</code> fell in category A and <code>528</code> fell in category B, then you would use for <code>N_first_stage</code> the named vector <code>c(A = 472, B = 528)</code>. Each name in <code>N_first_stage</code> must have at least one representative in <code>category</code>.</p>
+<p>If you obtained your data using a two-stage sample, you obtained a random sample of your population (the first stage sample), recording information that was relatively easy to obtain and that places subjects into two or more categories. And then you oversampled or undersampled these categories to obtain the <code>N</code> people whose values of <code>e</code>, <code>t</code>, <code>r</code>, and <code>category</code> you have recorded. <code>N_first_stage</code> counts the number of people from the first stage sample that fell in each category. If your categories were A and B, and in the first stage <code>472</code> fell in category A and <code>528</code> fell in category B, then you would use for <code>N_first_stage</code> the named vector <code>c(A = 472, B = 528)</code>. Each name in <code>N_first_stage</code> must have at least one representative in <code>category</code>.</p>
 </div>
 <div id="n_target-or-target_category" class="section level2">
 <h2><span class="header-section-number">5.2</span> <code>N_target</code> or <code>target_category</code></h2>
-<p>If your cohort data do not match your target population, and you have a sample from your target population containing easy-to-obtain information that places subjects into releveant categories, <code>rmap</code> can perform a weighted analysis. <code>N_target</code> counts the number of people from the target sample that falls in each category. If your categories were A and B, and in the first stage <code>472</code> fell in category A and <code>528</code> fell in category B, then you would use <code>N_target</code> to be the named vector <code>c(A = 472, B = 528)</code>. Each name in <code>N_target</code> must have at least one representative in <code>category</code>.</p>
-<p>For your convenience, if you have a sample from the target population with the covariate category for each person in the target population, let <code>rmap</code> do the counting. Call the vector containing the covariate category of eacy person in the target population <code>target_category</code> and supply this vector instead of <code>N_target</code>.</p>
+<p>If covariates of the participants of the cohort study differ from those of the population for which your predictive model is targeted, you can weight the cohort particpants using an additional sample, a target sample, whose covariate categories match the target population. Classify subjects in both cohort sample and target sample into joint covariate categories, labeled with capital letters beginning with <code>&quot;A&quot;</code>, <code>&quot;B&quot;</code>, etc. Let <code>category</code> be the vector of length <code>N</code> with <code>n</code>-th element containing the covariate category of the <code>n</code>-th person. Let <code>target_category</code> be a vector containing one element for each person in the target sample recording his/her covariate category.</p>
+<p>If instead of providing <code>rmap</code> with the vector <code>target_category</code>, you wish to provide <code>rmap</code> with counts of the numbers of people in the target population that fell in each covariate category, let <code>N_target</code> be the named vector counting the number of subjects from the target sample that fell in each category. If your categories were <code>&quot;A&quot;</code> and <code>&quot;B&quot;</code>, and in the first stage <code>472</code> fell in category A and <code>528</code> fell in category B, then you would use <code>N_target</code> to be the named vector <code>c(A = 472, B = 528)</code>. Each name in <code>N_target</code> must have at least one representative in <code>category</code>.</p>
 <p><a href="#top">TOP</a></p>
 </div>
 </div>
 <div id="rmap-inputs" class="section level1">
 <h1><span class="header-section-number">6</span> <code>rmap</code> inputs</h1>
-<p>The example in the introduction calls the function <code>rmap_random_sample_fn</code>. This function is simply a “wrapper” function in which I decided which options in <code>rmap</code> I to allow when you call this function. Use this function only if your design is a ranodm sample, you wish risk groups to be defined using quantiles, the assigned risks of each risk group to be summarized using their mean, and the confidence level of confidence intervals (eg the concordance) to be 0.95. To specify other options such as other designs and other ways to define risk groups, you need to manipulate the inputs of the workhorse functions: <code>rmap</code>.</p>
+<p>The example in the introduction calls the function <code>rmap_random_sample</code>. This function is simply a “wrapper” function in which I decided which options in <code>rmap</code> I want to allow when you call this function. Use this function only if your design is a random sample, you wish risk groups to be defined using quantiles, the assigned risks of each risk group to be summarized using their mean, and the confidence level of confidence intervals (eg the concordance) to be 0.95. To specify other options such as other designs and other ways to define risk groups, you need to manipulate the inputs of the workhorse functions: <code>rmap</code> and <code>rmap_individual</code>.</p>
 <p>The following details the inputs to <code>rmap</code>.</p>
 <div id="e-t-r" class="section level2">
 <h2><span class="header-section-number">6.1</span> <code>e</code>, <code>t</code>, <code>r</code></h2>
@@ -260,11 +261,11 @@ head(xxx)</code></pre>
 </div>
 <div id="t_star" class="section level2">
 <h2><span class="header-section-number">6.2</span> <code>t_star</code></h2>
-<p>This positive number is the right end point of the time period of interest. The risk model that you are evaluating expresses the risk of the outcome within the time period <code>[0, t_star]</code> and before a prespecified competing risk.</p>
+<p>This positive number is the right end point of the time period of interest. The personal risk model that you are evaluating expresses the risk of the outcome within the time period <code>[0, t_star]</code> and before a prespecified competing risk.</p>
 </div>
 <div id="design" class="section level2">
 <h2><span class="header-section-number">6.3</span> <code>design</code></h2>
-<p>Use this input to describe your study design and give <code>rmap</code> the necessary information to perform analyses based on your study design.</p>
+<p>Use this input to specify your study design and also to provide <code>rmap</code> the details necessary to perform analyses based on your study design.</p>
 <p>If your design was a random sample, use `design = “random_sample”.</p>
 <p>If your design was a two-stage sample, use <code>design = list(category = category, N_first_stage = N_first_stage)</code></p>
 <p>If your design was biased producing a cohort sample whose relevant categories do not proportionately match those of your target population, and you have a target sample with categories <code>target_category</code>, recording the covariate category of each person in the target sample, or <code>N_target</code>, counting the number of people in the target sample falling in each category, use <code>design = list(category = category, target_category = target_category)</code> or <code>design = list(category = category, N_target = N_target)</code>.</p>
@@ -283,31 +284,36 @@ You can specify <code>r_summary = &quot;mean&quot;</code> or <code>r_summary = &
 </div>
 <div id="n_bootstraps" class="section level2">
 <h2><span class="header-section-number">6.6</span> <code>N_bootstraps</code></h2>
-<p>This nonnegative integer specifies the number of bootstraps. If <code>N_bootstraps = 0</code>, no bootstraps are performed. For random samples and two-stage samples, grouped goodness-of-fit tests and concordance estimates can be gotten, but for inferences on concordance as well inferences on all quantities when the design is a weighted sample, bootstraps are required.</p>
+<p>This nonnegative integer specifies the number of bootstraps. If <code>N_bootstraps = 0</code>, no bootstraps are performed. For random samples and two-stage samples, grouped goodness-of-fit tests and concordance estimates can be gotten, but for inferences on concordance as well as inferences on all quantities when the design is a weighted sample, bootstraps are required.</p>
 </div>
 <div id="confidence_level" class="section level2">
 <h2><span class="header-section-number">6.7</span> <code>confidence_level</code></h2>
-<p>A positive number less than <code>1</code>, defaulted to <code>0.95</code>. If you do not specify <code>confidence_level</code>, rmap will use <code>0.95</code>.</p>
+<p>A positive number less than <code>1</code>. If you do not specify <code>confidence_level</code>, rmap will use <code>0.95</code>.</p>
 </div>
 </div>
 <div id="rmap_individual-inputs" class="section level1">
 <h1><span class="header-section-number">7</span> <code>rmap_individual</code> inputs</h1>
-<p>The above three methods show how to specify a grouped analysis. For an ungrouped analysis, <code>rmap</code> does not perform formal tests or inference, but provides a summary plot, an individual or ungrouped attribute diagram providing an estimate of risk at each observed assigned risk using an epsilon kernel neighborhood. To direct <code>rmap</code> to perform an ungrouped analysis, with <code>epsilon = N^(-1/3)</code> (theory suggests that the neighborhoods falling as <code>N^(-1/3)</code> have good asymptotic properties), use <code>risk_group = list(epsilon = epsilon)</code>.</p>
+<p><code>rmap_individual</code> does not perform formal tests or inference, but provides a summary plot, an individualized attribute diagram providing an estimate of risk at each observed assigned risk using an epsilon kernel neighborhood.</p>
+<p>Required arguements already discusses in <code>rmap</code> are <code>e</code>, <code>t</code>, <code>r</code>, <code>t_star</code>, <code>design</code>, <code>N_bootstraps</code>, and <code>confidence_level</code>.</p>
+<div id="epsilon" class="section level2">
+<h2><span class="header-section-number">7.1</span> <code>epsilon</code></h2>
+<p>This is a small positive number specifying the kernel neighborhoods used to calculate observed risk at each distinct assigned risk. Asymptotic theory suggests good behavior for epsilon = N^(-1/3).</p>
+</div>
 <div id="n_cores" class="section level2">
-<h2><span class="header-section-number">7.1</span> <code>N_cores</code></h2>
-<p>This postive number specifies the number of cores to use. It defaults to <code>1</code>, but if you would like parallel processing on the bootstrap calculations, you can specify the number of cores your system can alot to <code>rmap</code>.</p>
+<h2><span class="header-section-number">7.2</span> <code>N_cores</code></h2>
+<p>This postive number specifies the number of cores to use. It defaults to <code>1</code>, but if you would like parallel processing on the bootstrap calculations, you can specify the number of cores your system can alot to <code>rmap</code>. Currently this option cannot be used so it defaults to <code>1</code>.</p>
 </div>
 <div id="verbose" class="section level2">
-<h2><span class="header-section-number">7.2</span> <code>verbose</code></h2>
-<p>If you would like <code>rmap</code> to output extra information to show the progress of the bootstraps, you may specify <code>verbose = TRUE</code>. This variable defaults to <code>FALSE</code>.</p>
+<h2><span class="header-section-number">7.3</span> <code>verbose</code></h2>
+<p>If you would like <code>rmap</code> to output extra information to show the progress of the bootstraps, you may specify <code>verbose = TRUE</code>. This variable defaults to <code>FALSE</code>. Currently this option cannot be used so it defaults to <code>FALSE</code></p>
 </div>
 </div>
 <div id="explaining-rmap-output" class="section level1">
 <h1><span class="header-section-number">8</span> Explaining <code>rmap</code> output</h1>
-<p>The example in the introduction called the wrapper function <code>rmap_random_sample_individual_to_fn</code>. And then “pretty plotting” functions were called on the output to produce the plots and summary statistics that were displayed. If you are happy enough with these default plots, you can stop here. If you would like to customize your plots or dig into some of the results not given in the plots or understand in more detail the summaries shown, I detail below the output from <code>rmap</code>.</p>
-<div id="grouped-rmap-output" class="section level2">
-<h2><span class="header-section-number">8.1</span> Grouped <code>rmap</code> output</h2>
-<p>Grouped <code>rmap</code> output is broken down into two objects: <code>numerical_summaries</code> and <code>plots</code>.</p>
+<p>The example in the introduction called the wrapper function <code>rmap_random_sample</code>. And then “pretty plotting” functions were called on the output to produce the plots and summary statistics that were displayed. If you are happy enough with these and default plots and summary statistics, you can stop here and follow along my example there. If you would like to customize your plots or dig into some of the results not given in the plots or understand in more detail the summaries shown, I detail below the output from <code>rmap</code>.</p>
+<div id="rmap-output" class="section level2">
+<h2><span class="header-section-number">8.1</span> <code>rmap</code> output</h2>
+<p><code>rmap</code> output is broken down into two objects: <code>numerical_summaries</code> and <code>plots</code>.</p>
 <p><code>numerical_summaries</code> consist of the following</p>
 <ol style="list-style-type: decimal">
 <li><p><code>concordance</code> contains the concordance <code>estimate</code> as well as the <code>lower</code> and <code>upper</code> bounds of a 95 percent bootstrap confidence interval (or a confidence interval with a different confidence-level if you specified it with the input <code>confidence_level</code>)</p></li>
@@ -324,8 +330,8 @@ You can specify <code>r_summary = &quot;mean&quot;</code> or <code>r_summary = &
 <li><p><code>risk_plot</code> contains a grouped attribute diagram with the column <code>grouped_estimates$r</code> plotted on the x-axis and <code>grouped_estimates$pi_hat</code> together with <code>grouped_asymptotic_sds$lower</code> and <code>grouped_asymptotic_sds$upper</code> (if they are available or if they are not aviable use <code>grouped_bootstrap_sds$lower</code> and <code>grouped_bootstrap_sds$upper</code>) plotted on the y-axis.</p></li>
 </ol>
 </div>
-<div id="ungrouped-rmap-output" class="section level2">
-<h2><span class="header-section-number">8.2</span> Ungrouped <code>rmap</code> output</h2>
+<div id="rmap_individual-output" class="section level2">
+<h2><span class="header-section-number">8.2</span> <code>rmap_individual</code> output</h2>
 <p>Ungrouped <code>rmap</code> output contains just <code>plots</code> which consists of</p>
 <ol style="list-style-type: decimal">
 <li><p><code>df_for_risk_plot</code> is a data.frame that you can use to construct custom ungrouped attribute diagrams.</p></li>

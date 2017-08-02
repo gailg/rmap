@@ -5,17 +5,17 @@
 #' epsilon kernel nearest neighbor estimate of outcome
 #' probabilty for each distinct value of assigned risk
 #' 
-#' @details \code{rmap_individual_fn} produces an ungrouped
+#' @details \code{rmap_individual_fn} produces an individualized
 #' attribute diagram for random samples, two-stage samples,
 #' and weighted samples.
 #' \itemize{
-#' \item{Step 1: }{just redefined \code{e} and \code{t} so
+#' \item{Step 1: }{Redefined \code{e} and \code{t} so
 #' \code{t} does not exceed \code{tStar}.  If the original 
 #' \code{t} exceeds \code{tStar}, redefine it to be 
 #' \code{tStar} and reset its corresponding \code{e} to
 #' be \code{0} to signify censored.
 #' }
-#' \item{Step 2: }{calls \code{pi_hat_nn_fn} to geta an 
+#' \item{Step 2: }{calls \code{pi_hat_nn_fn} to get an 
 #' estimate which is a data.frame containing the columns:
 #' 1) \code{rho} a vector of sorted distinct values of
 #' \code{t}, and 2) \code{pi_hat} the kernel nearest
@@ -40,7 +40,7 @@
 #' sample \code{aaa} or the \code{target_category} and \code{c}
 #' column of the bootstrapped cohort sample.
 #' }
-#' \item{4. }{\code{pi_hat_fn} and \code{concordance_fn} require
+#' \item{4. }{\code{pi_hat_fn} requires
 #' only \code{weight} and not \code{baseArgs$N_two_stage} or
 #' \code{baseArgs$target_category}.
 #' }
@@ -49,7 +49,7 @@
 #' }
 #' 
 #' @param baseArgs A list provided by \code{baseArgsFn}.
-#' The objects requried to run \code{rmap_ungrouped} are
+#' The objects requried to run \code{rmap_individual_fn} are
 #' \code{c},
 #' \code{e},
 #' \code{confidence_level},
@@ -82,33 +82,26 @@
 #' }
 #' @examples 
 #' #-------------------------------------------------- A weighted example
-#' set.seed(1)
-#' options(digits = 4)
-#' set.seed(1)
-#' NNN = 80
-#' N_bootstrap_reps = 100
-#' cutoffs = c(0, 0.20, 1)
-#' weighted_example = weighted_example_fn(NNN)
-#' cohort_sampling_probability_dictionary = weighted_example$cohort_sampling_probability_dictionary
-#' cohort_sample = weighted_example$cohort_sample
-#' target_sample = weighted_example$target_sample
-#' tStar = weighted_example$t_star
-#' which_model = "r_B" 
-#' cohort_category = cohort_sample$category
-#' target_category = target_sample$category
-#' r = cohort_sample[[which_model]]
-#' e = cohort_sample$eee
-#' t = cohort_sample$ttt
-#' cohort_sample
-#' design = list(target_category = target_category, c = cohort_category)
-#' epsilon = nrow(cohort_sample)^(-1/3)
+#' data(weighted_example_cohort_sample)
+#' xxx = weighted_example_cohort_sample
+#' head(xxx)
+#' e = xxx$e
+#' t = xxx$t
+#' r = xxx$r
+#' tStar = 10
+#' data(weighted_example_target_sample)
+#' head(weighted_example_target_sample)
+#' target_category = weighted_example_target_sample$category
+#' category = xxx$category
+#' design = list(target_category = target_category, c = category)
+#' epsilon = length(e)^(-1/3)
 #' riskGroup = list(epsilon = epsilon)
-#' rSummary = "mean"
-#' bootstrap = N_bootstrap_reps
+#' bootstrap = 100
+#' set.seed(3)
 #' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap) 
 #' rmap_1 = rmap_individual_fn(baseArgs)
 #' rmap_1$df_for_risk_plot
-#' grid.arrange(rmap_1$risk_plot, top = "rmap_ungrouped on a weighted sample")
+#' grid.arrange(rmap_1$risk_plot, top = "rmap_individual_fn on a weighted sample")
 #' 
 #' @export
 rmap_individual_fn = function(baseArgs){

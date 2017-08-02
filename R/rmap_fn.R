@@ -31,9 +31,25 @@
 #' 
 #' @return A list containing
 #' \itemize{
-#' \item{\code{summary}: }{A list containing
+#' \item{\code{numerical_summaries}: }{A list containing
 #' \itemize{
-#' \item{\code{pi_estimate}: }{A data.frame containing 
+#' \item{\code{concordance}: }{A named vector containing the 
+#' the concordance estimate 
+#' \code{concordance}, together with \code{lower} and \code{upper},
+#' the lower and upper bounds of a confidence interval for concordance.
+#' }
+#' \item{\code{gof_asymptotic}: }{A named vector containing
+#' \code{statistic}, the chi-square goodness of fit test statistic 
+#' using in its denominator 
+#' the asymptotic-theory version of the estimate of
+#' standard deviation, and \code{p_value} its p-value.
+#' }
+#' \item{\code{gof_bootstrap}: }{A named vector containing
+#' \code{statistic}, the chi-square goodness of fit test statistic
+#' using \code{sd_boot} the bootstrap version of the estimate of 
+#' standard deviation, and \code{p_value} its p-value.
+#' }
+#' \item{\code{grouped_estimates}: }{A data.frame containing 
 #' \code{K} rows, one for each risk group and the following columns:
 #' \itemize{
 #' \item{\code{gamma_hat}: }{The weighted proportion of subjects
@@ -47,27 +63,28 @@
 #' }
 #' }
 #' }
-#' \item{\code{pi_sd_theory}: }{A data.frame containing \code{K}
+#' \item{\code{grouped_asymptotic_sds}: }{A data.frame containing \code{K}
 #' rows and the following columns:
 #' \itemize{
 #' \item{\code{sd}: }{The estimated standard deviation of the 
 #' estimate \code{pi_hat} in each risk group
 #' obtained by asymptotic theory.
 #' }
-#' \item{\code{lower}: }{The lower bound of a confidence interval
+#' \item{\code{lower}: }{The lower bound of a confidence interval,
+#' obtained by asymptotic theory,
 #' for the outcome probability in each risk group.
 #' }
 #' \item{\code{upper}: }{The upper bound of the confidence interval.
 #' }
 #' \item{\code{in_ci}: }{A character "yes" or "no" indicating
-#' if \code{pi_estimate$r} falls
+#' whether or not \code{pi_estimate$r} falls
 #' in the confidence interval.
 #' }
 #' }
 #' }
-#' \item{\code{pi_sd_boot}: }{A data.frame containing
+#' \item{\code{grouped_bootstrap_sds}: }{A data.frame containing
 #' \itemize{
-#' \item{\code{sd_boot}: }{The bootstrap estimate of teh
+#' \item{\code{sd}: }{The bootstrap estimate of the
 #' standard deviation of the \code{pi_hat}.
 #' }
 #' \item{\code{lower}: }{The lower bound of the bootstrap percentile
@@ -76,25 +93,10 @@
 #' \item{\code{upper}: }{The upper bound of the bootstrap percentile
 #' confidence interval.
 #' }
-#' \item{\code{in_ci_boot}: }{A character "yes" or "no" indicating if 
-#' \code{pi_estimate$r} falls in the bootstrap confidence interval.
+#' \item{\code{in_ci}: }{A character "yes" or "no" indicating if 
+#' \code{grouped_estimates$r} falls in the bootstrap confidence interval.
 #' }
 #' }
-#' }
-#' \item{\code{gof_theory}: }{A data.frame containing
-#' \code{statistic}, the chi-square goodness of fit test statistic 
-#' using  \code{sd} the asymptotic-theory version of the estimate of
-#' standard deviation, and \code{p_value} its p-value.
-#' }
-#' \item{\code{gof_boot}: }{A data.frame containing
-#' \code{statistic}, the chi-square goodness of fit test statistic
-#' using \code{sd_boot} the bootstrap version of the estimate of 
-#' standard deviation, and \code{p_value} its p-value.
-#' }
-#' \item{\code{concordance_summary}: }{A data.frame containing the 
-#' the concordance estimate 
-#' \code{concordance}, together with \code{lower} and \code{upper},
-#' the lower and upper bounds of a confidence interval for concordance.
 #' }
 #' }
 #' }
@@ -116,18 +118,17 @@
 #' }
 #' @examples 
 #' #-------------------------------------------------- A random sample example
-#' set.seed(1)
-#' tStar = 10
-#' NNN = 100
-#' randomSample = df_randomSample(NNN)
-#' xxx = randomSample
+#' data(random_sample_example)
+#' xxx = random_sample_example
+#' head(xxx)
 #' e = xxx$e
 #' t = xxx$t
 #' r = xxx$r
+#' tStar = 10
 #' design = "randomSample"
-#' riskGroup = list(K = 2)
+#' riskGroup = list(K = 4)
 #' rSummary = "mean"
-#' bootstrap = 20
+#' bootstrap = 100
 #' set.seed(1)
 #' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
 #' rmap_1 = rmap_fn(baseArgs)

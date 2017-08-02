@@ -25,15 +25,14 @@ opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 7, tidy=FAL
 
 # Introduction {#introduction}
 
-Personal predictive models use an individual's personal covariates to assign him/her a probability of developing a specific disease within a specified future time period `[0, t_star]` and before a prespecified competing risk.  Predictive models are often evaluated by comparing their assigned risks to outcome incidences among participants in a cohort study.  Performance of such models can be evaluated using two criteria: calibration and concordance. Model calibration (also called goodness-of-fit) measures how well the model-assigned risks agree
-with persons' subsequent observed outcomes. `rmap` offers a grouped goodness-of-fit test and grouped and individualized attribute diagrams. Concordance (also called the area under the ROC curve) measures how well a model separates positive and negative outcomes.`rmap` offers estimation and confidence intervals for the concordance as well as ROC plots. `rmap` handles random samples, two-stage sample designs, and weighted sample designs.
+Personal predictive models use an individual's covariates to assign him/her a probability of developing a specific disease or outcome within a specified future time period `[0, t_star]` and before a specified competing risk.  Predictive models are often evaluated by comparing their assigned risks to outcome occurence among participants in a longitudinal cohort study.  Performance of such models can be evaluated using two criteria: calibration and concordance. Model calibration (also called goodness-of-fit) measures how well the model-assigned risks agree
+with persons' subsequent observed outcomes. `rmap` offers a grouped goodness-of-fit test and grouped and individualized attribute diagrams. Concordance (also called the area under the ROC curve) measures how well a model separates or discriminates positive and negative outcomes.`rmap` offers estimation and confidence intervals for the concordance as well as ROC plots. `rmap` handles samples of participants that were obtained by random sampling, two-stage sample designs, and weighted designs.
 
-Below is a very simple call to an `rmap` function on a simulated random sample. The display shows `rmap` in action, estimating concordance, producing ROC plots, testing for grouped goodness-of-fit, and producing grouped and individualized attribute diagrams.
+Below is a simple call to an `rmap` function on a simulated random sample. The display shows `rmap` in action, estimating concordance, producing ROC plots, testing for grouped goodness-of-fit, and producing grouped and individualized attribute diagrams.
 
 ```{r message = FALSE, eval = TRUE, fig.height = 5, fig.width = 7}
 library(rmap)
-xxx = read.csv(file = "random_sample_example.csv", 
-               stringsAsFactors = FALSE)
+xxx = read.csv(file = "random_sample_example.csv", stringsAsFactors = FALSE)
 e = xxx$e
 t = xxx$t
 r = xxx$r
@@ -85,29 +84,31 @@ If your installation was successful, you should see the message
 
 # Data preparation {#data-preparation}
 
-You need a data set, containing, say $N$ people, and for the $n$-th person, you have the following data:
+You need a data set, containing, say `N` people, and for the `n`-th person, you have the following data:
 
 ## `e`
 
-The event for the subject. Record `e = 1` if the outcome of interest was observed to occur before being censored and before the competing event, `e = 2` if the competing risk, such as death from other causes,  was observed to occur before before the outcome, and before being censored, and `0` if censored before outcome and competing risk.  Acceptable values are `0, 1, 2`.
+The event for the subject. Record `e = 1` if the outcome of interest was observed to occur before being censored and before the competing event. Record `e = 2` if the competing risk was observed to occur before before the outcome and before being censored.  And record `0` if the subject was censored before outcome and competing risk.  Acceptable values are `0, 1, 2`.
 
 ## `t`
 
-The time until the event `e`.  Mathematically speaking, let `t_1` be time until outcome, `t_2` time until competing risk, `t_0` time until censoring . Then `t` is the minimum of `t_1`, `t_2`, `t_0`, and `e` records which of the events occurred first. Acceptable values are positive real numbers.
+The time until the event `e`.  Mathematically speaking, let `t1` be time until outcome, `t2` time until competing risk, `t0` time until censoring . Then `t` is the minimum of `t1`, `t2`, `t0`, and `e` records which of the events occurred first. Acceptable values are positive real numbers (that can exceed `t_star` the right endpoint of the time period of interest).
 
 ## `r`
 
-The risk assigned by the personal predictive model. This is the probability of outcome occuring before the competing risk and before `t_star`. Acceptable values are real numbers between `0` and `1`, including `0` and `1`.
+The risk assigned by the personal predictive model. This is the probability of the outcome of interest occuring before the competing risk and before `t_star`. Acceptable values are real numbers between `0` and `1`, including `0` and `1`.
 
 
 ## `category` (optional)
 
-If your data were obtained by two-stage sampling, this is the two-stage category indicating which two-stage category the person fell into. (See `N_first_stage` below.)  If your data are a cohort sample whose relevant covariates do not match your target population, and you would like to weight your cohort samples based on covariate information from a target population, `category` records which covariate category the (cohort) person fell into. (See `N_target` below.)
+If your data were obtained by two-stage sampling, this is the two-stage category indicating which two-stage category the person fell into. (See `N_first_stage` below.)  If your data are a cohort sample whose covariates suspected to be related to risk do not match those of your target population, and you would like to weight your cohort samples based on covariate information from a target population, `category` records which covariate category the (cohort) person fell into. (See `design` with with option `list(category = category, target_category = target_category` below.)
 
 
 # Reading in data {#reading-in-data}
 
 If your data is an excel file with columns `e`, `t`, `r`, and possibly `category`, save it as a CSV (comma separated value) file into your working directory. For practice you can download my excel file here, put it into your working directory, and try out the following commands.
+
+[random_sample_example.csv](random_sample_example.csv)
 
 
 ```{r eval = TRUE}
@@ -120,20 +121,19 @@ If you got the same results I get above, you are in business.
 
 ## `N_first_stage`
 
-If you obtained your data using a two-stage sample, you obtained a random sample of your population (the first stage sample), recording easy-to-obtain information that places subjects into two or more categories.  And then you oversampled or undersampled these categories to obtain the `N` people whose values of `e`, `t`, `r`, and `category` you have recorded. `N_first_stage` counts the number of people from the first stage sample that fell in each category. If your categories were A and B, and in the first stage `472` fell in category A and `528` fell in category B, then you would use for `N_first_stage` the named vector `c(A = 472, B = 528)`. Each name in `N_first_stage` must have at least one representative in `category`.
+If you obtained your data using a two-stage sample, you obtained a random sample of your population (the first stage sample), recording information that was relatively easy to obtain and that places subjects into two or more categories.  And then you oversampled or undersampled these categories to obtain the `N` people whose values of `e`, `t`, `r`, and `category` you have recorded. `N_first_stage` counts the number of people from the first stage sample that fell in each category. If your categories were A and B, and in the first stage `472` fell in category A and `528` fell in category B, then you would use for `N_first_stage` the named vector `c(A = 472, B = 528)`. Each name in `N_first_stage` must have at least one representative in `category`.
 
 ## `N_target` or `target_category`
 
-If your cohort data do not match your target population, and you have a sample from your target population containing easy-to-obtain information that places subjects into releveant categories, `rmap` can perform a weighted analysis.
-`N_target` counts the number of people from the target sample that falls in each category. If your categories were A and B, and in the first stage `472` fell in category A and `528` fell in category B, then you would use `N_target` to be the named vector `c(A = 472, B = 528)`. Each  name in `N_target` must have at least one representative in `category`. 
+If covariates of the participants of the cohort study differ from those of the population for which your predictive model is targeted, you can weight the cohort particpants using an additional sample, a target sample, whose covariate categories match the target population. Classify subjects in both cohort sample and target sample into joint covariate categories, labeled with capital letters beginning with `"A"`, `"B"`, etc. Let `category` be the vector of length `N` with `n`-th element containing the covariate category of the `n`-th person. Let `target_category` be a vector containing one element for each person in the target sample recording his/her covariate category. 
 
-For your convenience, if you have a sample from the target population with the covariate category for each person in the target population, let `rmap` do the counting. Call the vector containing the covariate category of eacy person in the target population `target_category` and supply this vector instead of `N_target`.
+If instead of providing `rmap` with the vector `target_category`, you wish to provide `rmap` with counts of the numbers of people in the target population that fell in each covariate category, let `N_target` be the named vector counting the number of subjects from the target sample that fell in each category. If your categories were `"A"` and `"B"`, and in the first stage `472` fell in category A and `528` fell in category B, then you would use `N_target` to be the named vector `c(A = 472, B = 528)`. Each  name in `N_target` must have at least one representative in `category`. 
 
 [TOP](#top)
 
 # `rmap` inputs
 
-The example in the introduction calls the function `rmap_random_sample_fn`.  This function is simply a "wrapper" function in which I decided which options in `rmap` I to allow when you call this function.  Use this function only if your design is a ranodm sample, you wish risk groups to be defined using quantiles, the assigned risks of each risk group to be summarized using their mean, and the confidence level of confidence intervals (eg the concordance) to be 0.95.  To specify other options such as other designs and other ways to define risk groups, you need to manipulate the inputs of the workhorse functions: `rmap`. 
+The example in the introduction calls the function `rmap_random_sample`.  This function is simply a "wrapper" function in which I decided which options in `rmap` I want to allow when you call this function.  Use this function only if your design is a random sample, you wish risk groups to be defined using quantiles, the assigned risks of each risk group to be summarized using their mean, and the confidence level of confidence intervals (eg the concordance) to be 0.95.  To specify other options such as other designs and other ways to define risk groups, you need to manipulate the inputs of the workhorse functions: `rmap` and `rmap_individual`.
 
 The following details the inputs to `rmap`.
 
@@ -143,11 +143,11 @@ These were described in the section "Data preparation".  If your cohort contains
 
 ## `t_star`
 
-This positive number is the right end point of the time period of interest.  The risk model that you are evaluating expresses the risk of the outcome within the time period `[0, t_star]` and before a prespecified competing risk.
+This positive number is the right end point of the time period of interest.  The personal risk model that you are evaluating expresses the risk of the outcome within the time period `[0, t_star]` and before a prespecified competing risk.
 
 ## `design`
 
-Use this input to describe your study design and give `rmap` the necessary information to perform analyses based on your study design.  
+Use this input to specify your study design and also to provide `rmap` the details necessary to perform analyses based on your study design.  
 
 If your design was a random sample, use `design = "random_sample".  
 
@@ -173,37 +173,40 @@ You can specify `r_summary = "mean"` or `r_summary = "median"` with the obvious 
 
 ## `N_bootstraps`
 
-This nonnegative integer specifies the number of bootstraps.  If `N_bootstraps = 0`, no bootstraps are performed. For random samples and two-stage samples, grouped goodness-of-fit tests and concordance estimates can be gotten, but for inferences on concordance as well inferences on all quantities when the design is a weighted sample, bootstraps are required.
+This nonnegative integer specifies the number of bootstraps.  If `N_bootstraps = 0`, no bootstraps are performed. For random samples and two-stage samples, grouped goodness-of-fit tests and concordance estimates can be gotten, but for inferences on concordance as well as inferences on all quantities when the design is a weighted sample, bootstraps are required.
 
 
 ## `confidence_level`
 
-A positive number less than `1`, defaulted to `0.95`.  If you do not specify `confidence_level`, rmap will use `0.95`.
+A positive number less than `1`.  If you do not specify `confidence_level`, rmap will use `0.95`.
 
 # `rmap_individual` inputs
 
+`rmap_individual` does not perform formal tests or inference, but provides a summary plot, an individualized attribute diagram providing an estimate of risk at each observed assigned risk using an epsilon kernel neighborhood.  
 
+Required arguements already discusses in `rmap` are `e`, `t`, `r`, `t_star`, `design`, `N_bootstraps`, and `confidence_level`.
 
+## `epsilon`
 
-The above three methods show how to specify a grouped analysis.  For an ungrouped analysis, `rmap` does not perform formal tests or inference, but provides a summary plot, an individual or ungrouped attribute diagram providing an estimate of risk at each observed assigned risk using an epsilon kernel neighborhood.  To direct `rmap` to perform an ungrouped analysis, with `epsilon = N^(-1/3)` (theory suggests that the neighborhoods falling as `N^(-1/3)` have good asymptotic properties), use `risk_group = list(epsilon = epsilon)`.
+This is a  small positive number specifying the kernel neighborhoods used to calculate observed risk at each distinct assigned risk. Asymptotic theory suggests good behavior for epsilon = N^(-1/3).
 
 
 ## `N_cores`
 
-This postive number specifies the number of cores to use.  It defaults to `1`, but if you would like parallel processing on the bootstrap calculations, you can specify the number of cores your system can alot to `rmap`.
+This postive number specifies the number of cores to use.  It defaults to `1`, but if you would like parallel processing on the bootstrap calculations, you can specify the number of cores your system can alot to `rmap`. Currently this option cannot be used so it defaults to `1`.
 
 ## `verbose`
 
-If you would like `rmap` to output extra information to show the progress of the bootstraps, you may specify `verbose = TRUE`.  This variable defaults to `FALSE`.
+If you would like `rmap` to output extra information to show the progress of the bootstraps, you may specify `verbose = TRUE`.  This variable defaults to `FALSE`. Currently this option cannot be used so it defaults to `FALSE`
 
 
 # Explaining `rmap` output
 
-The example in the introduction called the wrapper function `rmap_random_sample_individual_to_fn`. And then "pretty plotting" functions were called on the output to produce the plots and summary statistics that were displayed.  If you are happy enough with these default plots, you can stop here. If you would like to customize your plots or dig into some of the results not given in the plots or understand in more detail the summaries shown, I detail below the output from `rmap`.
+The example in the introduction called the wrapper function `rmap_random_sample`. And then "pretty plotting" functions were called on the output to produce the plots and summary statistics that were displayed.  If you are happy enough with these and default plots and summary statistics, you can stop here and follow along my example there. If you would like to customize your plots or dig into some of the results not given in the plots or understand in more detail the summaries shown, I detail below the output from `rmap`.
 
-## Grouped `rmap` output 
+## `rmap` output 
 
-Grouped `rmap` output is broken down into two objects: `numerical_summaries` and `plots`.  
+`rmap` output is broken down into two objects: `numerical_summaries` and `plots`.  
 
 `numerical_summaries` consist of the following
 
@@ -230,7 +233,7 @@ and `pi_hat` which estimates the probability of getting the outcome before `t_st
 
 3. `risk_plot` contains a grouped attribute diagram with the column `grouped_estimates$r` plotted on the x-axis and `grouped_estimates$pi_hat` together with `grouped_asymptotic_sds$lower` and `grouped_asymptotic_sds$upper` (if they are available or if they are not aviable use `grouped_bootstrap_sds$lower` and `grouped_bootstrap_sds$upper`) plotted on the y-axis.
 
-## Ungrouped `rmap` output  
+## `rmap_individual` output 
 
 Ungrouped `rmap` output contains just `plots` which consists of
 

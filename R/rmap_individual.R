@@ -36,7 +36,7 @@
 #' calibration of this model. Acceptable values are real numbers 
 #' between \code{0} and \code{1}.
 #' 
-#' @param tStar A positive number equal to the duration of the the study.
+#' @param t_star A positive number equal to the duration of the the study.
 #' The risk model that you are evaluating expresses the risk of the outcome
 #' occuring within the time period \code{[0, t_star]} and before the competing
 #' risk.
@@ -169,9 +169,8 @@
 #' 
 #' @export
 #' 
-rmap_individual = function(e, t, r, t_star, design, epsilon, N_bootstraps, 
-                          confidence_level = 0.95){
-    risk_group = list(epsilon = epsilon)
+rmap_individual = function(e, t, r, t_star, design, epsilon, N_bootstraps, confidence_level = 0.95){
+  risk_group = list(epsilon = epsilon)
   r_summary = "mean"
   N_cores = 0
   verbose = FALSE

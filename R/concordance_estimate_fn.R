@@ -9,9 +9,11 @@
 #' @return A list that contains
 #' \itemize{
 #' \item{\code{concordance}: }{A number between 0 and 1 equal to the concordance
-#' or the probability that the assigned risk of a randomly selected case exceeds 
-#' that of a randomly selected control, if there were no censoring or competing
-#' risk. See zzzzz on the website.
+#' or the probability that the assigned risk of a randomly selected outcome 
+#' positive person exceeds 
+#' that of a randomly selected outcome negative person.
+#' This measure is also called the area under the receiver operating 
+#' characteristic.
 #' }
 #' \item{\code{df_for_roc_plot}: }{A data.frame containing the columns
 #' \code{one_minus_specificity} and \code{sensitivity}, which can be plotted

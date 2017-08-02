@@ -39,7 +39,7 @@
 #' calibration of this model. Acceptable values are real numbers 
 #' between \code{0} and \code{1}.
 #' 
-#' @param tStar A positive number equal to the duration of the the study.
+#' @param t_star A positive number equal to the duration of the the study.
 #' The risk model that you are evaluating expresses the risk of the outcome
 #' occuring within the time period \code{[0, t_star]} and before the competing
 #' risk.
@@ -82,7 +82,7 @@
 #' }
 #' \item{\code{list(category = category, N_target = N_target)}: } {
 #' Continuing with the previous choice for \code{design}, if instead of providing
-#' \code{rmap} with the vector \code{target_cateogry} you wish to provide rmap
+#' \code{rmap} with the vector \code{target_category} you wish to provide rmap
 #' with counts of the numbers of people in the target population that fell 
 #' in each covariate category, let \code{N_target} be a named vector counting 
 #' the number of subjects from the target sample that fell into each category.
@@ -94,7 +94,7 @@
 #' }
 #' }
 #' 
-#' @param riskGroup Describes the way you want the subjects to be divided
+#' @param risk_group Describes the way you want the subjects to be divided
 #' into risk groups. Choose one of the following named lists:
 #' \itemize{
 #' \item{\code{list(K = K)}: }{Define \code{K} to be a positive integer
@@ -154,9 +154,25 @@
 #' 
 #' @return A list containing
 #' \itemize{
-#' \item{\code{summary}: }{A list containing
+#' \item{\code{numerica_summaries}: }{A list containing
 #' \itemize{
-#' \item{\code{pi_estimate}: }{A data.frame containing 
+#' \item{\code{concordance}: }{A named vector containing the 
+#' the concordance estimate 
+#' \code{concordance}, together with \code{lower} and \code{upper},
+#' the lower and upper bounds of a confidence interval for concordance.
+#' }
+#' \item{\code{gof_asymptotic}: }{A named vector containing
+#' \code{statistic}, the chi-square goodness of fit test statistic 
+#' using in its denominator 
+#' the asymptotic-theory version of the estimate of
+#' standard deviation, and \code{p_value} its p-value.
+#' }
+#' \item{\code{gof_bootstrap}: }{A named vector containing
+#' \code{statistic}, the chi-square goodness of fit test statistic
+#' using \code{sd_boot} the bootstrap version of the estimate of 
+#' standard deviation, and \code{p_value} its p-value.
+#' }
+#' \item{\code{grouped_estimates}: }{A data.frame containing 
 #' \code{K} rows, one for each risk group and the following columns:
 #' \itemize{
 #' \item{\code{gamma_hat}: }{The weighted proportion of subjects
@@ -170,27 +186,28 @@
 #' }
 #' }
 #' }
-#' \item{\code{pi_sd_theory}: }{A data.frame containing \code{K}
+#' \item{\code{grouped_asymptotic_sds}: }{A data.frame containing \code{K}
 #' rows and the following columns:
 #' \itemize{
 #' \item{\code{sd}: }{The estimated standard deviation of the 
 #' estimate \code{pi_hat} in each risk group
 #' obtained by asymptotic theory.
 #' }
-#' \item{\code{lower}: }{The lower bound of a confidence interval
+#' \item{\code{lower}: }{The lower bound of a confidence interval,
+#' obtained by asymptotic theory,
 #' for the outcome probability in each risk group.
 #' }
 #' \item{\code{upper}: }{The upper bound of the confidence interval.
 #' }
 #' \item{\code{in_ci}: }{A character "yes" or "no" indicating
-#' if \code{pi_estimate$r} falls
+#' whether or not \code{pi_estimate$r} falls
 #' in the confidence interval.
 #' }
 #' }
 #' }
-#' \item{\code{pi_sd_boot}: }{A data.frame containing
+#' \item{\code{grouped_bootstrap_sds}: }{A data.frame containing
 #' \itemize{
-#' \item{\code{sd_boot}: }{The bootstrap estimate of teh
+#' \item{\code{sd}: }{The bootstrap estimate of the
 #' standard deviation of the \code{pi_hat}.
 #' }
 #' \item{\code{lower}: }{The lower bound of the bootstrap percentile
@@ -199,25 +216,10 @@
 #' \item{\code{upper}: }{The upper bound of the bootstrap percentile
 #' confidence interval.
 #' }
-#' \item{\code{in_ci_boot}: }{A character "yes" or "no" indicating if 
-#' \code{pi_estimate$r} falls in the bootstrap confidence interval.
+#' \item{\code{in_ci}: }{A character "yes" or "no" indicating if 
+#' \code{grouped_estimates$r} falls in the bootstrap confidence interval.
 #' }
 #' }
-#' }
-#' \item{\code{gof_theory}: }{A data.frame containing
-#' \code{statistic}, the chi-square goodness of fit test statistic 
-#' using  \code{sd} the asymptotic-theory version of the estimate of
-#' standard deviation, and \code{p_value} its p-value.
-#' }
-#' \item{\code{gof_boot}: }{A data.frame containing
-#' \code{statistic}, the chi-square goodness of fit test statistic
-#' using \code{sd_boot} the bootstrap version of the estimate of 
-#' standard deviation, and \code{p_value} its p-value.
-#' }
-#' \item{\code{concordance_summary}: }{A data.frame containing the 
-#' the concordance estimate 
-#' \code{concordance}, together with \code{lower} and \code{upper},
-#' the lower and upper bounds of a confidence interval for concordance.
 #' }
 #' }
 #' }
