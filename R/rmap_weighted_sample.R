@@ -7,8 +7,7 @@ rmap_weighted_sample = function (
   rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, 
                       N_bootstraps, confidence_level)
   epsilon = length(e)^(-1/3)
-  risk_group = list(epsilon = epsilon)
-  individual = rmap_individual(e, t, r, t_star, design, risk_group,
+  individual = rmap_individual(e, t, r, t_star, design, epsilon,
                                N_bootstraps, confidence_level)
   
   list(rmap_answers = rmap_answers,
