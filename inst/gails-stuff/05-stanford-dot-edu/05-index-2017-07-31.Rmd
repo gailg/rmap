@@ -322,14 +322,14 @@ target_category = target_sample$category
 category = xxx$category
 set.seed(1)
 design = list(target_category = target_category, category = category)
+cutoffs = c(0, 0.20, 1)
 risk_group = list(cutoffs = cutoffs)
 r_summary = "mean"
 confidence_level = 0.95
 rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, 
                     N_bootstraps, confidence_level)
 epsilon = length(e)^(-1/3)
-risk_group = list(epsilon = epsilon)
-individual = rmap_individual(e, t, r, t_star, design, risk_group,
+individual = rmap_individual(e, t, r, t_star, design, epsilon,
                              N_bootstraps, confidence_level)
 the_message = paste("doing it without calling rmap_weighted_sample", sep = "\n")
 grid.arrange(textGrob(the_message), 
