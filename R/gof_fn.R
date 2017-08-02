@@ -51,7 +51,7 @@
 #' data.frame(gamma_hat, r_bar, pi_hat, sigma)
 #' gof_fn(gamma_hat, r_bar, pi_hat, sigma)
 #' # just to double check that this makes sense
-#' pi_sd_theory_fn(baseArgs, extraArgs)$pi_sd_theory 
+#' grouped_asymptotic_sds_fn(baseArgs, extraArgs)$grouped_asymptotic_sds 
 #' 
 #' @export
 

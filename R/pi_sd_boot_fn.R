@@ -6,7 +6,7 @@
 #' outcome probability.
 #' 
 #' @param baseArgs A list provided by \code{baseArgsFn}.  The objects
-#' required by \code{pi_estimate_fn} are 
+#' required by \code{pi_sd_boot_fn} are 
 #' \code{c}
 #' \code{e},
 #' \code{K}, \code{k},

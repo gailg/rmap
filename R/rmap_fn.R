@@ -77,7 +77,7 @@
 #' \item{\code{upper}: }{The upper bound of the confidence interval.
 #' }
 #' \item{\code{in_ci}: }{A character "yes" or "no" indicating
-#' whether or not \code{pi_estimate$r} falls
+#' whether or not \code{grouped_estimates$r} falls
 #' in the confidence interval.
 #' }
 #' }
@@ -193,21 +193,21 @@ rmap_fn = function(baseArgs){
   roc_plot = ggplot(df_for_roc_plot, aes(x = one_minus_specificity, y = sensitivity)) + 
     geom_step() + 
     geom_abline(slope = 1, intercept = 0, color = "red", linetype = 2) 
-  pi_estimate = pi_estimate_fn(baseArgs)$pi_estimate
-  gamma_hat = pi_estimate$gamma_hat
-  r_bar = pi_estimate$r
-  pi_hat = pi_estimate$pi_hat
+  grouped_estimates = grouped_estimates_fn(baseArgs)$grouped_estimates
+  gamma_hat = grouped_estimates$gamma_hat
+  r_bar = grouped_estimates$r
+  pi_hat = grouped_estimates$pi_hat
   extraArgs = list(gammaHat = gamma_hat,
                    piHat = pi_hat)
-  pi_sd_theory = if(any(baseArgs$N_nonzero_events == 0 || baseArgs$sampling == "weighted")){
+  grouped_asymptotic_sds = if(any(baseArgs$N_nonzero_events == 0 || baseArgs$sampling == "weighted")){
     NULL
   } else {
-    pi_sd_theory_fn(baseArgs, extraArgs)$pi_sd_theory
+    grouped_asymptotic_sds_fn(baseArgs, extraArgs)$grouped_asymptotic_sds
   }
-  gof_theory = if(is.null(pi_sd_theory) || any(pi_sd_theory$sd < baseArgs$small_number)){
+  gof_theory = if(is.null(grouped_asymptotic_sds) || any(grouped_asymptotic_sds$sd < baseArgs$small_number)){
     NULL
   } else {
-    sigma = pi_sd_theory$sd
+    sigma = grouped_asymptotic_sds$sd
     gof_fn(gamma_hat, r_bar, pi_hat, sigma)
   }
   if(baseArgs$N_bootstraps == 0){
@@ -232,12 +232,12 @@ rmap_fn = function(baseArgs){
       pi_sd_boot[, c("lower", "upper")]
     }
   } else {
-    pi_sd_theory[, c("lower", "upper")]
+    grouped_asymptotic_sds[, c("lower", "upper")]
   }
   df_for_risk_plot = if(is.null(sd_part)){
-    100 * pi_estimate[, c("r", "pi_hat")]
+    100 * grouped_estimates[, c("r", "pi_hat")]
   } else {
-    100 * cbind(pi_estimate[, c("r", "pi_hat")], sd_part)
+    100 * cbind(grouped_estimates[, c("r", "pi_hat")], sd_part)
   }
   risk_plot = 
     ggplot(df_for_risk_plot, aes(x = r, y = pi_hat, ymin = lower, ymax = upper)) +
@@ -257,8 +257,8 @@ rmap_fn = function(baseArgs){
     concordance = concordance_summary,
     gof_asymptotic = gof_theory,
     gof_bootstrap = gof_boot,
-    grouped_estimates = pi_estimate,
-    grouped_asymptotic_sds = pi_sd_theory,
+    grouped_estimates = grouped_estimates,
+    grouped_asymptotic_sds = grouped_asymptotic_sds,
     grouped_bootstrap_sds = pi_sd_boot
   )
   list(numerical_summaries = numerical_summaries,

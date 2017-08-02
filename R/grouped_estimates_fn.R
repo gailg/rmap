@@ -3,7 +3,7 @@
 #' For each risk group, produce \code{gamma_hat}, \code{r}, and \code{pi_hat}.
 #' 
 #' @param baseArgs A list provided by \code{baseArgsFn}.  The objects
-#' required by \code{pi_estimate_fn} are 
+#' required by \code{grouped_estimates_fn} are 
 #' \code{c}
 #' \code{e},
 #' \code{K}, \code{k},
@@ -40,17 +40,17 @@
 #' rSummary = "mean"
 #' bootstrap = 100
 #' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
-#' pi_estimate_fn(baseArgs)
+#' grouped_estimates_fn(baseArgs)
 #' 
 #' @export
 
 
-pi_estimate_fn = function(baseArgs){
+grouped_estimates_fn = function(baseArgs){
   gammaHat = gammaHatFn(baseArgs)
   pi_hat = pi_hat_fn(baseArgs)
   r_bar = baseArgs$rSummary
   list(
-    pi_estimate = data.frame(
+    grouped_estimates = data.frame(
       gamma_hat = gammaHat,
       r = baseArgs$rSummary,
       pi_hat = pi_hat))

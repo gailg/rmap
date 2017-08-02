@@ -23,7 +23,7 @@
 #' 
 #' @return A list containing
 #' \itemize{
-#' \item{\code{pi_sd_theory}: }{A data.frame containing \code{K} rows,
+#' \item{\code{grouped_asymptotic_sds}: }{A data.frame containing \code{K} rows,
 #' one for each risk group, and the following columns:
 #' \itemize{
 #' \item{\code{sd}: }{The estimated standard deviation of the estimate
@@ -58,11 +58,11 @@
 #' rSummary = "mean"
 #' bootstrap = 100
 #' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
-#' pi_sd_theory_fn(baseArgs)
+#' grouped_asymptotic_sds_fn(baseArgs)
 #' 
 #' @export
 
-pi_sd_theory_fn = function(baseArgs, extraArgs = FALSE){
+grouped_asymptotic_sds_fn = function(baseArgs, extraArgs = FALSE){
   pi_hat = if("pi_hat" %in% names(extraArgs)){
     extraArgs$pi_hat
   } else {
@@ -74,7 +74,7 @@ pi_sd_theory_fn = function(baseArgs, extraArgs = FALSE){
   lower = piHatCIs[, "lower"]
   upper = piHatCIs[, "upper"]
   in_ci = ifelse(lower <= baseArgs$rSummary & baseArgs$rSummary <= upper, "yes", "no")
-  pi_sd_theory = data.frame(
+  grouped_asymptotic_sds = data.frame(
     sd = sigma,
     lower,
     upper,
@@ -87,6 +87,6 @@ pi_sd_theory_fn = function(baseArgs, extraArgs = FALSE){
   } else {
     additional
   }
-  list(pi_sd_theory = pi_sd_theory,
+  list(grouped_asymptotic_sds = grouped_asymptotic_sds,
        extraArgs = extraArgs)
 }
