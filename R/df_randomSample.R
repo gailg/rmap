@@ -129,5 +129,5 @@ df_randomSample = function(NTotal = 1000, distribution = "lognormal",
   kBinOneStage(dataf, K)
 }
 
-# Fri Mar 25 13:59:01 PDT 2011
+
 

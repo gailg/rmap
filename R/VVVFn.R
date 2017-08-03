@@ -41,7 +41,7 @@
 #' options(digits = 3)
 #' options(scipen = 10)
 #' set.seed(5)
-#' ddd = df_twoStage(NTotal = 10, KKK = 2)
+#' ddd = df_twoStage(NTotal = 10, K = 2)
 #' d = ddd$d
 #' d[9,] = d[1,]
 #' d[9,]$e = 0
