@@ -1,5 +1,109 @@
-
-
+#' @title A random sample of people with disease
+#' subject to censoring and competing risks
+#' 
+#' @description 
+#' Individuals in the data set are subject to times 
+#' (\code{t0}) to censoring, times (\code{t1}) 
+#' to disease, and times (\code{t2}) to death. 
+#' We observe \code{t = min(t0, t1, t2)}
+#' and \code{e = } which of \code{t0}, 
+#' \code{t1}, \code{t2} is equal to \code{t}.
+#' 
+#' The generating functions generate \code{t0}, 
+#' \code{t1}, and \code{t2}
+#' independently according to exponential distributions 
+#' with rates \code{eta0}, \code{eta1}, and 
+#' \code{eta2} respectively, 
+#' where \code{eta0} and \code{eta2} are inputs and 
+#' \code{eta1} is generated 
+#' from either a \code{lognormal} or 
+#' \code{beta} distribution.  If \code{lognormal},
+#' then \code{log(t2)} is normal with mean 
+#' \code{param1} and sd \code{param2}.  
+#' If \code{beta}, then \code{param1} and 
+#' \code{param2} are the shape parameters 
+#' of \code{beta}.
+#' 
+#' Given these models for generating data, 
+#' the probability of developing disease given a person's 
+#' eta1 can be calculated using Equation (18) in 
+#' "rmap-formulas-v02.pdf" from the website.  
+#' This probability called the risk is calculated and 
+#' recorded as \code{r} in the output variables.
+#' 
+#' This is an internal function that is used by 
+#' \code{df_randomSample} and \code{df_twoStage}.  The
+#' user is advised to use either of these two functions, 
+#' and not this raw function.
+#' 
+#' @param NTotal
+#' An integer equal to the number of people in the 
+#' random sample.
+#' 
+#' @param distribution
+#' A character string equal to \code{lognormal} or
+#' \code{beta}.  This is the distribution used to generate
+#' \code{eta1} which is the rate of the exponential 
+#' that generates the times to disease.  Mean time to 
+#' disease is \code{1/eta1}
+#' 
+#' @param param1
+#' A number that determines the first parameter 
+#' of the distribution that generates rate of disease.  
+#' If \code{distribution = lognormal}, \code{log(t1)} 
+#' is normal with mean \code{param1}.  If 
+#' \code{distribution = beta}, \code{param1} is the 
+#' \code{shape1} parameter of \code{rbeta}.
+#' 
+#' @param param2
+#' A number that determines the second parameter of 
+#' the distribution that generates rate of disease.  
+#' If \code{distribution = lognormal}, \code{log(t1)} is 
+#' normal with sd \code{param2}.  If 
+#' \code{distribution = beta}, \code{param2} is the 
+#' \code{shape2} parameter of \code{rbeta}.
+#' 
+#' @param eta0
+#' A positive number that determines the rate of censoring.  
+#' Times to censoring are generated
+#' according to \code{rexp} with \code{rate} parameter 
+#' \code{eta0}.
+#' 
+#' @param eta2
+#' A positive number that determines the rate of death.  
+#' Times to death are generated according to \code{rexp} with 
+#' \code{rate} parameter \code{eta2}.
+#' 
+#' @param tStar
+#' A positve number that determines the length of time of
+#' the study.
+#' 
+#' @return A data.frame with
+#' \code{NTotal} rows and with columns
+#' \itemize{
+#' \item{\code{e}: }{
+#' Disease status equal to \code{0} for censored,
+#' \code{1} for outcome, and \code{2} for death from 
+#' other causes.
+#' }
+#' \item{\code{t}: }{
+#' Time of event \code{e}.
+#' }
+#' \item{\code{w}: }{
+#' The rate of the
+#' exponential time to disease.
+#' }
+#' \item{\code{r}: }{
+#' The probability of disease given the covariate \code{w}.
+#' }
+#' }
+#' 
+#' @examples 
+#' set.seed(1)
+#' df_raw(NTotal = 10, distribution = "lognormal", 
+#'        param1 = -1.8, param2 = 0.4, eta0 = 0.1, eta2 = 0.1, tStar = 10)
+#'        
+#' @export
 df_raw = function(NTotal, distribution, param1, param2, eta0, eta2, tStar) {
   eta1 = w = switch(distribution,
            lognormal = exp(rnorm(n = NTotal, mean = param1, sd = param2)),
@@ -18,14 +122,3 @@ df_raw = function(NTotal, distribution, param1, param2, eta0, eta2, tStar) {
   r = (numerator / denominator) * (1 - exp(-(eta1 + eta2) * tStar))
   data.frame(e = te[,2], t = te[,1], w = w, r = r)
 }
-
-
-## df_oneStage = function(NTotal = 1000, distribution = "lognormal",
-##   param1 = -1.8, param2 = 0.4,
-##   eta0 = .1, eta2 = .1, tStar = 10, KKK = 5)
-## {
-##   dataf = df_raw(NTotal, distribution, param1, param2, eta0, eta2, tStar)
-##   kBinOneStage(dataf, KKK)
-## }
-
-## # Wed Mar 16 11:15:17 PDT 2011

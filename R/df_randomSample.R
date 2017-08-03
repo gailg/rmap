@@ -1,11 +1,132 @@
-
+#' @title A random sample of people with disease
+#' subject to censoring and competing risks
+#' 
+#' @description 
+#' Individuals in the data set are subject to times 
+#' (\code{t0}) to censoring, times (\code{t1}) 
+#' to disease, and times (\code{t2}) to death. 
+#' We observe \code{t = min(t0, t1, t2)}
+#' and \code{e = } which of \code{t0}, 
+#' \code{t1}, \code{t2} is equal to \code{t}.
+#' 
+#' The generating functions generate \code{t0}, 
+#' \code{t1}, and \code{t2}
+#' independently according to exponential distributions 
+#' with rates \code{eta0}, \code{eta1}, and 
+#' \code{eta2} respectively, 
+#' where \code{eta0} and \code{eta2} are inputs and 
+#' \code{eta1} is generated 
+#' from either a \code{lognormal} or 
+#' \code{beta} distribution.  If \code{lognormal},
+#' then \code{log(t2)} is normal with mean 
+#' \code{param1} and sd \code{param2}.  
+#' If \code{beta}, then \code{param1} and 
+#' \code{param2} are the shape parameters 
+#' of \code{beta}.
+#' 
+#' Given these models for generating data, 
+#' the probability of developing disease given a person's 
+#' eta1 can be calculated using Equation (18) in 
+#' "rmap-formulas-v02.pdf" from the website.  
+#' This probability called the risk is calculated and 
+#' recorded as \code{r} in the output variables.
+#' 
+#' Use this function for generating random
+#' samples to test \code{rmap} and \code{rmap_individual}.
+#' 
+#' @param NTotal
+#' An integer equal to the number of people in the 
+#' random sample.
+#' 
+#' @param distribution
+#' A character string equal to \code{lognormal} or
+#' \code{beta}.  This is the distribution used to generate
+#' \code{eta1} which is the rate of the exponential 
+#' that generates the times to disease.  Mean time to 
+#' disease is \code{1/eta1}
+#' 
+#' @param param1
+#' A number that determines the first parameter 
+#' of the distribution that generates rate of disease.  
+#' If \code{distribution = lognormal}, \code{log(t1)} 
+#' is normal with mean \code{param1}.  If 
+#' \code{distribution = beta}, \code{param1} is the 
+#' \code{shape1} parameter of \code{rbeta}.
+#' 
+#' @param param2
+#' A number that determines the second parameter of 
+#' the distribution that generates rate of disease.  
+#' If \code{distribution = lognormal}, \code{log(t1)} is 
+#' normal with sd \code{param2}.  If 
+#' \code{distribution = beta}, \code{param2} is the 
+#' \code{shape2} parameter of \code{rbeta}.
+#' 
+#' @param eta0
+#' A positive number that determines the rate of censoring.  
+#' Times to censoring are generated
+#' according to \code{rexp} with \code{rate} parameter 
+#' \code{eta0}.
+#' 
+#' @param eta2
+#' A positive number that determines the rate of death.  
+#' Times to death are generated according to \code{rexp} with 
+#' \code{rate} parameter \code{eta2}.
+#' 
+#' @param tStar
+#' A positve number that determines the length of time of
+#' the study.
+#' 
+#' @param K
+#' A positive integer that determines the number of risk groups. 
+#' This function assigns the subjects into approximately 
+#' equal-sized risk groups. The risk group assignment is 
+#' recorded in the column \code{k}, \code{1} for the people 
+#' with the smallest risk \code{r}, and so on up to \code{K} 
+#' for the people with the largest risk.
+#' 
+#' @return A data.frame with
+#' \code{NTotal} rows and with columns
+#' \itemize{
+#' \item{\code{e}: }{
+#' Disease status equal to \code{0} for censored,
+#' \code{1} for outcome, and \code{2} for death from 
+#' other causes.
+#' }
+#' \item{\code{t}: }{
+#' Time of event \code{e}.
+#' }
+#' \item{\code{w}: }{
+#' The rate of the
+#' exponential time to disease.
+#' }
+#' \item{\code{r}: }{
+#' The probability of disease given the covariate \code{w}.
+#' }
+#' \item{\code{c}: }{
+#' A vector of \code{"A"}s.  This vector stores the two-stage
+#' category under two-stage sampling.  For random samples, 
+#' all subjects are considered to be from the same category 
+#' \code{"A"}.
+#' }
+#' \item{\code{k}: }{
+#' A vector of integers representing the risk group assignment 
+#' based on the risk vector \code{r} and the number of
+#' risk groups \code{K}.
+#' }
+#' }
+#' 
+#' @examples 
+#' set.seed(1)
+#' df_randomSample(20)
+#'        
+#' @export
 
 df_randomSample = function(NTotal = 1000, distribution = "lognormal",
   param1 = -1.8, param2 = 0.4,
-  eta0 = .1, eta2 = .1, tStar = 10, KKK = 5)
+  eta0 = .1, eta2 = .1, tStar = 10, K = 5)
 {
   dataf = df_raw(NTotal, distribution, param1, param2, eta0, eta2, tStar)
-  kBinOneStage(dataf, KKK)
+  kBinOneStage(dataf, K)
 }
 
 # Fri Mar 25 13:59:01 PDT 2011
