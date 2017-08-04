@@ -65,7 +65,7 @@
 #' @param p
 #' A named vector containing the two elements \code{p["A"]} 
 #' the resampling probability for category \code{"A"}, and
-#' \cod{p["B"]} the resampling probability for 
+#' \code{p["B"]} the resampling probability for 
 #' category \code{"B"}.
 #' 
 #' @return A list with three elements

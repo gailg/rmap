@@ -59,7 +59,7 @@
 #' bootstrap = N_bootstrap_reps
 #' baseArgs = baseArgsFn(e, t, r, tStar, design, riskGroup, rSummary, bootstrap)
 #' concordance_fn(baseArgs)
-
+#' @import survival
 #' @export
 
 concordance_fn = function(baseArgs){

@@ -1,4 +1,4 @@
-#' @title An annotated ROC plot using \code{rmap_answers}
+#' An annotated ROC plot using \code{rmap_answers}
 #' 
 #' @param rmap_answers Output from \code{rmap} or the
 #' \code{rmap_answers} object from \code{rmap_random_sample}
@@ -26,6 +26,8 @@
 #' rmap_answers = the_random_sample$rmap_answers
 #' title = "This is to show off the title of the ROC plot"
 #' pretty_roc_plot(rmap_answers, title)
+#' 
+#' @import ggplot2
 #' 
 #' @export
 pretty_roc_plot = function(rmap_answers, title = "ROC Plot"){

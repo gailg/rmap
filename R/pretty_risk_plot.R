@@ -1,4 +1,4 @@
-#' @title An annotated attribute diagram plot using \code{rmap_answers}
+#' An annotated attribute diagram plot using \code{rmap_answers}
 #' 
 #' @param rmap_answers Output from \code{rmap} or the
 #' \code{rmap_answers} object from \code{rmap_random_sample}
@@ -28,6 +28,7 @@
 #' title = "This is to show off the title of the attribute diagram plot"
 #' pretty_risk_plot(rmap_answers, title)
 #' 
+#' @import ggplot2
 #' @export
 
 

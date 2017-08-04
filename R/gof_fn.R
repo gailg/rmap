@@ -53,6 +53,7 @@
 #' # just to double check that this makes sense
 #' grouped_asymptotic_sds_fn(baseArgs, extraArgs)$grouped_asymptotic_sds 
 #' 
+#' @import CompQuadForm
 #' @export
 
 

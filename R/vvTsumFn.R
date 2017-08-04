@@ -44,7 +44,6 @@
 #' uuT_R
 #' 
 #' @export
-#' 
 vvTsumFn = function(uuu, mult = rep(1, nrow(uuu))) {
   NB1 = matrix( rep(0, ncol(uuu)^2), nrow = ncol(uuu))          
   for(n in 1:nrow(uuu)) {                                           

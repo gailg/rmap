@@ -184,6 +184,8 @@
 #' grid.arrange(plots$roc_plot, plots$risk_plot, ncol = 2, 
 #'              top = "rmap_grouped on a two-stage sample")
 #' rmap_3$summary
+#' 
+#' @import ggplot2
 #' @export
 
 rmap_fn = function(baseArgs){

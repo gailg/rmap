@@ -1,4 +1,4 @@
-#' @title An annotated indivualized attribute diagram plot using results from 
+#' An annotated indivualized attribute diagram plot using results from 
 #' \code{rmap_individual}
 #' 
 #' @param individual Output from \code{rmap_individual}.
@@ -30,6 +30,7 @@
 #' subtitle = "I have nothing more to say"
 #' pretty_individual_risk_plot(individual, title, subtitle)
 #' 
+#' @import ggplot2
 #' @export
 pretty_individual_risk_plot = function(individual, 
   title = "Individualized Attribute Diagram",

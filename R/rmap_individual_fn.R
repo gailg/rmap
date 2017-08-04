@@ -103,6 +103,7 @@
 #' rmap_1$df_for_risk_plot
 #' grid.arrange(rmap_1$risk_plot, top = "rmap_individual_fn on a weighted sample")
 #' 
+#' @import parallel ggplot2
 #' @export
 rmap_individual_fn = function(baseArgs){
   e = baseArgs$e
@@ -115,7 +116,6 @@ rmap_individual_fn = function(baseArgs){
     NULL
   } else {
     iter_fn = if(baseArgs$multicore) {
-      require(parallel)
       mclapply
     } else {
       lapply

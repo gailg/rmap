@@ -233,6 +233,7 @@
 #' base_args_bootNN1
 #' pi_hat_fn(base_args_bootNN1)
 #' 
+#' @import stats
 #' @export
 base_args_boot_fn = function(baseArgs) {
   if(baseArgs$sampling == "weighted"){
