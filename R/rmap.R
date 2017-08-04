@@ -150,7 +150,7 @@
 #' 
 #' @param confidence_level A positive number less than \code{1}, 
 #' defaulted to \code{0.95}, specifying the confidence levels of the
-#' confidence intervals inside \code{rmap}
+#' confidence intervals inside \code{rmap}.
 #' 
 #' @return A list containing
 #' \itemize{

@@ -101,7 +101,7 @@ The risk assigned by the personal predictive model. This is the probability of t
 
 ## `category` (optional)
 
-If your data were obtained by two-stage sampling, this is the two-stage category indicating which two-stage category the person fell into. (See `N_first_stage` below.)  If your data are a cohort sample whose covariates suspected to be related to risk do not match those of your target population, and you would like to weight your cohort samples based on covariate information from a target population, `category` records which covariate category the (cohort) person fell into. (See `design` with with option `list(category = category, target_category = target_category` below.)
+If your data were obtained by two-stage sampling, this is the two-stage category indicating which two-stage category the person fell into. (See `N_first_stage` below.)  If your data are a cohort sample whose covariates suspected to be related to risk do not match those of your target population, and you would like to weight your cohort samples based on covariate information from a target population, `category` records which covariate category the (cohort) person fell into. (See `N_target` or `target_category` in the section "Other data you may need" below.)
 
 
 # Reading in data {#reading-in-data}

@@ -112,6 +112,10 @@
 #' @param bootstrap Either a single integer number, 
 #' describing the number of bootstraps or \code{FALSE} 
 #' to turn off bootstrapping.
+#' @param confidenceLevel
+#' A positive number less than \code{1}, 
+#' defaulted to \code{0.95}, specifying the confidence levels of the
+#' confidence intervals inside \code{rmap}.
 #' @param multicore Currently not used.
 #' A logical value. If multicore = TRUE and
 #' (\code{riskGroup = list(epsilon = epsilon)}) and bootstrap 

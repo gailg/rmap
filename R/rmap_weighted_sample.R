@@ -4,7 +4,13 @@
 #' \code{rmap} and \code{rmap_individual} 
 #' but without as many options, perhaps useful if your sample
 #' is a weighted sample. Provided here to give you an example of
-#' a call to \code{rmap} and \code{rmap_individual}
+#' a call to \code{rmap} and \code{rmap_individual}.
+#' We assume here that the covariates of the participants of the
+#' cohort study differ from those of the population for which 
+#' the predictive model is target.  A target sample has been
+#' obtained, and subjects in both cohort sample
+#' and target sample have been classified into joint covariate 
+#' categories. 
 #' 
 #' @param e Throughout this help page, let \code{N} be the number 
 #' of people in your data set.  \code{e} is a vector of length 
@@ -37,6 +43,16 @@
 #' The goal of the \code{rmap} package is to assess the validity and
 #' calibration of this model. Acceptable values are real numbers 
 #' between \code{0} and \code{1}.
+#' 
+#' @param category A vector of length \code{N} containing the 
+#' joint-covariate categories of the cohort sample.  Possible
+#' elements are character strings such as \code{"A"}, \code{"B"}, etc.
+#' which label the covariate categories.
+#' 
+#' @param target_category  A vector containing one element for each
+#' person in the target sample recording his/her covariate category.
+#' Possible elements are the same character strings as those used in
+#' \code{category}.
 #' 
 #' @param t_star A positive number equal to the duration of the the study.
 #' The risk model that you are evaluating expresses the risk of the outcome
