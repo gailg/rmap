@@ -1,0 +1,181 @@
+---
+title: "02-read-data"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 4.5, fig.width = 6.5, tidy=FALSE)
+```
+
+
+"2017-08-05 14:07:52 PDT"
+
+`r getwd()`  
+
+`r Sys.time()`
+
+
+# Random Sample
+```{r random_sample, message = FALSE, eval = TRUE, fig.height = 5, fig.width = 7}
+library(rmap)
+xxx = read.csv("random_sample_example.csv")
+head(xxx)
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+design = "random_sample"
+risk_group = list(K = 4)
+r_summary = "mean"
+N_bootstraps = 100
+set.seed(1)
+rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, N_bootstraps)
+epsilon = length(e)^(-1/3)
+individual = rmap_individual(e, t, r, t_star, design, epsilon, N_bootstraps)
+the_message = paste("rmap on random sample", sep = "\n")
+grid.arrange(textGrob(the_message), 
+             pretty_risk_plot(rmap_answers), 
+             pretty_roc_plot(rmap_answers), 
+             pretty_individual_risk_plot(individual),
+             ncol = 2)
+```
+
+
+# Two-stage sample
+
+```{r two_stage_sample_grouped, fig.height = 5, fig.width = 7}
+library(rmap)
+xxx = read.csv("two_stage_sample_example.csv", stringsAsFactors = FALSE)
+head(xxx)
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+N_first_stage = c(A = 132, B = 168)
+N_first_stage
+category = xxx$category
+design = list(N_first_stage = N_first_stage, category = category)
+risk_group = list(K = 3)
+r_summary = "mean"
+N_bootstraps = 100
+set.seed(3)
+rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, N_bootstraps)
+epsilon = length(e)^(-1/3)
+individual = rmap_individual(e, t, r, t_star, design, epsilon, N_bootstraps)
+the_message = paste("rmap on two-stage-sample")
+grid.arrange(textGrob(the_message), 
+             pretty_risk_plot(rmap_answers), 
+             pretty_roc_plot(rmap_answers), 
+             pretty_individual_risk_plot(individual),
+             ncol = 2)
+```
+
+# Weighted
+
+```{r weighted_grouped, fig.height = 5, fig.width = 7}
+library(rmap)
+xxx = read.csv("weighted_example_cohort_sample.csv", stringsAsFactors = FALSE)
+head(xxx)
+e = xxx$e
+t = xxx$t
+r = xxx$r
+t_star = 10
+target_sample = read.csv("weighted_example_target_sample.csv", stringsAsFactors = FALSE)
+head(target_sample)
+target_category = target_sample$category
+category = xxx$category
+design = list(target_category = target_category, category = category)
+cutoffs = c(0, 0.20, 1)
+risk_group = list(cutoffs = cutoffs)
+r_summary = "mean"
+N_bootstraps = 100
+set.seed(5)
+rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, N_bootstraps)
+epsilon = length(e)^(-1/3)
+individual = rmap_individual(e, t, r, t_star, design, epsilon, N_bootstraps)
+the_message = paste("rmap on weighted sample")
+grid.arrange(textGrob(the_message), 
+             pretty_risk_plot(rmap_answers), 
+             pretty_roc_plot(rmap_answers), 
+             pretty_individual_risk_plot(individual),
+             ncol = 2)
+```
+
+
+# Comparing two risk models using composite plots
+
+```{r composite}
+xxx = read.csv("two_model_comparison_example.csv")
+head(xxx)
+e = xxx$e
+t = xxx$t
+r1 = xxx$r1
+r2 = xxx$r2
+t_star = 10
+design = "random_sample"
+risk_group = list(K = 4)
+r_summary = "mean"
+N_bootstrap = 100
+rmap_1 = rmap(e, t, r1, t_star, design, risk_group, r_summary, N_bootstraps)
+rmap_2 = rmap(e, t, r2, t_star, design, risk_group, r_summary, N_bootstraps)
+epsilon = nrow(xxx)^(-1/3)
+individual_1 = rmap_individual(e, t, r1, t_star, design, epsilon, N_bootstraps)
+individual_2 = rmap_individual(e, t, r1, t_star, design, epsilon, N_bootstraps)
+rmap_1$numerical_summaries
+names(rmap_1$plots)
+names(individual_1)
+roc_1 = rmap_1$plots$df_for_roc_plot
+roc_2 = rmap_2$plots$df_for_roc_plot
+head(roc_1)
+roc_1$model = rep("Model 1 is super duper", nrow(roc_1))
+roc_2$model = rep("Model 2", nrow(roc_2))
+df = rbind(roc_1, roc_2)
+ggplot(df, aes(x = one_minus_specificity, y = sensitivity, color = model)) +
+  geom_step() + 
+  geom_abline(slope = 1, intercept = 0, color = "gray", linetype = 2) +
+  scale_color_manual(values = c("blue", "red")) +
+  theme(legend.title = element_blank()) +
+  theme(legend.position = c(0.2, 0.9)) +
+  ggtitle("ROC plots for assigned risk Models 1 and 2")
+p1 = rmap_1$plots$risk_plot + ggtitle("Zee Model One")
+p2 = rmap_2$plots$risk_plot + ggtitle("Yep this is Model Two")
+p3 = individual_1$risk_plot
+p4 = individual_2$risk_plot
+grobs = lapply(list(p1, p2, p3, p4), `+`, 
+               theme(axis.title = element_blank(),
+                     plot.title = element_text(hjust = 0.5)))
+space = .5
+grid.arrange(grobs[[1]] + theme( axis.text.x = element_blank(),
+                                 plot.margin = unit(c(space,0,0,space), "cm")),
+             grobs[[2]] + theme( axis.text = element_blank(),
+                                 plot.margin = unit(c(space,space,0,0), "cm")),
+             grobs[[3]] + theme( plot.margin = unit(c(0,0,space,space), "cm")), 
+             grobs[[4]] + theme( axis.text.y = element_blank(),
+                                 plot.margin = unit(c(0,space,space,0), "cm")), 
+             left = "Observed Risks (%)",
+             bottom = "Assigned Risks (%)",
+             top = "Attribute and Individualized Attribute Diagrams for Models 1 and 2",
+             ncol = 2)
+```
+
+
+
+
+
+

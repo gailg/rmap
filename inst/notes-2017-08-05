@@ -1,0 +1,11 @@
+"2017-08-05 12:09:58 PDT"
+This is version 0.03.00
+
+
+Added are the abililty to handle weighted samples and the ability to compute concordance and plot ROC plots.
+
+Instead of riskValidate, etc, there are now just two main functions rmap (replace riskValidate and adding concordance) and rmap_individual (replace riskValidateUngrouped).  My thinking is rmap is the main function doing everything that the package promises except rmap_individual, which is the extra little bit to provide another kind of summary.  
+
+The word ungrouped has been dropped and replaced with individual or individualized.  All variables visible to the user are in hadley-speak instead of camelCase.  Parallel has been turned off.  There are pretty functions to replace the graphics that we had before, and the user is encouraged to use ggplot to create custom plots. 
+
+
