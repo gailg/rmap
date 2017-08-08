@@ -1,0 +1,26 @@
+\contentsline {section}{\numberline {1}Grouped Analysis}{2}
+\contentsline {subsection}{\numberline {1.1}The problem}{2}
+\contentsline {subsection}{\numberline {1.2}Notation dictionary}{2}
+\contentsline {subsection}{\numberline {1.3}Two-stage sampling}{3}
+\contentsline {subsubsection}{\numberline {1.3.1}Simple random sampling}{3}
+\contentsline {subsubsection}{\numberline {1.3.2}Back to two-stage sampling}{3}
+\contentsline {subsection}{\numberline {1.4}The data}{4}
+\contentsline {subsection}{\numberline {1.5}Goals }{5}
+\contentsline {subsection}{\numberline {1.6}The likelihood}{5}
+\contentsline {subsection}{\numberline {1.7}$u_n$ and $V$}{6}
+\contentsline {subsubsection}{\numberline {1.7.1}$u_n(\gamma )$ and $V(\gamma )$}{6}
+\contentsline {subsubsection}{\numberline {1.7.2}$u_n(\lambda )$ and $V(\lambda )$}{8}
+\contentsline {subsubsection}{\numberline {1.7.3}$u_n$ and $V$}{10}
+\contentsline {subsection}{\numberline {1.8}The delta method}{11}
+\contentsline {subsection}{\numberline {1.9}The HT estimate $\mathaccentV {tilde}07E{\xi }^T = (\mathaccentV {tilde}07E{\gamma }, \mathaccentV {tilde}07E{\pi })^T$ }{12}
+\contentsline {subsection}{\numberline {1.10}Hosmer-Lemeshow statistic}{14}
+\contentsline {subsection}{\numberline {1.11}AUC}{14}
+\contentsline {subsubsection}{\numberline {1.11.1}Break up $\unhbox \voidb@x \hbox {AUC}(\xi )$}{14}
+\contentsline {subsubsection}{\numberline {1.11.2}Calculating $f_1(\xi ) = \DOTSB \sum@ \slimits@ _{k=1}^K \gamma _{k}^2 (1 - \pi _{k}) \pi _{k}$}{15}
+\contentsline {subsubsection}{\numberline {1.11.3}Calculating $f_2(\pi ) = \DOTSB \sum@ \slimits@ _{k'=1}^{K-1}\DOTSB \sum@ \slimits@ _{k''=k'+1}^K \gamma _{k'} \gamma _{k''} (1-\pi _{k'}) \pi _{k''}$}{15}
+\contentsline {subsubsection}{\numberline {1.11.4}Calculating $g(\xi ) = (1-\pi )\pi $}{16}
+\contentsline {subsection}{\numberline {1.12}SD of a Risk Model}{17}
+\contentsline {section}{\numberline {2}Ungrouped Analysis}{18}
+\contentsline {subsection}{\numberline {2.1}Introduction}{18}
+\contentsline {subsection}{\numberline {2.2}Estimation}{19}
+\contentsline {subsection}{\numberline {2.3}Calibration}{19}

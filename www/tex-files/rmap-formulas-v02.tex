@@ -1,0 +1,1389 @@
+\documentclass[11pt]{article}  
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{helvet}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{array}
+
+\setlength{\oddsidemargin}{-0.5in}
+\setlength{\evensidemargin}{-0.5in}
+\setlength{\topmargin}{-0.25in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textwidth}{7.5in}
+\setlength{\textheight}{9.25in}
+\setlength{\parindent}{0in}
+\setlength{\parskip}{2mm}
+
+\title{`rmap' Package Documentation (v.02)}
+\date{August 31, 2011}
+\author{Gail Gong \and David Johnston}
+
+\pagestyle{plain}
+
+%\renewcommand{\contentsname}{\tiny{}}
+
+\begin{document}
+
+\vspace{-80px}
+\maketitle
+
+\vspace{-70px}
+\tableofcontents
+
+
+\section{Grouped Analysis}
+\subsection{The problem}
+Assume that, during the time interval $[0, t*)$, a person can be diagnosed
+with a specific disease or die from other causes.  Assume also that we
+have in hand a model that can calculate a probability of the
+person being diagnosed with the disease before dying from other causes
+and before time $t*$. We want to validate this model. 
+
+
+\subsection{Notation dictionary}
+The notation used here is different slightly from that used in
+\emph{Two-stage Sampling Designs for Validating Personal Risk Models}
+by Whittemore and Halpern, which has been submitted to
+\emph{Biostatistics} in 2010. 
+ \\
+\\
+% \begin{tabular}{ l l l }
+% WH & GG & to jog your memory\\
+% \hline
+% l & k & risKgroup\\
+% L & K & total number of risKgroups\\
+% $\tau$ & e & Event\\
+% &$\theta$& $(\gamma, \pi)$\\
+% $\theta$&& $(\gamma, \lambda)$\\
+% i & n & subject iNdex\\
+% N & N & total number of subjects\\
+% $t_{lm}$ & $\tau_{km}$ & ordered event times in the kth risK group\\
+
+% $X_{li}(t_{lm})$ & $N_{kn}(\tau_{km}) = N_{kmn}$ & indicates whether $kn$ person
+% is at risk at time $\tau_{km}$\\
+% & $D_{ken}(\tau_{km}) = D_{kemn}$ & indicates whether $kn$ person had
+% event $e$ at time $\tau_{km}$\\
+% $n_{lm} = \sum_{i} a_{i} X_{li}(t_{lm})$ & $N_{km} = \sum_{n}
+% a_{n}N_{kn}(\tau_{km})$ & Number in risK group k at risk at time
+% $\tau_{km}$\\
+% $d_{l\tau m} = \sum_{i} a_{i}X_{li}(t_{lm}) N_{l \tau i}(t_{lm})$&$D_{kem}
+% = \sum_{n}a_{n}N_{kmn}D_{ken}(\tau_{km})$ & Number in risK group k who has
+% event $e$ at time $\tau_{km}$
+% \end{tabular}
+
+
+\begin{tabular}{|l|l|p{3in}|}
+\hline
+{\bf WH} & {\bf rmap} & {\bf to jog your memory}\\
+\hline
+l & k & risKgroup\\
+L & K & total number of risKgroups\\
+$\tau$ & e & Event\\
+&$\theta$& $(\gamma, \pi)$\\
+$\theta$&& $(\gamma, \lambda)$\\
+i & n & subject iNdex\\
+N & N & total number of subjects\\
+$t_{lm}$ & $\tau_{km}$ & ordered event times in the kth risK group\\
+
+$X_{li}(t_{lm})$ & $N_{kn}(\tau_{km}) = N_{kmn}$ & indicates whether $kn$ person
+is at risk at time $\tau_{km}$\\
+ & $D_{ken}(\tau_{km}) = D_{kemn}$ & indicates whether $kn$ person had
+event $e$ at time $\tau_{km}$\\
+$n_{lm} = \sum_{i} a_{i} X_{li}(t_{lm})$ & $N_{km} = \sum_{n}
+a_{n}N_{kn}(\tau_{km})$ & Number in risK group k at risk at time
+$\tau_{km}$\\
+$d_{l\tau m} = \sum_{i} a_{i}X_{li}(t_{lm}) N_{l \tau i}(t_{lm})$ & 
+$D_{kem} = \sum_{n}a_{n}N_{kmn}D_{ken}(\tau_{km})$ & 
+Number in risK group k who has event $e$ at time $\tau_{km}$ \\
+\hline
+\end{tabular}
+
+
+\newpage
+
+\subsection{Two-stage sampling}
+We will allow for the possibility that the people
+in the study are sampled according to 
+two-stage sampling, and so we provide this tiny interlude.
+
+
+\subsubsection{Simple random sampling}
+For comparison, we begin this discussion with simple random sampling.
+Let $\{x_n\}_{n=1,...N} $ be a random sample from a population
+governed by the density $f(x,\theta)$.  Introduce the notation
+\begin{eqnarray}
+\mbox{loglike}_n & = & \mbox{log}(f(x_n,\theta)) \label{eq:startmap} \\
+u_n & = & \frac{\partial \mbox{loglike}_n}{\partial \theta} \\
+I_n & = & - \frac{\partial u_n}{\partial \theta} \\
+U(\theta) & = & \sum_{n=1} ^N u_n \\
+A & = & \frac{1}{N}\sum_{n=1} ^N I_n \\
+V & = & A^{-1} 
+\end{eqnarray}
+The MLE $\hat{\theta}$ is the solution to $U(\theta) = 0$;  the
+asymptotic distribution of $\sqrt{N}(\hat{\theta}-\theta)$ is Normal
+with zero mean and variance $V$, and $\hat{\theta}$ has covariance
+matrix $\frac{1}{N} V$.  
+
+\subsubsection{Back to two-stage sampling}
+\label{sec:roadmap}
+
+We use two-stage sampling with bernoulli second stage sampling.  In
+the first stage, screen $N$ subjects; $\mathcal{S} =
+\{x_n\}_{n=1,...N}$ are the subjects in the 
+first stage. 
+Let $\mathcal{S}_c$ be those screened patients falling in the $c$th category, 
+$Q_c = \{n|x_n \in \mathcal{S}_c\}$ be their subscripts, and $N_c = |Q_c|$ 
+denote the number of people in the first stage who land in category
+$c$.  (Interpret the term ``screen'' to mean get enough information
+on the $n$th subject to know what category $c$ she falls in.) In the
+second stage, test each person in $\mathcal{S}_c$ with probability
+$p_c$, and let $\bar{\mathcal{S}}_c$ denote those people tested,
+$\overline{Q}_c$ denote their subscripts, and $\overline{N}_c =
+|\overline{Q}_c|$ 
+denote the number of people who fall in category $c$ and are
+tested. (Interpret the term ``test'' to mean get all the information
+on the $n$th subject.) The sets
+$\{\bar{\mathcal{S}}_c\}_{c=1,...C}$  contain all the observations we can
+get are hands on, the ones that make it into the data set we are going
+to analyze.
+
+Define $u_n$ and $I_n$ as in simple random sampling, and 
+\begin{eqnarray}
+\hat{\omega}_c & = & \frac{N_c}{N} \\
+\hat{p}_c & = & \frac{\bar{N}_c}{N_c}\\
+a_n & = & \sum_c \frac{1}{\hat{p}_c}1(n \in \bar{Q}_c)\\
+U(\theta) & = & \sum_{n=1} ^N a_n u_n \\
+A & = & \frac{1}{N}\sum_{n=1} ^N a_n I_n\\
+B_1 & = & \frac{1}{N}\sum_{n=1} ^N a_n u_n u_n^T \\
+V & = & A^{-1} \mbox{  or  } B_1^{-1}\\
+\hat{\mu}_c & = & \frac{1}{\bar{N}_c} \sum_{n \in \bar{Q}_c}u_n\\
+\hat{\Phi}_c & = & \frac{1}{\bar{N}_c} \sum_{n \in \bar{Q}_c}u_nu_n^T\\
+B_2 & = & \sum_c \hat{\omega}_c
+                 \frac{1-\hat{p}_c}{\hat{p}_c}(\hat{\Phi}_c -
+                   \hat{\mu}_c\hat{\mu}_c^T)\\
+\mbox{V2Stage} & = & V + V B_2 V \label{eq:endmap}
+\end{eqnarray}
+The solution $\tilde{\theta}$ to $U(\theta) = 0$ we call 
+the  Horvitz-Thompson estimate.  Notice that the 
+Horvitz-Thompson estimate maximizes the PSEUDO likelihood equation 
+$\sum_n a_n \mbox{loglike}_n$.  We have  $\sqrt{N}(\tilde{\theta}-\theta)$ is Normal
+with zero mean and variance $\mbox{V2Stage}$, and $\tilde{\theta}$ has covariance
+matrix $\frac{1}{N} \mbox{V2Stage}$.  
+
+\subsection{The data}
+
+For each person $x_n$, we record
+
+% \begin{equation}
+%    \begin{array}{lll}
+% \mbox{Variable} & \mbox{Description} & \mbox{Range}\\
+% \mbox{-----------} & \mbox{----------------} & \mbox{---------}\\
+% e_n & \mbox{Event type } &
+% 0 = \mbox{censored}, 1 = \mbox{disease}, 2 = \mbox{death from other causes} \\
+% t_n  & \mbox{Time of event} & [0, t*) \\
+% r_n & \mbox{prob of disease as predicted by the model}& (0,1)\\
+% k_n & \mbox{risKgroup as defined by } r_n & 1,...,K \\
+% c_n & \mbox{two stage Category}& 1,...,C \\
+% z_n & \mbox{covariates used to calculate } r_n & \mbox{ }
+%    \end{array}
+% \end{equation}
+
+\begin{center}
+\begin{tabular}{|l|l|p{3in}|}
+\hline
+{\bf Variable} & {\bf Description} & {\bf Range} \\
+\hline
+$e_n$ & event type & 0 = censored, 1= disease, 2 = death from other
+causes \\
+$t_n$ & time of event & $[0, t*)$ \\
+$r_n$ & probability of disease as predicted by the model & $(0, 1)$ \\
+$k_n$ & risKgroup as defined by $r_n$ & $1, ..., K$ \\
+$c_n$ & two stage Category & $1, ..., C$ \\
+$z_n$ & covariates used to calculate $r_n$ (optional) & \\
+\hline
+\end{tabular}
+\end{center}
+
+
+The number of riskgroups $K$ is chosen in advance by the user, and typically the
+riskgroups are defined by which $K$-tile each person's predicted
+probability $r_n$ falls in. \\ 
+\\
+The rmap package contains functions \texttt{df\_randomSample} and
+\texttt{df\_twoStage}, which randomly generate a sample dataset.  
+This dataset is a data.frame with columns $e$, $t$, $r$, $k$, and
+$c$. Each row represents one subject.
+
+
+% \section{Goals}
+% Let $\lambda_{ke}(t)$ be the hazard for event type $e$ of people in
+% riskgroup $k$. The probability of disease in the interval $[0,t*)$ is $\pi_k$
+% \begin{eqnarray}
+% \pi_k & = & \int_{0}^{t^*} \lambda_{k1}(t)S_{k1}(t)S_{k2}(t)dt \\
+% S_{ke} & = & e^{-\Lambda_{ke}(t)}
+% \end{eqnarray}
+% We have the following goals:  (1) Estimate $\pi_k$.  (2) Obtain the
+% estimated covariance matrix $\Sigma_{\pi} = \widehat{\mbox{cov}}(\hat{\pi}_1,...,\hat{\pi}_K)$.  (3)
+% Calculate the Pearson chi-squared goodness of fit statistic.  (4)
+% Calculate the Auc and its estimated variance.
+
+% For two-stage sampling, we just crank through the formulas in Section
+% 2.  To do this, we begin by writing down the likelihood equation.
+
+\subsection{Goals }
+Let $\lambda_{ke}(t)$ be the hazard for event type $e$ of people in
+riskgroup $k$. The probability of disease in the interval $[0,t*)$ is $\pi_k$
+\begin{eqnarray}
+\pi_k & = & \int_{0}^{t^*} \lambda_{k1}(t)S_{k1}(t)S_{k2}(t)dt \\
+S_{ke} & = & e^{-\Lambda_{ke}(t)} \\
+\Lambda_{ke}(t) & = & \int_0^t \lambda_{ke}(s)ds
+\end{eqnarray}
+
+We have the following goals for which we must derive appropriate formulas:
+\begin{enumerate} 
+  \item Estimate $\pi_k$
+  \item Obtain the estimated covariance 
+            matrix $\Sigma =
+            \widehat{\mbox{cov}}(\hat{\gamma}_1, ..., \hat{\gamma}_{K-1}, \hat{\pi}_1,...,\hat{\pi}_K)$
+  \item Calculate the Hosmer-Lemeshow Chi-squared goodness of fit statistic
+  \item Calculate the AUC and its estimated variance
+  \item Calculate SD, the standard deviation of the model and its
+    estimated variance
+
+% DJ_FLAG: Should we say we want to obtain the estimated covariance
+% matrix Sigma_gamma?
+
+\end{enumerate}
+
+
+
+\subsection{The likelihood}
+For the $n$th person, we observe the data $x_n = (\varepsilon_n, t_n,
+k_n)$.  We take her contribution to the likelihood to be
+\begin{eqnarray}
+f(x_n) & = & P(k_n) \times P(\varepsilon_n, t_n | k_n) \label{eq:likelihood} \\
+          & = & \prod_{k=1}^K \left( P(k_n = k)^{k_n = k} \times P(\varepsilon_n, t_n |
+  k_n = k) \right)
+\end{eqnarray}
+The first term of equation (\ref{eq:likelihood}) we take to be a 
+multinomial probability $P(k_n = k) =
+\gamma_k$, where $\sum_{k=1}^K \gamma_k = 1$.  
+
+The second term $P(\varepsilon_n, t_n | k_n = k)$
+will be conditional on the failure times of riskgroup $k$.  The
+failure times are times in which a subject either gets disease or dies.
+Order these failure times and denote them like this:
+\begin{eqnarray}
+0<\tau_{k1} < ...< \tau_{km} < ... < \tau_{kM_k}\le t*
+\end{eqnarray}
+
+$m \in \{1, ..., M_k\}$ indexes these unique failure times for one risk
+group. 
+
+Define
+\begin{eqnarray}
+\lambda_{kem} & = & \lambda_{ke}(\tau_{km})\\
+\lambda_{k} & = &
+              ((\lambda_{k11}, \cdots, \lambda_{k1m}, \cdots, \lambda_{k1M}),
+               (\lambda_{k21}, \cdots, \lambda_{k2m}, \cdots, \lambda_{k2M}))
+                  \\
+\lambda & = & (\lambda_{1},...\lambda_{k}, ...\lambda_{K}) \\
+\lambda_{k \bullet m} & = & \lambda_{k1m} + \lambda_{k2m} \\
+L & = & 2 \sum_{k=1}^K{M_k}
+\end{eqnarray}
+
+We call $\lambda$ the vector of discrete hazards and $L$ is the
+number of elements in $\lambda$.  This is how we think
+about the second term $P(\varepsilon_n, t_n | k_n = k)$.  Suppose $t_n$ falls inside
+$[\tau_{k,m(n)}, \tau_{k,m(n)+1})$ for some $m(n) = 1,\cdots, M_k$.  We assume
+that the only times when she can have an event is at times $\tau_{k1},
+\cdots,\tau_{k,m(n)}$. 
+We say she is at risk during these times. At time $\tau_{km}$, 
+the probability that she will
+have event $e = 1$ is $\lambda_{k1m}$, have event  $e
+= 2$ is 
+$\lambda_{k2m}$, and the probability that she will have neither is
+$1-\lambda_{k \bullet m}$
+In other words, at each failure
+time for which this person is at risk, she has a multinomial probability
+for the three outcomes, e = 0, 1 or 2. Define
+\begin{eqnarray}
+N_{kmn} & = & N_{kn}(\tau_{km}) = 1(k_n == k \mbox{ and } t_n \ge
+                       \tau_{km})\\
+D_{kemn} & = & D_{ken}(\tau_{km}) = 1(k_n == k \mbox{ and } e_n == e
+                        \mbox{ and } t_n \le \tau_{km})\\
+D_{k \bullet mn} & = & D_{k1mn} + D_{k2mn}
+\end{eqnarray}
+
+$N_{kmn}$ indicates whether or not the $n$th person is at risk at time
+$\tau_{km}$, and $D_{kemn}$ indicates whether or not the $n$th person had
+event $e$ at time $\tau_{km}$. 
+Now we can write the
+second term
+
+\begin{eqnarray}
+P(\varepsilon_n, t_n | k_n = k) & = & \prod_{m = 1}^{M_k} 
+                \lambda_{k1m}^{N_{kmn}D_{k1mn}} \lambda_{k2m}^{N_{kmn}D_{k2mn}}
+                 (1-\lambda_{k \bullet m})^{N_{kmn}(1-D_{k \bullet mn})}
+\end{eqnarray}
+
+Putting together the first and second terms and then taking the log, 
+the $n$th person's contribution to the loglikelihood is
+\begin{eqnarray}
+\mbox{loglike}_n(\gamma, \lambda) & = & 
+                \sum_{k=1}^{K}1(k_n = k)
+                \mbox{log}(\gamma_k) \nonumber \\
+       & + & \sum_{k=1}^{K} \sum_{m=1}^{M_k} N_{kmn}\Biggl( 
+                D_{k1mn} \mbox{log}(\lambda_{k1m}) +
+                D_{k2mn} \mbox{log}(\lambda_{k2m}) +
+                (1 - D_{k\bullet mn}) \mbox{log}(1-\lambda_{k\bullet m})
+                \Biggr)
+\end{eqnarray}
+The first term is the first term in the equation that precedes (5) of
+Whittemore and Halpern 2010,
+and the second term is (10) in Whittemore and Halpern 2010.
+
+
+
+\subsection{$u_n$ and $V$}
+
+\subsubsection{$u_n(\gamma)$ and $V(\gamma)$}
+
+We continue following the roadmap presented in equations
+(\ref{eq:startmap}) to (\ref{eq:endmap}).  Here we get the partial derivatives of 
+the a person's contribution to the loglikelihood with respect to $\gamma$.
+
+\begin{eqnarray}
+u_n(\gamma_{k}) & = & 
+                    \frac{\partial \mbox{loglike}_n}{\partial
+                   \gamma_{k}} = \frac{1(k_n=k)}{\gamma_k} - 
+                    \frac{1(k_n=K)}{1-(\gamma_1 + \cdots
+                      +\gamma_{K-1})} \\
+I_n(\gamma_{k},\gamma_{k}) & = & 
+                   -\frac{\partial u_n(\gamma_k)}{\partial
+                    \gamma_{k}} = \frac{1(k_n=k)}{\gamma_k^2} +
+                    \frac{1(k_n=K)}{\Bigl(1-(\gamma_1 + \cdots
+                      +\gamma_{K-1})\Bigr)^2} \\
+I_n(\gamma_{k},\gamma_{k'}) & = & -\frac{\partial u_n(\gamma_k)}{\partial
+                      \gamma_{k'}} = 
+                      \frac{1(k_n=K)}{\Bigl(1-(\gamma_1 + \cdots +\gamma_{K-1})\Bigr)^2}, 
+                       \mbox{ if } k \neq k'
+\end{eqnarray}
+
+and we then sum over $\sum_{n=1}^N a_n$:
+
+\begin{eqnarray}
+U(\gamma_{k}) & = & \sum_{n=1}^N a_n u_n(\gamma_{k})  \\
+                       & = & \frac{\sum_{n=1}^N a_n 1(k_n=k)}{\gamma_k} - 
+                                  \frac{\sum_{n=1}^N a_n
+                                    1(k_n=K)}{1-(\gamma_1 + 
+                                     \cdots +\gamma_{K-1})} \\
+                        & = & \frac{N_k}{\gamma_k} - 
+                                   \frac{N_K}{1-(\gamma_1 + \cdots +\gamma_{K-1})} \\
+N_k & = &\sum_{n=1}^N a_n 1(k_n=k) \\
+\sum_{n=1}^N a_n I_n(\gamma_k,\gamma_k)  & = & 
+                          \frac{ \sum_{n=1}^N a_n 1(k_n=k)}{\gamma_k^2} +
+                          \frac{ \sum_{n=1}^N a_n 1(k_n=K)}{\Bigl(1-(\gamma_1 + \cdots
+                          +\gamma_{K-1})\Bigr)^2} \\
+         & = & \frac{N_k}{\gamma_k^2} + 
+                            \frac{
+                              N_K}{\gamma_K^2}   \label{eq:lasttwo1} \\  
+\sum_{n=1}^N a_n I_n(\gamma_k,\gamma_{k'}) & = & 
+                          \frac{ \sum_{n=1}^N a_n 1(k_n=K)}
+                          {\Bigl(1-(\gamma_1 + \cdots
+                            +\gamma_{K-1})\Bigr)^2} \\
+           & = & \frac{ N_K} {\gamma_K^2} \label{eq:lasttwo2}
+\end{eqnarray}
+
+and solving $U(\tilde{\gamma}_{k})=0$ gives 
+
+\begin{eqnarray}
+  \label{eq:3}
+\tilde{\gamma}_{k} & = & N_k/N\\
+N & = &\sum_{k=1}^K N_k
+\end{eqnarray}
+
+% Substituting $\tilde{\gamma}_k$ into the last two of the $\sum_{n=1}^N
+% a_n$ equations gives
+
+Substituting $\tilde{\gamma}_k$ into equations (\ref{eq:lasttwo1}) and 
+(\ref{eq:lasttwo2}) gives:
+
+\begin{eqnarray}
+NA(\gamma_k,\gamma_k) & = & 
+                                                 \frac{N}{\tilde{\gamma}_k} +
+                                                 \frac{N}{\tilde{\gamma}_K}
+                                                 \\
+NA(\gamma_k,\gamma_{k'}) & = & \frac{N}{\tilde{\gamma}_K} \\
+\tilde{\gamma}_K & = & 1-(\tilde{\gamma}_1 + \cdots + \tilde{\gamma}_{K-1})
+\end{eqnarray}
+
+Using Mathematica we get
+
+\begin{eqnarray}
+  \label{eq:one}
+V(\gamma) & = & 
+                              A^{-1}(\gamma)  \\ 
+                  & = & \frac{1}{N} \times \Biggl(
+                             \left( 
+                             \begin{array} {ccc}
+                                      \gamma_1 & & 0\\
+                                       & \ddots & \\
+                                      0 & & \gamma_{K-1}
+                               \end{array} \right)
+                              - \left( 
+                             \begin{array} {c} 
+                                    \gamma_1 \\ 
+                                    \vdots \\ 
+                                    \gamma_{K-1} 
+                             \end{array}
+                             \right) \left(
+                             \begin{array} {ccc} 
+                                     \gamma_1 & \cdots & \gamma_{K-1} 
+                              \end{array}
+                            \right)
+                            \Biggr)
+\end{eqnarray}
+which matches (2) of Whittemore and Halpern 2010.
+
+
+\subsubsection{$u_n(\lambda)$ and $V(\lambda)$}
+
+Next, get the partial derivatives of a person's contribution to the
+loglikelihood with respect to $\lambda$.
+
+\begin{align}
+u_n(\lambda_{kem}) & = &
+                      \frac{\partial \mbox{loglike}_n}{\partial
+                      \lambda_{kem}} 
+           & = &  N_{kmn} \Biggl( 
+                      \frac{ D_{kemn} }{ \lambda_{kem} } 
+                      - \frac{  1 - D_{k\bullet mn}  }{  1-\lambda_{k\bullet m} }
+                      \Biggl)\\
+I_n(\lambda_{k1m},\lambda_{k1m})  & = &
+                     - \frac{ \partial u_n(\lambda_{k1m}) }{ \partial \lambda_{k1m}  } 
+            & = &  N_{kmn} \Biggl(
+                    \frac{ D_{k1mn} }{ \lambda_{k1m}^2 } 
+                     + \frac{  1 - D_{k\bullet mn}  }{  (1-\lambda_{k\bullet m})^2 }
+                     \Biggl)\\
+I_n(\lambda_{k1m},\lambda_{k2m})  & = &
+                     - \frac{ \partial u_n(\lambda_{k1m}) }{ \partial \lambda_{k2m}  } 
+           & = &  N_{kmn} \Biggl(
+                    \frac{  1 - D_{k\bullet mn}  }{  (1-\lambda_{k\bullet m})^2 }
+                    \Biggl)\\
+I_n(\lambda_{k2m},\lambda_{k2m})  & = &
+                     - \frac{ \partial u_n(\lambda_{k2m}) }{ \partial \lambda_{k2m}  } 
+             & = &   N_{kmn} \Biggl(
+                   \frac{ D_{k2mn} }{ \lambda_{k2m}^2 } 
+                  + \frac{  1 - D_{k\bullet mn}  }{  (1-\lambda_{k\bullet m})^2 }
+\Biggl) \label{eq:eqnLittleU}
+\end{align}
+
+%DJ_FLAG: Should \lambda_{k \bullet m} be defined?
+
+The first equation in the above display checks with
+(16) of Whittemore and Halpern. Next, sum over $\sum_{n=1}^N
+a_n$:
+
+
+\begin{eqnarray}
+U(\lambda_{kem}) & = & 
+                                 \sum_{n=1}^N a_n N_{kmn} \Biggl( 
+                                 \frac{ D_{kemn} }{ \lambda_{kem} } 
+                                 - \frac{ 1 - D_{k\bullet mn} }{ 1-\lambda_{k\bullet m} }
+                                 \Biggl) \\
+             & = & 
+                                 \frac{ \sum_{n=1}^N a_n N_{kmn} D_{kemn} }{ \lambda_{kem} } 
+                                 - \frac{\sum_{n=1}^N a_n N_{kmn} - 
+                                   \sum_{n=1}^N a_n N_{kmn} D_{k\bullet mn} }{ 1-\lambda_{k\bullet m} }
+                                 \\
+              & = &  
+                                  \frac{ D_{kem} }{ \lambda_{kem} } 
+                                  - \frac{ N_{km}- D_{k\bullet m}}{ 1-\lambda_{k\bullet m} }
+                                  \\
+D_{kem} & = & \sum_{n=1}^N a_n N_{kmn} D_{kemn} \\
+D_{k\bullet m} & = & \sum_{n=1}^N a_n N_{kmn} D_{k\bullet mn}) \\
+N_{km} & = & \sum_{n=1}^N a_n N_{kmn} \\
+\sum_{n=1}^N a_n I_n(\lambda_{k1m},\lambda_{k1m})  & = & 
+                                  \sum_{n=1}^N a_n N_{kmn} \Biggl(
+                                  \frac{ D_{k1mn} }{ \lambda_{k1m}^2 } 
+                                  + \frac{  1 - D_{k\bullet mn}  }{  (1-\lambda_{k\bullet m})^2 }
+                                  \Biggl) \\
+\sum_{n=1}^N a_n I_n(\lambda_{k1m},\lambda_{k2m})  & = & 
+                                  \sum_{n=1}^N a_n N_{kmn} \Biggl(
+                                  \frac{  1 - D_{k\bullet mn}  }{  (1-\lambda_{k\bullet m})^2 }
+                                  \Biggl) \\
+\sum_{n=1}^N a_n I_n(\lambda_{k2m},\lambda_{k2m})  & = & 
+                                  \sum_{n=1}^N a_n N_{kmn} \Biggl(
+                                  \frac{ D_{k2mn} }{ \lambda_{k2m}^2 } 
+                                  + \frac{  1 - D_{k\bullet mn}  }{  (1-\lambda_{k\bullet m})^2 }
+                                  \Biggl) \\
+\sum_{n=1}^N a_n I_n(\lambda_{kem},\lambda_{kem})  & = & 
+                                  \frac{ \sum_{n=1}^N a_n N_{kmn} D_{kemn} }{ \lambda_{k1m}^2 } 
+                                  + \frac{  \sum_{n=1}^N a_n N_{kmn} - \sum_{n=1}^N a_n N_{kmn}
+                                    D_{k\bullet mn}  }{
+                                    (1-\lambda_{k\bullet m})^2 } \\
+                & = & 
+                                   \frac{ D_{kem}}{ \lambda_{kem}^2 } 
+                                   + \frac{  N_{km} - D_{k \bullet m}  }{  (1-\lambda_{k\bullet m})^2 }
+                                   \\
+                & = & 
+                                   N_{km}\Biggl(\frac{ D_{kem}/N_{km} }{ \lambda_{kem}^2 } 
+                                   + \frac{  (N_{km} - D_{k \bullet m})/N_{km}  }{  (1-\lambda_{k\bullet m})^2 }
+                                   \Biggr) 
+\end{eqnarray}
+
+and solving $0 = U(\lambda)$ gives 
+
+\begin{eqnarray}
+\tilde{\lambda}_{kem} & = & \frac{D_{kem}}{N_{km}}
+\end{eqnarray}
+
+Since $\lambda_{k1m}$ and $\lambda_{k2m}$ both appear in the equations
+for $0 = U(\lambda_{k1m})$ and $0 = U(\lambda_{k2m})$, we need to consider
+this system of two equations and two unknowns.  Simple substitution of
+$\tilde{\lambda}_{k1m}$ and $\tilde{\lambda}_{k2m}$ into these
+equations show that they are the required solutions. Substituting
+$\tilde{\lambda}_{kem}$ into appropriate sum over $\sum_{n=1}^N a_n$
+equations,
+
+\begin{eqnarray}
+\sum_{n=1}^N a_n I_n(\tilde{\lambda}_{kem},\tilde{\lambda}_{kem})  & = & 
+                                      N_{km}\Biggl(\frac{
+                                        \tilde{\lambda}_{kem} }
+                                      { \tilde{\lambda}_{kem}^2 } 
+                                      + \frac{  1- \tilde{\lambda}_{k
+                                          \bullet m}  }
+                                      {  (1-\tilde{\lambda}_{k\bullet m})^2 }
+                                      \Biggr) \\
+                  & = &  \frac{ N_{km} }{ \tilde{\lambda}_{kem} } 
+                                      + \frac{  N_{km}  }{  1-\tilde{\lambda}_{k\bullet m} } \label{eq:NAkmdiag}
+                                      \\
+\sum_{n=1}^N a_n I_n(\tilde{\lambda}_{k1m},\tilde{\lambda}_{k2m})  
+& = &  
+                                     \frac{  N_{km}  }{
+                                       1-\tilde{\lambda}_{k\bullet m}
+                                     }  \label{eq:NAkmoffdiag}  
+\end{eqnarray}
+
+%If I write the above two by two matrix like this
+We can build a two-by-two matrix using equations (\ref{eq:NAkmdiag})
+and (\ref{eq:NAkmoffdiag}).  Setting $e=1$ or $e=2$ in equation
+(\ref{eq:NAkmdiag}) fills the diagonal elements of the matrix, and
+equation (\ref{eq:NAkmoffdiag}) fills the off-diagonal elements. 
+
+
+%DJ_FLAG: Should this really be a 2x2 matrix?
+
+\begin{eqnarray}
+(NA)_{km} & = &
+                                 \frac{N_{km}}{ \tilde{\lambda}_{k1m} \tilde{\lambda}_{k2m} 
+                                   (1-\tilde{\lambda}_{k1m}-\tilde{\lambda}_{k2m})
+                                 }
+                                 \left( \begin{array} {cc}
+                                     \tilde{\lambda}_{k2m}(1-\tilde{\lambda}_{k2m}) & 
+                                     \tilde{\lambda}_{k1m} \tilde{\lambda}_{k2m} \\
+                                     \tilde{\lambda}_{k1m} \tilde{\lambda}_{k2m} &
+                                     \tilde{\lambda}_{k1m}(1-\tilde{\lambda}_{k1m})
+                                   \end{array} \right)
+\end{eqnarray}
+
+We can put the matrix into Mathematica and get 
+
+\begin{eqnarray}
+(NA)_{km}^{-1} & = & 
+                          \frac{1}{N_{km}}
+                          \left( 
+                          \begin{array} {cc}
+                            \tilde{\lambda}_{k1m} (1-\tilde{\lambda}_{k1m})&
+                            -\tilde{\lambda}_{k1m} \tilde{\lambda}_{k2m}\\
+                            -\tilde{\lambda}_{k1m} \tilde{\lambda}_{k2m}&
+                            \tilde{\lambda}_{k2m} (1-\tilde{\lambda}_{k2m})
+                          \end{array}
+                        \right) \\
+V_{km} & = & 
+                         A_{km}^{-1} = \frac{N}{N_{km}}
+                         \left( 
+                         \begin{array} {cc}
+                             \tilde{\lambda}_{k1m} (1-\tilde{\lambda}_{k1m})&
+                             -\tilde{\lambda}_{k1m} \tilde{\lambda}_{k2m}\\
+                             -\tilde{\lambda}_{k1m} \tilde{\lambda}_{k2m}&
+                               \tilde{\lambda}_{k2m} (1-\tilde{\lambda}_{k2m})
+                           \end{array} 
+                         \right) \label{eq:Vkm}
+\end{eqnarray}
+
+This checks with (13) of Whittemore and Halpern 2010.  The implied
+order for $V_{km}$ defined in equation (\ref{eq:Vkm}) is different
+than the order we see in the \texttt{rmap} package.  Equation 
+(\ref{eq:Vkm2}) better accommodates the order of the data structure in the \texttt{rmap}
+package.
+
+\begin{align}
+V_{k, e_1, e_2, m} & = \left\{
+                             \begin{array}{l l}
+                                 \lambda_{ke_1m}(1-\lambda_{ke_1m}) & \quad \text{if $e_1 = e_2$}\\
+                                 \lambda_{k1m} \lambda_{k2m} & \quad \text{if $e_1 \neq e_2$}\\
+                             \end{array} 
+                           \right.  \label{eq:Vkm2}
+\end{align}
+
+\subsubsection{$u_n$ and $V$}
+
+Write
+% DJ_FLAG: Define?
+
+\begin{eqnarray}
+%  \label{eq:2}   %LOOK is this the referencing problem?
+\theta & = & 
+               \left( 
+               \begin{array}{c}
+                   \gamma\\
+                   \lambda
+               \end{array}
+             \right) \\
+u_n & = & 
+              \left( 
+             \begin{array}{c}
+                  u_n(\gamma)\\
+                  u_n(\lambda)
+              \end{array}
+            \right)
+\end{eqnarray}
+
+where $u_n(\gamma)$ is the $K-1$ dimensional vector of derivatives
+with respect to $\gamma_1, \cdots \gamma_{K-1}$ and $u_n(\lambda)$ is the 
+% many % DJ_FLAG: many == 2 * \sum{M_K} ? 
+$L$
+dimensional vector of derivatives with respect to all the components
+of $\lambda$.
+Remember that $\lambda = (\lambda_1, ..., \lambda_k, ..., \lambda_K)$, where
+$\lambda_k =
+      ((\lambda_{k11}, \cdots, \lambda_{k1m}, \cdots, \lambda_{k1M}),
+               (\lambda_{k21}, \cdots, \lambda_{k2m}, \cdots,
+               \lambda_{k2M}))$. Also remember that $L = 2 \sum_{k=1}^K{M_k}$.
+Also write
+%DJ_FLAG: Define?
+
+\begin{eqnarray}
+%  \label{eq:4} % LOOK is this the referencing problem?
+A & = & \left( \begin{array}{cc}
+                            A(\gamma) & 0\\
+                            0 & A(\lambda)
+                       \end{array} 
+                     \right) \\
+V & = & A^{-1} =  \left( \begin{array}{cc}
+                                        V(\gamma) & 0 \\
+                                        0 & V(\lambda)
+                                      \end{array} 
+                                    \right)
+\end{eqnarray}
+
+Two-stage sample theory says $\tilde{\theta}$ has covariance matrix
+$\mbox{V2Stage}$.
+
+\begin{eqnarray}
+%  \label{eq:5} % LOOK is this the referencing problem?
+\mbox{V2Stage} & = & 
+                                 V + V \mbox{ } B_2 \mbox{ } V\\
+\hat{\mu}_c & = & \frac{1}{\bar{N}_c} \sum_{n \in \bar{Q}_c}u_n\\
+\hat{\Phi}_c & = & \frac{1}{\bar{N}_c} \sum_{n \in
+                                 \bar{Q}_c}u_nu_n^T\\
+B_2 & = & \sum_c \hat{\omega}_c
+                           \frac{1-\hat{p}_c}{\hat{p}_c}
+                           \frac{\bar{N}_c}{\bar{N}_c - 1}
+                           (\hat{\Phi}_c -
+                           \hat{\mu}_c\hat{\mu}_c^T)  \label{eq:B2}
+\end{eqnarray}
+
+In the \texttt{rmap} package, \texttt{B2Fn} divides the calculation of 
+equation (\ref{eq:B2}) into two parts: \texttt{PhiHatPart} and
+\texttt{muHatPart}.  To follow the logic of the \texttt{rmap} it is
+useful to write $B_2$ as follows:
+
+\begin{eqnarray}
+B_2 & = & \sum_c \hat{\omega}_c
+                           \frac{1-\hat{p}_c}{\hat{p}_c}
+                           \frac{\bar{N}_c}{\bar{N}_c - 1} 
+                           \hat{\Phi}_c
+              - \sum_c \hat{\omega}_c
+                           \frac{1-\hat{p}_c}{\hat{p}_c}
+                           \frac{\bar{N}_c}{\bar{N}_c - 1} 
+                           \hat{\mu}_c\hat{\mu}_c^T \label{eq:B2num2}
+\end{eqnarray}
+
+The first term of equation (\ref{eq:B2num2}) is calculated as
+\texttt{PhiHatPart}, and the second term is calculated as
+\texttt{muHatPart}. 
+
+\subsection{The delta method}
+Suppose $X$ is an $I$-dimensional random vector with distribution
+\begin{eqnarray}
+X & \sim & \mbox{Normal}(\mu, \Sigma)
+\end{eqnarray}
+(Therefore $\mu$ is also an $I$ dimensional vector and $\Sigma$ is an
+$I \times I$ dimensional matrix.)
+Define the $J$ dimensional random vector $Y = f(X)$. 
+To make things very explicit
+write
+% DJ_FLAG: Define?
+\begin{eqnarray}
+\left( 
+\begin{array}{l}
+       Y_1 \\
+       \vdots \\
+       Y_J
+\end{array} 
+\right) 
+             & = & 
+                  \left ( 
+                    \begin{array}{l}
+                        f_1(X_1, \cdots, X_I)\\
+                        \vdots \\
+                        f_J(X_1, \cdots, X_I)  
+                    \end{array}
+                  \right)
+\end{eqnarray}
+
+Then 
+
+\begin{eqnarray}
+Y & \sim & \mbox{Normal}(f(\mu), \Delta^T \Sigma \Delta)
+\label{eq:eqnYNormal}
+\end{eqnarray}
+
+where 
+
+\begin{eqnarray}
+\Delta^T_{ji} & = & \frac{\partial f_j}{\partial \mu_i}
+\end{eqnarray}
+
+Again to make things really explicit we can write out the covariance
+of $Y$ like this:
+
+\begin{eqnarray}
+\mbox{cov}(Y) & = & 
+        \left( \begin{array}{lll}
+            \frac{\partial f_1}{\partial \mu_1} & \cdots 
+            & \frac{\partial f_1}{\partial \mu_I}\\
+            \vdots & & \vdots\\
+            \frac{\partial f_J}{\partial \mu_1} & \cdots
+            & \frac{\partial f_J}{\partial \mu_I}
+          \end{array} \right)
+        \left( \begin{array} {lll}
+            \sigma_{11} & \cdots & \sigma_{1I}\\
+            \vdots & & \vdots\\
+            \sigma_{II} & \cdots & \sigma_{II}
+          \end{array} \right)
+        \left( \begin{array} {lll}
+            \frac{\partial f_1}{\partial \mu_1} & \cdots
+            & \frac{\partial f_J}{\partial \mu_1}\\
+            \vdots & & \vdots\\
+            \frac{\partial f_1}{\partial \mu_I} & \cdots
+            & \frac{\partial f_J}{\partial \mu_I}\\
+          \end{array} \right)
+      \end{eqnarray}
+
+%DJ_FLAG: Where should \xi be defined??
+\subsection{The HT estimate $\tilde{\xi}^T = (\tilde{\gamma},
+  \tilde{\pi})^T$ }
+\label{sec:HT}
+
+Apply the delta method to $X = \tilde{\theta}$, 
+$Y = \tilde{\xi} = \begin{pmatrix}  \tilde{\gamma}\\
+  \tilde{\pi}  \end{pmatrix}$, 
+$\mu = \theta$,
+and $\xi = \begin{pmatrix}  \gamma\\
+  \pi  \end{pmatrix} = f(\mu) 
+= f \begin{pmatrix}  \gamma\\
+  \lambda  \end{pmatrix} = \begin{pmatrix}  \gamma\\
+  g(\lambda)  \end{pmatrix}$
+where
+
+\begin{eqnarray}
+\tilde{\pi}_k & = & g_k(\tilde{\lambda}_k)
+               = \sum_{m=1}^{M_k}
+               \tilde{\lambda}_{k1m}\prod_{m'=1}^{m-1}(1-\tilde{\lambda}_{k \bullet m'})\label{eqnPi}
+\end{eqnarray}
+
+From the fact that $\tilde{\theta} \sim \mbox{Normal}(\theta,
+\frac{\mbox{V2Stage}}{N})$
+and from the delta method, we get
+
+\begin{eqnarray}
+\tilde{\xi} & =  & 
+             \begin{pmatrix}  \tilde{\gamma}\\
+                   \tilde{\pi}  
+              \end{pmatrix} \sim \mbox{Normal}(
+               \begin{pmatrix}  \tilde{\gamma}\\  \tilde{\pi}  \end{pmatrix},
+ \frac{\Sigma} {N} ) \label{eq:xiTilde}
+\end{eqnarray}
+
+where 
+
+\begin{eqnarray}
+D & = & \left( 
+               \begin{array}{cc}
+                    I_{K-1} & 0 \\
+                    0 & D(\lambda)
+                \end{array} 
+               \right) \\
+D(\lambda) & = & \left( 
+                \begin{array} {lll}
+                    \frac{\partial g_1}{\partial \lambda_1} & \cdots & 
+                           \frac{\partial g_J}{\partial \lambda_1} \\
+                     \vdots & & \vdots\\
+                     \frac{\partial g_1}{\partial \lambda_L}
+                          & \cdots & 
+                          \frac{\partial g_J}{\partial
+                          \lambda_L} \\
+                    \end{array}
+                    \right) 
+                    \label{eqnDeltaDetails}  \\
+\Sigma & = & D^T \mbox{ V2Stage } D
+\end{eqnarray}
+
+%DJ_FLAG: What is the definition of \clubsuit ?
+
+The derivatives can be gotten in closed form.  From equations 
+(\ref{eq:beginexamp}) to (\ref{eq:endexamp}) we drop
+ the subscript $k$ and the $\tilde{\mbox{  }}$ from the notation
+so Equation (\ref{eqnPi}) becomes
+
+%DJ_FLAG: What is the definition of "this paragraph only" ?
+
+\begin{eqnarray}
+\pi & = & g(\lambda) = \sum_{m=1}^{M}
+                                  \lambda_{1m}\prod_{m'=1}^{m-1}(1-\lambda_{\bullet
+                                    m'}) \label{eq:beginexamp} \\ 
+\lambda_{\bullet m} & = & \lambda_{1m} + \lambda_{2m}
+\end{eqnarray}
+
+We are going to write out the gory details for $M = 5$.  Here is a list
+of all the elemnts inside $\lambda$.  Remember that we are dropping the
+subscipt $k$. 
+
+\begin{eqnarray}
+\lambda & = & \left( 
+                 \begin{array} {cccccc}
+                     & m = 1& m = 2& m = 3& m = 4& m = 5 \\
+                     e = 1& \lambda_{11}& \lambda_{12}& \lambda_{13}& \lambda_{14}&
+                          \lambda_{15} \\
+                     e = 2& \lambda_{21}& \lambda_{22}& \lambda_{23}& \lambda_{24}&
+                        \lambda_{25} \\
+                    \end{array}
+                  \right) 
+\end{eqnarray}
+
+Now we can write out $\pi$
+
+\begin{eqnarray}
+\pi & = & \lambda_{11} \nonumber \\
+      & + & \lambda_{12}(1-\lambda_{\bullet 1}) \nonumber \\
+      & + & \lambda_{13}(1-\lambda_{\bullet, 1}) (1-\lambda_{\bullet
+                  2}) \nonumber \\
+      & + & \lambda_{14}(1-\lambda_{\bullet 1}) (1-\lambda_{\bullet 2})
+                  (1-\lambda_{\bullet 3})  \nonumber \\
+      & + & \lambda_{15}(1-\lambda_{\bullet 1}) (1-\lambda_{\bullet 2})
+                  (1-\lambda_{\bullet 3}) (1-\lambda_{\bullet 4}) 
+\end{eqnarray}
+
+Now think about taking the partial derivatives
+$\frac{\partial \pi}{\partial \lambda_{13} }$ and $\frac{\partial
+  \pi}{\partial \lambda_{23} }$.  Notice that in the equation for
+$\pi$, $\lambda_{13}$ shows up only in the terms that begins
+$\lambda_{13}$,  $\lambda_{14}$,  $\lambda_{15}$, and exactly one time
+in each term.  Also, $\pi$, $\lambda_{23}$ shows up only in the terms
+that begin with  $\lambda_{14}$,  $\lambda_{15}$, and again exactly
+one time in each term.  And one more thing, 
+$\frac{\partial (1-\lambda_{\bullet 3})}{\partial \lambda_{13} } =
+\frac{\partial (1-\lambda_{1 3} - \lambda_{2 3})}{\partial \lambda_{13} } 
+= -1$
+and
+$\frac{\partial (1-\lambda_{\bullet 3})}{\partial \lambda_{23} } = -1$.
+Now it is time to take derivatives.
+
+\begin{eqnarray}
+\frac{\partial \pi}{\partial \lambda_{13} } & = &
+                               (1-\lambda_{\bullet 1}) (1-\lambda_{\bullet
+                                 2})  \nonumber \\
+                   & - & \lambda_{14}(1-\lambda_{\bullet 1})
+                   (1-\lambda_{\bullet 2}) \nonumber \\
+                   & - & \lambda_{15}(1-\lambda_{\bullet 1})
+                              (1-\lambda_{\bullet 2})(1-\lambda_{\bullet 4})\\
+\frac{\partial \pi}{\partial \lambda_{23} } & = &  
+                              -  \lambda_{14}(1-\lambda_{\bullet 1})
+                              (1-\lambda_{\bullet 2}) \nonumber \\
+                   & - & \lambda_{15}(1-\lambda_{\bullet 1})
+                             (1-\lambda_{\bullet 2})
+                             (1-\lambda_{\bullet 4})
+\end{eqnarray}
+
+And we see that in general,
+
+\begin{eqnarray}
+\frac{\partial \pi}{\partial \lambda_{2m} } & = & 
+                 -\sum_{m''=m+1}^M \lambda_{1m''} \prod_{m'=1, m' \neq
+                   m}^{m''-1}(1-\lambda_{\bullet m'}) \\
+\frac{\partial \pi}{\partial \lambda_{1m} } & = &
+                  \prod_{m'=1}^{m-1}(1-\lambda_{\bullet m'}) + \frac{\partial
+                    \pi}{\partial \lambda_{2m} } \label{eq:endexamp}
+\end{eqnarray}
+
+Now we can write 
+
+\begin{eqnarray}
+D & = & \Delta(D_1, \cdots, D_K) \\
+D_k & = & \left( 
+            \begin{array} {c}
+                D_{k1} \\
+                D_{k2}\\
+            \end{array}
+          \right)\\
+D_{k1m} & = & \prod_{m'=1}^{m-1}(1-\lambda_{\bullet m'}) + D_{k2m} \\
+D_{k2m} & = & -\sum_{m'=m+1}^M \lambda_{1m'} \prod_{m''=1, m'' \neq
+                       m}^{m'-1}(1-\lambda_{\bullet m''}) 
+\end{eqnarray}
+
+
+% \section{Pearson chi-square}
+% To evaluate the accuracy of the estimates $\tilde{\pi}_k$ we use the
+% Pearson chi-square statistic
+% \begin{eqnarray}
+% \chi^2_K & = & N (\tilde{\pi} - r - \zeta)^T \Sigma(\pi)^{-1} (\tilde{\pi}
+% - r - \zeta)\\
+% \zeta & = & \left( \begin{array} {l}
+% \frac{1}{2 N_1}\\
+% \vdots\\
+% \frac{1}{2 N_K}\\
+% \end{array} \right)
+% \end{eqnarray}
+% where $N_{k}$ is the upweighted numbers, the number of people in stage
+% one, that fell in riskgroup $k$.
+
+
+\subsection{Hosmer-Lemeshow statistic}
+
+To evaluate the validity of the model that predicts risks $r_n$, we use the
+Hosmer-Lemeshow chi-square statistic
+
+\begin{eqnarray}
+\chi^2_K = \sum_{k=1}^K \frac{(\hat{\pi}_k - \tilde{r}_k)^2}{\hat{\sigma}^2_k}
+\end{eqnarray}
+
+where $\tilde{r}_k$ is a central measure of $r_n$ for subjects in risk
+group $k$. 
+%DJ_FLAG: Where is the formula for Hosmer-Lemeshow?
+
+
+\subsection{AUC}
+
+The AUC is defined
+
+\begin{eqnarray}
+\mbox{AUC}(\xi) & = & \frac{
+                             \sum_{k=1}^K \gamma_{k}^2 (1 - \pi_{k}) \pi_{k} + 
+                             \sum_{k=1}^K \sum_{k'>k} \gamma_{k} \gamma_{k'} (1-\pi_{k}) \pi_{k'}
+                         }{
+                              2(1-\pi)\pi
+                         }
+                         \\
+\pi & = & \sum_{k=1}^K \gamma_k \pi_k \label{eq:piOverall}
+\end{eqnarray}
+%DJ_FLAG: What is /xi?
+
+We will want to calculate a confidence interval for the AUC.  Since
+the values of the AUC fall inside the unit interval, we will define
+$B = \mbox{logit}(\mbox{A}) =\mbox{log}(\mbox{AUC}/(1-\mbox{AUC})) = \mbox{log}(\mbox{AUC}) -
+\mbox{log}(1-\mbox{AUC})$ 
+and we will approximate the distribution of
+$\tilde{B}$ to be Normal with mean $\mbox{logit}(\mbox{AUC}))$ and
+variance
+
+\begin{eqnarray}
+\mbox{Var}\bigl(\tilde{B}\bigr) & = & 
+                               \frac{ 
+                                  D_B D_{\mbox{AUC}}^T 
+                                  \mbox{ }\Sigma \mbox{ }D_{\mbox{AUC}} D_B
+                                }{N} \\
+D_B & = & 
+                            \frac{\partial B}{\partial \mbox{AUC} }
+                            = \frac{\partial}{\partial \mbox{AUC} }
+                            \bigl(\mbox{log}(\mbox{AUC}) - 
+                            \mbox{log}(1-\mbox{AUC})
+                            \bigr) \\
+            & =&        \frac{1}{\mbox{AUC}}-\frac{1}{1-
+                            \mbox{AUC}} = \frac{1}{\mbox{AUC}(1-\mbox{AUC})}
+                             \\
+%
+D_{\mbox{AUC}}^T & = & 
+                            \left( 
+                              \begin{array}{cccccc}
+                                  \frac{\partial}{\partial \gamma_1 } &
+                                  \cdots &
+                                  \frac{\partial}{\partial
+                                    \gamma_{K-1} } &
+                                  \frac{\partial}{\partial \pi_1 } &
+                                  \cdots &
+                                  \frac{\partial}{\partial \pi_{K} }
+                              \end{array}
+                            \right) \mbox{AUC}(\xi)
+%
+\end{eqnarray}  
+
+Then we form a 95 percent confidence interval for $B$: 
+$\bigl[\tilde{B} - 1.96 \sigma, \tilde{B} + 1.96 \sigma\bigr]$ where
+$\sigma = \sqrt{\mbox{Var}(\tilde{B})}$. and then a 95 percent
+confidence interval for $\mbox{AUC}$ is 
+$\bigl[\mbox{logistic}(\tilde{B} - 1.96 \sigma),
+\mbox{logistic}(\tilde{B} + 1.96 \sigma)\bigr]$.
+
+
+
+\subsubsection{Break up $\mbox{AUC}(\xi)$}
+
+(We are going to use the delta method again.  This time, we are going
+to transform the random variable $\hat{\xi}$ to $\mbox{AUC}$.  The
+transformation will be written in terms of $f$ and $g$, which are
+different from the $f$ and $g$ from section (\ref{sec:HT}).)
+
+Rewrite
+
+\begin{eqnarray}
+%  \label{eq:6}  % LOOK is this the referencing problem?
+\mbox{AUC}(\xi) & = & \frac{\frac{1}{2}f_1(\xi) + f_2(\xi)}{g(\xi)} \\
+f_1(\xi) & = & \sum_{k=1}^K \gamma_{k}^2 (1 - \pi_{k}) \pi_{k} \\
+f_2(\xi) & = & 
+                \sum_{k'=1}^{K-1}\sum_{k''=k'+1}^K \gamma_{k'} \gamma_{k''}
+               (1-\pi_{k'}) \pi_{k''}\\
+g(\pi) & = & (1-\pi)\pi
+\end{eqnarray}
+
+\subsubsection{Calculating $f_1(\xi) = \sum_{k=1}^K \gamma_{k}^2 (1 - \pi_{k})
+  \pi_{k}$}
+
+Calculate the partial derivative with respect to $\gamma_k$.  Ignoring the
+constraint on the $\gamma_k$s, 
+
+\begin{eqnarray}
+%  \label{eq:7} % LOOK is this the referencing problem?
+\frac{\partial f_1}{\partial \gamma_{k} } & = &
+                                2 \gamma_k (1-\pi_k)\pi_k
+\end{eqnarray}
+
+and then imposing the constraint,
+
+\begin{eqnarray}
+\frac{\partial f_1}{\partial \gamma_{k} } & = &
+                                 2 \biggl(\gamma_k (1-\pi_k)\pi_k - \gamma_K (1-\pi_K)\pi_K\biggr)
+\end{eqnarray}
+
+Also, 
+
+\begin{eqnarray}
+\frac{\partial f_1}{\partial \pi_{k} } & = & \gamma_k^2\bigl(1 - 2 \pi_k\bigr)
+\end{eqnarray}
+
+And putting them all together,
+
+\begin{eqnarray}
+\frac{\partial f_1}{\partial \gamma_{k} } & = &
+                2 \biggl(\gamma_k (1-\pi_k)\pi_k - \gamma_K
+                (1-\pi_K)\pi_K\biggr) \\
+\frac{\partial f_1}{\partial \pi_{k} } & = & \gamma_k^2\bigl(1 - 2
+                \pi_k\bigr) 
+\end{eqnarray}
+
+\subsubsection{Calculating $f_2(\pi)  =
+              \sum_{k'=1}^{K-1}\sum_{k''=k'+1}^K
+              \gamma_{k'} \gamma_{k''}
+              (1-\pi_{k'}) \pi_{k''}$}
+
+To see how to proceed, it helps to imagine 
+differentiating with respect to $\gamma_3$ or $\pi_3$.  Here are the possible
+values of $(k',k'')$
+
+\begin{verbatim}
+  12 13 14 15
+     23 24 25
+        34 35
+           45
+\end{verbatim}
+
+All the places where 3 shows up are $k'=1,2$ and so $k'' = 3$ and
+$k'=3$ and $k'' = 4,5$. Ignoring the constraints on the
+$\gamma_k$s, 
+
+\begin{eqnarray}
+\frac{\partial f_2}{\partial \gamma_{k} }  & = & 
+                 \sum_{k'=1}^{k-1} \gamma_{k'} (1-\pi_{k'}) \pi_{k}
+                 +\sum_{k'' = k+1}^K\gamma_{k''}(1-\pi_k)\pi_{k''}
+                 \\
+\frac{\partial f_2}{\partial \gamma_{K} }  & = & 
+                   \sum_{k'=1}^{K-1} \gamma_{k'} (1-\pi_{k'}) \pi_{K}
+\end{eqnarray}
+
+and then imposing the constraint, 
+
+\begin{eqnarray}
+\frac{\partial f_2}{\partial \gamma_{k} }  & = & 
+                 \sum_{k'=1}^{k-1} \gamma_{k'} (1-\pi_{k'}) \pi_{k}
+                 +\sum_{k'' = k+1}^K\gamma_{k''}(1-\pi_k)\pi_{k''}
+                 -\sum_{k'=1}^{K-1} \gamma_{k'} (1-\pi_{k'}) \pi_{K}
+\end{eqnarray}
+
+for $k = 1,\cdots, K-1$. Using the same reasoning as for the
+unsconstrained calculation for the $\gamma_k$, we get a similar
+expression for the derivative with respect to $\pi_k$, and putting them together, 
+
+\begin{eqnarray}
+\frac{\partial f_2}{\partial \gamma_{k} }  & = & 
+                     \sum_{k'=1}^{k-1} \gamma_{k'} (1-\pi_{k'}) \pi_{k}
+                     +\sum_{k'' = k+1}^K\gamma_{k''}(1-\pi_k)\pi_{k''}
+                     -\sum_{k'=1}^{K-1} \gamma_{k'} (1-\pi_{k'})
+                     \pi_{K} \\
+\frac{\partial f_2}{\partial \pi_{k} }  & = & 
+                      \sum_{k'=1}^{k-1} \gamma_{k'} \gamma_{k} (1-\pi_{k'})
+                      - \sum_{k''= k+1}^K \gamma_{k} \gamma_{k''}\pi_{k''}
+\end{eqnarray}
+
+%DJ_FLAG: I'm here Thu Apr 28 17:01:24 PDT 2011
+
+
+\subsubsection{Calculating $g(\xi)  =  (1-\pi)\pi$}
+
+Before differentiating $g$, first calculate without regard to the
+constraint
+
+\begin{eqnarray}
+\frac{\partial \pi}{\partial \gamma_{k} } & = & 
+                    \frac{\partial }{\partial \gamma_{k} } \sum_{k=1}^K \gamma_k \pi_k
+                    = \pi_k 
+\end{eqnarray}
+
+and then imposing the constraint,
+
+\begin{eqnarray}
+\frac{\partial \pi}{\partial \gamma_{k} } & = & \pi_k - \pi_K
+\end{eqnarray}
+
+Also,
+
+\begin{eqnarray}
+\frac{\partial \pi}{\partial \pi_{k} }& = & \gamma_k
+\end{eqnarray}
+
+Next, write
+
+\begin{eqnarray}
+%   \label{eq:10} % LOOK is this the referencing problem?
+g(\xi) & = &  (1-\pi) \pi = \pi - \pi^2 \\
+\frac{\partial g(\xi)}{\partial \gamma_{k} } & = &  
+                       (1-2\pi) \frac{\partial \pi}{\partial \gamma_{k} }
+                       = (1-2\pi) (\pi_k - \pi_K) \\
+\frac{\partial g(\xi)}{\partial \pi_{k} }  & = & 
+                       (1-2\pi) \frac{\partial \pi}{\partial \pi_{k} }
+                       = (1-2\pi) \gamma_k 
+\end{eqnarray}
+
+Finally, use the quotient rule to calculate
+
+\begin{eqnarray}
+\frac{\partial}{\partial \xi_i } \left(\mbox{AUC}\right) & = &     
+                    \frac{\partial}{\partial \xi_i
+                    }\left(\frac{\frac{f_1}{2} + f_2}{g}\right)  
+= 
+                    \frac{
+                              \frac{\partial(\frac{f_1}{2} + f_2)}{\partial \xi_i }g - (\frac{f_1}{2}+f_2)
+                              \frac{\partial g}{\partial \xi_i }
+                           }{g^2}
+\end{eqnarray}
+
+
+\subsection{SD of a Risk Model}
+
+
+The standard deviation of outcome probabilities across the risk groups
+is defined as 
+\begin{align}
+\mbox{SD} & = \sqrt{ \sum_{k=1}^K{\gamma_k (\pi_k - \pi)^2} }
+\end{align}
+where $\pi = \sum_{k=1}^K{\gamma_k \pi_k}$ is defined by equation  
+(\ref{eq:piOverall}). This formula for $\mbox{SD}$  is equation (4) of Whittemore and
+Halpern 2010. 
+
+To get an estimate for $\mbox{SD}$, substitute estimates for true
+values
+\begin{align}
+\tilde{\mbox{SD}} & = \sqrt{ 
+\sum_{k=1}^K{\tilde{\gamma}_k (\tilde{\pi}_k - \tilde{\pi})^2} }
+\end{align}
+where
+$\tilde{\pi} = \sum_{k=1}^K{\tilde{\gamma}_k \tilde{\pi}_k}$
+
+To obtain confidence intervals, we again use the delta method.  
+From Equation (\ref{eq:xiTilde}), 
+$\tilde{\xi} = \begin{pmatrix}  \tilde{\gamma}\\
+  \tilde{\pi}  \end{pmatrix} \sim \mbox{Normal}(
+\begin{pmatrix}  \tilde{\gamma}\\  \tilde{\pi}  \end{pmatrix},
+ \frac{\Sigma}{N}
+)$
+In this section, define the function $f(\xi)$ to be
+\begin{align}
+f(\xi) & = \mbox{VAR} = \sum_{k=1}^K{\gamma_k (\pi_k - \pi)^2} 
+\end{align}
+
+By the delta method,
+\begin{align}
+\mbox{Var}(\mbox{VAR}) & =  D^T \frac{\Sigma}{N} D\\
+D^T & = \bigg(
+\frac{ \partial }{ \partial \gamma_1 }, \cdots,
+\frac{ \partial }{ \partial \gamma_{K-1} },
+\frac{ \partial }{ \partial \pi_1 }, \cdots,
+\frac{ \partial }{ \partial \pi_K }
+\bigg) f(\xi)
+\end{align}
+
+First take derivatives of $\pi$.
+\begin{eqnarray}
+\frac{ \partial \pi }{ \partial \gamma_k } & = & \pi_{k} - \pi_{K},
+\mbox{ } k
+= 1, \cdots K-1\\
+\frac{ \partial \pi }{ \partial \pi_k} & = & \gamma_k
+\end{eqnarray}
+Next, take derivatives of $f(\xi)$ with respect to $\gamma_k$
+\begin{align}
+\frac{ \partial f(\xi) }{ \partial \gamma_k} & = 
+\sum_{k'=1}^K \frac{ \partial }{ \partial \gamma_k} \bigg(
+\gamma_{k'} \big( \pi_{k'} - \pi\big)^2
+\bigg)\\
+& =  \sum_{k'=1}^K \bigg(
+\frac{ \partial \gamma_{k'} }{ \partial \gamma_k} 
+\big( \pi_{k'} - \pi\big)^2
++
+\gamma_{k'} \frac{ \partial }{ \partial \gamma_k} \big( \pi_{k'} - \pi\big)^2
+\bigg)\\
+& = 
+\big( \pi_{k} - \pi \big)^2 -\big( \pi_{K} - \pi \big)^2
+- 2 \sum_{k'=1}^K \bigg(\gamma_{k'} \big( \pi_{k'} - \pi\big)
+\big(\gamma_k-\gamma_K\big)\\
+& =  \big( \pi_{k} - \pi \big)^2 -\big( \pi_{K} - \pi \big)^2
+\end{align}
+
+And then take derivatives of $f(\xi)$ with respect to $\pi_k$ 
+\begin{align}
+\frac{ \partial f(\xi)}{ \partial \pi_k} & =  
+\sum_{k'=1}^K \frac{ \partial }{ \partial \pi_k} \bigg(
+\gamma_{k'} \big( \pi_{k'} - \pi\big)^2
+\bigg)\\
+ & = 
+\sum_{k'=1}^K 
+\gamma_{k'} \frac{ \partial }{ \partial \pi_k} \bigg(
+\big( \pi_{k'} - \pi\big)^2
+\bigg)\\
+& = 
+\sum_{k'=1}^K 
+\gamma_{k'} 
+2 \big( \pi_{k'} - \pi\big)
+\frac{ \partial }{ \partial \pi_k} 
+\big( \pi_{k'} - \pi\big)\\
+ & =  
+\sum_{k'=1}^K 
+\gamma_{k'} 
+2 \big( \pi_{k'} - \pi\big)
+\bigg( \delta_{k,k'} - \gamma_k
+\bigg)\\
+& =  2 \gamma_{k}  \big( \pi_{k} - \pi\big)
+\end{align}
+Finally, write $\mbox{SD} = g(\mbox{VAR}) = \sqrt{\mbox{VAR}}$.  Using
+the delta method again, 
+$\mbox{Var}(\mbox{SD}) = g'(\mbox{VAR})^2 \mbox{Var}(\mbox{VAR})$.
+where $g'(\mbox{VAR}) = \frac{1}{2 \mbox{SD}}$.
+We get 
+\begin{align}
+\mbox{Var}(\mbox{SD}) & = \frac{1}{4 \mbox{VAR}}  D^T \frac{\Sigma}{N} D.
+\end{align}
+
+
+\section{Ungrouped Analysis}
+
+\subsection{Introduction}
+
+Suppose a risk model is used to assign risks to $N$ subjects at entry
+to a cohort study.  We follow the subjects until time $t^*$ and record
+for each subject a followup time $T$, an event status $E$, and an
+assigned risk $R$ where
+\begin{align}
+T & = \text{min}(t^*, U, C)\\
+U & = \text{time to disease or death}\\
+C & = \text{time to censoring}\\
+E & =   \left\{
+  \begin{array}{l l}
+    0 & \quad \text{if censored}\\
+    1 & \quad \text{if disease}\\
+    2 & \quad \text{if death from other causes}\\
+  \end{array} \right.
+\end{align}
+
+The joint probability that an individual is assigned risk $R = r$ and
+experiences event $E = j$, $j = 1,2$ in the period $(0, t^*)$ is
+\begin{align}
+P\big(U \le t \text{ and } E = j \text{ and } R = r \big) & = f_R(r) F_{jr}(t)\\
+f_R(r) & = \text{the probability density function of } R\\
+F_{jr}(t) & = P\big(U \le t \text{ and } E = j \big| R = r \big)
+\end{align}
+The quantity $F_{jr}(t)$ is the event-specific cumulative incidence
+function among those assigned risk $r$. Our goals are to estimate the
+probabilites $g(r) = f_R(r)$ and $\pi(r) = F_{1r}(t^*)$ and use
+functions of the estimates to assess model calibration (how well
+assigned risks agree with subsequent outcomes) and discrimination
+(how well the risks distinguish those who do and do not develop the
+outcome in the risk period).
+
+Our previous work corresponds to the special case in which individual
+risks have been grouped into $K$ bins or risk groups and summarized by means or
+medians $0 \le r_1 < \cdots < r_K \le 1$ with $\gamma_k = g(r_k)$ and
+nonparametric estimates obtained for the group-specific outcome
+probabilities $\pi_k$, $k = 1, \cdots, K$. Here we generalize this
+approach by using the nearest neighbor estimates (NNEs) proposed by
+Akritos (1994) and Saha and Heagerty (2010).
+
+\subsection{Estimation}
+
+Let $\mathcal{R}$ denote the set of distinct assigned risks.  For
+each $\rho \in \mathcal{R}$, estimate $g(\rho)$ by the empirical pdf 
+\begin{align}
+\hat{g}(\rho) & = \frac{\big| \{n: r_n = \rho\} \big|}{N} \label{eq:gHatRho}
+\end{align}
+and estimate $\hat{\pi}(\rho)$ by 
+(1) Obtain a $\varepsilon$ kernel nearest neighborhood of $\rho$
+\begin{align}
+\mathcal{NN}(\rho) & = \bigg\{ n: \big| \hat{G}(r_n) - \hat{G}(\rho) \big| <
+\varepsilon \bigg\}.
+\end{align}
+(2) Considering all observations in $\mathcal{NN}(\rho)$ to be one bin or
+risk group, use our previous methodology to estimate the
+group-specific outcome probability $\pi_{\mathcal{NN}(\rho)}$.
+
+
+
+For two-stage sampling, replace Equation (\ref{eq:gHatRho}) with
+\begin{align}
+\hat{g}(\rho) & = \frac{\sum_n a_n 1(r_n = \rho)}{\sum_n a_n}
+\end{align}
+
+\subsection{Calibration}
+
+We compute a calibration curve or an individualized attribute diagram,
+defined to be a scatterplot of points $\{\rho, \hat{\pi}(\rho) : \rho
+\in \mathcal{R} \}$ with line segments connecting adjacent points.  95
+percent (nonsimultaneous) confidence bands for this curve are obtained
+by calculating bootstrap estimates of the standard deviation of
+$\hat{\pi}(\rho)$. 
+
+
+
+
+\end{document}
+

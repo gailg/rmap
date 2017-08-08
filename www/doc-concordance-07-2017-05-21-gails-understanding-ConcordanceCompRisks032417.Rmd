@@ -1,0 +1,81 @@
+---
+title: "07-2017-05-02-gails-understanding-ConcordanceCompRisks032417"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-05-01 19:28:49 PDT"
+
+Last knit was `r Sys.time()`
+
+Obtain weighted estimate of the concordance between assigned risks and observed outcomes for one disease and one competing risk.
+
+$T^{(0)}$ is time until censoring
+
+$T^{(1)}$ is the time until disease
+
+$T^{(2)}$ is the time until death from other causes
+
+
+$S_0(t) = P(T^{(0)} > t)$ 
+
+
+$T = \text{min} \big( T^{(0)}, T^{(1)},  T^{(2)} \big)$
+
+$e$ indicates which of $T^{(0)}$, $T^{(1)}$, $T^{(2)}$ is the minimum and equal to $T$
+
+$r$ is here assigned risk
+
+We observe $(e, T, r)$
+
+The weighted estimate of concordance proposed by Blanche et al is
+\begin{align}
+\hat{C} &= \frac{
+\sum_{n_1 = 1}^N \sum_{n_2 = 1}^N w_{n_1} w_{n_2} A_{n_1} B_{n_2} 1 \big(r_{n_1} > r_{n_2} \big)
+}{
+\Big( \sum_{n_1 = 1}^N w_{n_1} A_{n_1} \Big) \Big( \sum_{n_2 = 1}^N w_{n_2} B_{n_2} \Big)
+}
+\end{align}
+
+And the chunks I need to get the ROC picture are
+\begin{align}
+\text{selectivity} &= \frac{
+\sum_{n = 1}^N w_n A_n 1 \big( r_n > c \big)
+}{
+\sum_{n = 1}^N w_n A_n
+}\\
+\text{specificity} &= \frac{
+\sum_{n = 1}^N w_n B_n 1 \big( r_n \le c \big)
+}{
+\sum_{n = 1}^N w_n B_n
+}
+\end{align}
+
+Use weighted Kaplan-Meier to estimate $S_0(t)$ and
+
+$A_n = 1 \big( T_n \le t^* \text{ and } e_n = 1 \big) \Big/ \hat{S}_0 \big( T_n \big)$
+
+$B_n = \Bigg\{  1 \big( T_n > t^* \big) \Big/ \hat{S}_0 ( t^* ) \Bigg\} + \Bigg\{ 1 \big( T_n \le t^* \text{ and } e_n = 2    \big) \Big/ \hat{S}_0 \big(T_n \big) \Bigg\}$
+
+THE END
