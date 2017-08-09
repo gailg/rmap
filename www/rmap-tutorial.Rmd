@@ -25,7 +25,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 7, tidy=FALSE)
 ```
 
-"2017-08-08 14:15:58 PDT"
+"2017-08-09 11:40:27 PDT"
 
 # Introduction {#introduction}
 
@@ -70,6 +70,15 @@ The following sections describe how to install `rmap`, the inputs you need, how 
 If you have not yet installed R, download the latest version (at least 3.4.0) for your operating system at:
 
 http://www.r-project.org
+
+
+One of the required steps below is to install `devtools`.  Before that, if your operating system is Windows, you will need to install Rtools, and if your operating system is Mac OS, you will need to install Xcode and command-line tools:
+
+https://cran.r-project.org/bin/windows/Rtools/
+
+https://developer.apple.com/xcode/
+
+http://osxdaily.com/2014/02/12/install-command-line-tools-mac-os-x/
 
 Run the R application. To install the rmap package, enter the following lines of code to the R prompt:
 
@@ -209,9 +218,9 @@ This is a  small positive number specifying the kernel neighborhoods used to cal
 
 The example in the introduction called the wrapper function `rmap_random_sample`. And then "pretty plotting" functions were called on the output to produce the plots and summary statistics that were displayed.  If you are happy enough with these and default plots and summary statistics, you can stop here and follow along my example there. 
 
-`rmap` and `rmap_individual` outputs other things that were not shown in the example.  
+`rmap` and `rmap_individual` outputs other things that were not shown in the example.  `rmap` output is broken down into two objects: `numerical_summaries` and `plots`. 
 
-```{r explain_rmap}
+```{r explain_rmap, fig.height = 3, fig.width = 4}
 library(rmap)
 xxx = read.csv("random_sample_example.csv")
 e = xxx$e
@@ -226,9 +235,18 @@ set.seed(1)
 rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, N_bootstraps)
 names(rmap_answers)
 rmap_answers$numerical_summaries
+names(rmap_answers$plots)
+head(rmap_answers$plots$df_for_roc_plot)
 ```
 
-`rmap` output is broken down into two objects: `numerical_summaries` and `plots`.  
+```{r fig.height = 3, fig.width = 4}
+rmap_answers$plots$roc_plot
+```
+```{r fig.height = 3, fig.width = 4}
+rmap_answers$plots$risk_plot
+```
+
+ 
 
 ## `numerical_summaries` consist of the following
 
@@ -257,7 +275,7 @@ and `pi_hat` which estimates the probability of getting the outcome before `t_st
 
 ## `rmap_individual` output 
 
-```{r explain_rmap_individual}
+```{r explain_rmap_individual, fig.height = 3, fig.width = 4}
 library(rmap)
 xxx = read.csv("random_sample_example.csv")
 e = xxx$e
@@ -273,6 +291,10 @@ epsilon = length(e)^(-1/3)
 individual = rmap_individual(e, t, r, t_star, design, epsilon, N_bootstraps)
 names(individual)
 head(individual$df_for_risk_plot)
+```
+
+```{r fig.height = 3, fig.width = 4}
+individual$risk_plot
 ```
 
 
@@ -432,7 +454,7 @@ grid.arrange(textGrob(the_message),
 
 # An example that compares two risk models {#comparing-two-models}
 
-```{r compare}
+```{r compare, fig.height = 3, fig.width = 4}
 library(rmap)
 xxx = read.csv("two_model_comparison_example.csv")
 head(xxx)
@@ -467,6 +489,9 @@ ggplot(df, aes(x = one_minus_specificity, y = sensitivity, color = model)) +
   theme(legend.title = element_blank()) +
   theme(legend.position = c(0.2, 0.9)) +
   ggtitle("ROC plots for assigned risk Models 1 and 2")
+```
+
+```{r fig.height = 5, fig.width = 7}
 p1 = rmap_1$plots$risk_plot + ggtitle("Zee Model One")
 p2 = rmap_2$plots$risk_plot + ggtitle("Yep this is Model Two")
 p3 = individual_1$risk_plot
@@ -514,4 +539,3 @@ grid.arrange(grobs[[1]] + theme( axis.text.x = element_blank(),
 
 [doc-rmap-walkthrough-v01.pdf](doc-rmap-walkthrough-v01.pdf)
 
- 
