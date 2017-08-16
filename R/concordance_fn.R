@@ -84,12 +84,10 @@ concordance_fn = function(baseArgs){
   sss_ttt = survival_fn(ttt, survival_fit)
   b2 = ifelse(b2_numerator == 0, 0, b2_numerator/sss_ttt)
   bbb = (b1 + b2) * weight
-  numerator = sum(sapply(1:(length(n_1_uni)), function(kkk){
-    sapply(n_2_uni, function(n_2){
-      n_1 = n_1_uni[kkk]
-      aaa[kkk] * bbb[n_2] * (risk[n_1] > risk[n_2])
-    })
-  }))
+  inequality_part = outer(risk[n_1_uni],  risk[n_2_uni], `>`)
+  number_part = outer(aaa, bbb)
+  numerator = sum(inequality_part * number_part)
+  
   denominator = sum(aaa) * sum(bbb)
   concordance = numerator / denominator
 

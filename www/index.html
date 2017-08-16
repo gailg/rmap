@@ -165,7 +165,7 @@ $(document).ready(function () {
 </div>
 
 <p><A NAME="top"> </A></p>
-<p>“2017-08-09 11:40:27 PDT”</p>
+<p>“2017-08-14 14:27:08 PDT”</p>
 <div id="introduction" class="section level1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
 <p>Personal predictive models use an individual’s covariates to assign him/her a probability of developing a specific disease or outcome within a specified future time period <code>[0, t_star]</code> and before a specified competing risk. Predictive models are often evaluated by comparing their assigned risks to outcome occurence among participants in a longitudinal cohort study. Performance of such models can be evaluated using two criteria: calibration and concordance. Model calibration (also called goodness-of-fit) measures how well the model-assigned risks agree with persons’ subsequent observed outcomes. <code>rmap</code> offers a grouped goodness-of-fit test and grouped and individualized attribute diagrams. Concordance (also called the area under the ROC curve) measures how well a model separates or discriminates positive and negative outcomes.<code>rmap</code> offers estimation and confidence intervals for the concordance as well as ROC plots. <code>rmap</code> handles three designs for obtaining samples of participants: (1) random sampling, (2) two-stage sampling, and (3) weighted designs.</p>
@@ -215,7 +215,8 @@ if(&quot;rmap&quot; %in% rownames(installed.packages())){
 }</code></pre>
 <p>If your installation was successful, you should see the message</p>
 <pre><code>[1] &quot;rmap installed successfully--you are good to go!&quot;</code></pre>
-<p>To install RStudio, follow the instructions here: <a href="https://www.rstudio.com/products/rstudio/download/" class="uri">https://www.rstudio.com/products/rstudio/download/</a> <a href="#top">TOP</a></p>
+<p>To install RStudio, follow the instructions here: <a href="https://www.rstudio.com/products/rstudio/download/" class="uri">https://www.rstudio.com/products/rstudio/download/</a></p>
+<p><a href="#top">TOP</a></p>
 </div>
 <div id="data-preparation" class="section level1">
 <h1><span class="header-section-number">4</span> Data preparation</h1>
@@ -226,7 +227,7 @@ if(&quot;rmap&quot; %in% rownames(installed.packages())){
 </div>
 <div id="t" class="section level2">
 <h2><span class="header-section-number">4.2</span> <code>t</code></h2>
-<p>The time until the event <code>e</code>. Mathematically speaking, let <code>t1</code> be time until outcome, <code>t2</code> time until competing risk, <code>t0</code> time until censoring . Then <code>t</code> is the minimum of <code>t1</code>, <code>t2</code>, <code>t0</code>, and <code>e</code> records which of the events occurred first. Acceptable values are positive real numbers (that can exceed <code>t_star</code> the right endpoint of the time period of interest).</p>
+<p>The time until the event <code>e</code>. Mathematically speaking, let <code>t1</code> be time until outcome, <code>t2</code> time until competing risk, <code>t0</code> time until censoring . Then <code>t</code> is the minimum of <code>t1</code>, <code>t2</code>, <code>t0</code>, and <code>e, above, records which of the events occurred first. Acceptable values for</code>t<code>are positive real numbers (that can exceed</code>t_star` the right endpoint of the time period of interest).</p>
 </div>
 <div id="r" class="section level2">
 <h2><span class="header-section-number">4.3</span> <code>r</code></h2>
@@ -234,12 +235,12 @@ if(&quot;rmap&quot; %in% rownames(installed.packages())){
 </div>
 <div id="category-optional" class="section level2">
 <h2><span class="header-section-number">4.4</span> <code>category</code> (optional)</h2>
-<p>If your data were obtained by two-stage sampling, this is the two-stage category indicating which two-stage category the person fell into. (See <code>N_first_stage</code> below.) If your data are a cohort sample whose covariates suspected to be related to risk do not match those of your target population, and you would like to weight your cohort samples based on covariate information from a target population, <code>category</code> records which covariate category the (cohort) person fell into. (See <code>N_target</code> or <code>target_category</code> in the section “Other data you may need” below.)</p>
+<p>If your data were obtained by two-stage sampling, this is the two-stage category indicating which two-stage category the person fell into. (See also <code>N_first_stage</code> below.) If your data are a cohort sample whose relevant covariates do not match those of your target population, and you would like to weight your cohort samples based on covariate information from a target population, <code>category</code> records which covariate category the (cohort) person fell into. (See also <code>N_target</code> or <code>target_category</code> in <a href="#other-data">Other data you may need</a>.)</p>
 </div>
 </div>
 <div id="reading-in-data" class="section level1">
 <h1><span class="header-section-number">5</span> Reading in data</h1>
-<p>If your data is an excel file with columns <code>e</code>, <code>t</code>, <code>r</code>, and possibly <code>category</code>, save it as a CSV (comma separated value) file into your working directory. For practice you can download my excel file <a href="random_sample_example.csv" class="uri">random_sample_example.csv</a>, put it into your working directory, and try out the following commands. If you got the same results I get above, you are in business.</p>
+<p>If your data is an excel file with columns <code>e</code>, <code>t</code>, <code>r</code>, and possibly <code>category</code>, save it as a CSV (comma separated value) file to your working directory. For practice you can download my excel file <a href="random_sample_example.csv" class="uri">random_sample_example.csv</a>, save it to your working directory, and try out the following commands. If you get the same results I get above, you are in business.</p>
 <pre class="r"><code>xxx = read.csv(file = &quot;random_sample_example.csv&quot;, stringsAsFactors = FALSE)
 head(xxx)</code></pre>
 <pre><code>##   e    t      r
@@ -259,7 +260,7 @@ head(xxx)</code></pre>
 </div>
 <div id="n_target-or-target_category" class="section level2">
 <h2><span class="header-section-number">6.2</span> <code>N_target</code> or <code>target_category</code></h2>
-<p>If covariates of the participants of the cohort study differ from those of the population for which your predictive model is targeted, you can weight the cohort particpants using an additional sample, a target sample, whose covariate categories match the target population. Classify subjects in both cohort sample and target sample into joint covariate categories, labeled with capital letters beginning with <code>&quot;A&quot;</code>, <code>&quot;B&quot;</code>, etc. Let <code>category</code> be the vector of length <code>N</code> with <code>n</code>-th element containing the covariate category of the <code>n</code>-th person. Let <code>target_category</code> be a vector containing one element for each person in the target sample recording his/her covariate category.</p>
+<p>If covariates of the participants of the cohort study differ from those of the population for which your predictive model is targeted, you can weight the cohort particpants using an additional sample, a target sample, whose covariate categories match the target population. Classify subjects in both cohort sample and target sample into covariate categories, labeled with capital letters beginning with <code>&quot;A&quot;</code>, <code>&quot;B&quot;</code>, etc. Let <code>category</code> be the vector of length <code>N</code> with <code>n</code>-th element containing the covariate category of the <code>n</code>-th person. Let <code>target_category</code> be a vector containing one element for each person in the target sample recording his/her covariate category.</p>
 <p>If instead of providing <code>rmap</code> with the vector <code>target_category</code>, you wish to provide <code>rmap</code> with counts of the numbers of people in the target population that fell in each covariate category, let <code>N_target</code> be the named vector counting the number of subjects from the target sample that fell in each category. If your categories were <code>&quot;A&quot;</code> and <code>&quot;B&quot;</code>, and in the first stage <code>472</code> fell in category A and <code>528</code> fell in category B, then you would use <code>N_target</code> to be the named vector <code>c(A = 472, B = 528)</code>. Each name in <code>N_target</code> must have at least one representative in <code>category</code>.</p>
 <p><a href="#top">TOP</a></p>
 </div>
@@ -538,6 +539,7 @@ design = list(target_category = target_category, category = category)
 cutoffs = c(0, 0.20, 1)
 risk_group = list(cutoffs = cutoffs)
 r_summary = &quot;mean&quot;
+N_bootstraps = 100
 confidence_level = 0.95
 rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, 
                     N_bootstraps, confidence_level)
