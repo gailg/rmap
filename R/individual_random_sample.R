@@ -1,10 +1,10 @@
-#' @title \code{rmap} and \code{rmap_individual} on a random sample using quantile risk groups
+#' @title \code{rmap_individual} on a random sample using quantile risk groups
 #' 
 #' @description A wrapper function that gives an easier call to
-#' \code{rmap} 
+#' \code{rmap_individual} 
 #' but without as many options, perhaps useful if your sample
 #' is a random sample. Provided here to give you an example of
-#' a call to \code{rmap}.
+#' \code{rmap_individual}
 #' 
 #' @param e Throughout this help page, let \code{N} be the number 
 #' of people in your data set.  \code{e} is a vector of length 
@@ -43,15 +43,11 @@
 #' occuring within the time period \code{[0, t_star]} and before the competing
 #' risk.
 #' 
-#' @param K An integer specifying the number of quantiles to use
-#' for risk groups.  If you set \code{K = 4}, then you are
-#' specifying the risk groups are quartiles.
-#' 
 #' @param N_bootstraps A non-negative integer
 #' describing the number of bootstraps.  
 #' Turn off bootstrapping with \code{N_bootstraps = 0}.
 #' 
-#' @return The same output as \code{rmap}.
+#' @return The same output as \code{rmap_individual}.
 #' 
 #' @examples 
 #' data(random_sample_example)
@@ -63,18 +59,15 @@
 #' K = 4
 #' N_bootstraps = 100
 #' set.seed(1)
-#' rmap_answers = rmap_random_sample(e, t, r, t_star, K, N_bootstraps)
-#' grid.arrange(pretty_roc_plot(rmap_answers), 
-#'              pretty_risk_plot(rmap_answers), 
-#'              ncol = 2)
+#' individual = individual_random_sample(e, t, r, t_star, N_bootstraps)
+#' pretty_individual_risk_plot(individual)
 #'              
 #' @export
-rmap_random_sample = function(e, t, r, t_star, K, N_bootstraps){
+individual_random_sample = function(e, t, r, t_star, N_bootstraps){
   design = "random_sample"
-  risk_group = list(K = K)
-  r_summary = "mean"
+  epsilon = length(e)^(-1/3)
   confidence_level = 0.95
-  rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, 
-                      N_bootstraps, confidence_level)
-  rmap_answers
+  individual = rmap_individual(e, t, r, t_star, design, epsilon, 
+                               N_bootstraps, confidence_level)
+  individual
 }

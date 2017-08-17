@@ -1,10 +1,10 @@
-#' @title \code{rmap} on a weighted sample using cutoff risk groups
+#' @title \code{rmap_individual} on a weighted sample using cutoff risk groups
 #' 
 #' @description A wrapper function that gives an easier call to
-#' \code{rmap} 
+#' \code{rmap_individual} 
 #' but without as many options, perhaps useful if your sample
 #' is a weighted sample. Provided here to give you an example of
-#' a call to \code{rmap}.
+#' a call to \code{rmap_individual}.
 #' We assume here that the covariates of the participants of the
 #' cohort study differ from those of the population for which 
 #' the predictive model is target.  A target sample has been
@@ -70,7 +70,9 @@
 #' describing the number of bootstraps.  
 #' Turn off bootstrapping with \code{N_bootstraps = 0}.
 #' 
-#' @return The same output as \code{rmap}
+#' @return A list containing \code{rmap_answers}, which are outputs from 
+#' \code{rmap}, and \code{individual}, which are outputs from
+#' \code{rmap_individual}
 #' 
 #' @examples 
 #' data(weighted_example_cohort_sample)
@@ -85,23 +87,19 @@
 #' head(target_sample)
 #' target_category = target_sample$category
 #' category = xxx$category
-#' cutoffs = c(0, 0.20, 1)
 #' N_bootstraps = 100
 #' set.seed(1)
-#' rmap_answers = rmap_weighted_sample(
-#'   e, t, r, category, target_category, t_star, cutoffs, N_bootstraps)
-#' grid.arrange(pretty_roc_plot(rmap_answers),
-#'              pretty_risk_plot(rmap_answers), 
-#'              ncol = 2)
+#' individual = individual_weighted_sample(
+#'   e, t, r, category, target_category, t_star, N_bootstraps)
+#' pretty_individual_risk_plot(individual)
 #'              
 #' @export
-rmap_weighted_sample = function (
-  e, t, r, category, target_category, t_star, cutoffs, N_bootstraps){
+individual_weighted_sample = function (
+  e, t, r, category, target_category, t_star, N_bootstraps){
   design = list(target_category = target_category, category = category)
-  risk_group = list(cutoffs = cutoffs)
-  r_summary = "mean"
+  epsilon = length(e)^(-1/3)
   confidence_level = 0.95
-  rmap_answers = rmap(e, t, r, t_star, design, risk_group, r_summary, 
-                      N_bootstraps, confidence_level)
-  rmap_answers
+  individual = rmap_individual(e, t, r, t_star, design, epsilon,
+                               N_bootstraps, confidence_level)
+  individual
 }

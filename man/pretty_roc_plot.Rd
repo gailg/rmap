@@ -33,8 +33,7 @@ t_star = 10
 K = 4
 N_bootstraps = 100
 set.seed(1)
-the_random_sample = rmap_random_sample(e, t, r, t_star, K, N_bootstraps)
-rmap_answers = the_random_sample$rmap_answers
+rmap_answers = rmap_random_sample(e, t, r, t_star, K, N_bootstraps)
 title = "This is to show off the title of the ROC plot"
 pretty_roc_plot(rmap_answers, title)
 
