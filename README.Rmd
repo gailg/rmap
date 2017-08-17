@@ -26,6 +26,7 @@ opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FA
 trunk/projects/calibration/07-rmap-v-0.01-06/05-new-to-version-0.01-07/12-2015-03-01-rmap-documentation.Rmd
 
 For documentation see http://stanford.edu/~ggong/rmap
+
 For questions or corrections, please email gailgongster@gmail.com
 
 Personal predictive models use an individual's covariates to assign him/her a probability of developing a specific disease or outcome within a specified future time period `[0, t_star]` and before a specified competing risk.  Predictive models are often evaluated by comparing their assigned risks to outcome occurence among participants in a longitudinal cohort study.  Performance of such models can be evaluated using two criteria: calibration and concordance. Model calibration (also called goodness-of-fit) measures how well the model-assigned risks agree
