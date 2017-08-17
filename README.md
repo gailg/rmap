@@ -3,7 +3,6 @@
 
 
 
-trunk/projects/calibration/07-rmap-v-0.01-06/05-new-to-version-0.01-07/12-2015-03-01-rmap-documentation.Rmd
 
 For documentation see http://stanford.edu/~ggong/rmap
 
