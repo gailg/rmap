@@ -1,5 +1,5 @@
 ---
-title: "07-2017-05-02-gails-understanding-ConcordanceCompRisks032417"
+title: "doc-concordance-formulas"
 author: ''
 output:
   html_document:
@@ -23,7 +23,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
 ```
 
-`r getwd()`  
+
 
 "2017-05-01 19:28:49 PDT"
 
@@ -78,4 +78,4 @@ $A_n = 1 \big( T_n \le t^* \text{ and } e_n = 1 \big) \Big/ \hat{S}_0 \big( T_n 
 
 $B_n = \Bigg\{  1 \big( T_n > t^* \big) \Big/ \hat{S}_0 ( t^* ) \Bigg\} + \Bigg\{ 1 \big( T_n \le t^* \text{ and } e_n = 2    \big) \Big/ \hat{S}_0 \big(T_n \big) \Bigg\}$
 
-THE END
+07-2017-05-02-gails-understanding-ConcordanceCompRisks032417
