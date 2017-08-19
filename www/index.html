@@ -160,12 +160,12 @@ $(document).ready(function () {
 <li><a href="#a-two-stage-sample-example-using-rmap-and-rmap_individual"><span class="toc-section-number">14</span> a two-stage sample example using <code>rmap</code> and <code>rmap_individual</code></a></li>
 <li><a href="#comparing-two-models"><span class="toc-section-number">15</span> An example that compares two risk models</a></li>
 <li><a href="#data-sets"><span class="toc-section-number">16</span> Example datasets you can download</a></li>
-<li><a href="#documentation"><span class="toc-section-number">17</span> Documentation</a></li>
+<li><a href="#documentation"><span class="toc-section-number">17</span> Documentation and references</a></li>
 </ul>
 </div>
 
 <p><A NAME="top"> </A></p>
-<p>“2017-08-18 12:46:13 PDT”</p>
+<p>“2017-08-18 17:03:26 PDT”</p>
 <div id="introduction" class="section level1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
 <p>Personal predictive models use an individual’s covariates to assign him/her a probability of developing a specific disease or outcome within a specified future time period <code>[0, t_star]</code> and before a specified competing risk. Predictive models are often evaluated by comparing their assigned risks to outcome occurence among participants in a longitudinal cohort study. Performance of such models can be evaluated using two criteria: calibration and concordance. Model calibration (also called goodness-of-fit) measures how well the model-assigned risks agree with subsequent observed outcomes. <code>rmap</code> provides a grouped goodness-of-fit test and grouped and individualized attribute diagrams. Concordance (also called the area under the ROC curve) measures how well a model separates or discriminates positive and negative outcomes.<code>rmap</code> provides estimation and confidence intervals for the concordance as well as ROC plots. As of version 0.03.00, <code>rmap</code> handles three designs for obtaining samples of participants: (1) random sampling, (2) two-stage sampling, and (3) weighted designs.</p>
@@ -799,11 +799,13 @@ grid.arrange(grobs[[1]] + theme( axis.text.x = element_blank(),
 <p><a href="#top">TOP</a></p>
 </div>
 <div id="documentation" class="section level1">
-<h1><span class="header-section-number">17</span> Documentation</h1>
-<p><a href="doc-rmap-formulas-v02.pdf" class="uri">doc-rmap-formulas-v02.pdf</a></p>
-<p><a href="doc-rmap-simulatedData-v01.pdf" class="uri">doc-rmap-simulatedData-v01.pdf</a></p>
-<p><a href="doc-rmap-walkthrough-v01.pdf" class="uri">doc-rmap-walkthrough-v01.pdf</a></p>
-<p><a href="doc-concordance-formulas.pdf" class="uri">doc-concordance-formulas.pdf</a></p>
+<h1><span class="header-section-number">17</span> Documentation and references</h1>
+<p>“Evaluating disease prediction models using a cohort whose covariate distribution differs from that of the target population” <a href="doc-CSB_SMMR.pdf">click here</a></p>
+<p>“Multi-stage sampling in genetic epidemiology”, Alice Whittemore and Jerry Halpern, January 30, 1997, Statistics in Medicine.</p>
+<p><a href="doc-rmap-formulas-v02.pdf">rmap-formulas-v02.pdf</a></p>
+<p><a href="doc-rmap-simulatedData-v01.pdf">rmap-simulatedData-v01.pdf</a></p>
+<p><a href="doc-rmap-walkthrough-v01.pdf">rmap-walkthrough-v01.pdf</a></p>
+<p><a href="doc-concordance-formulas.pdf">concordance-formulas.pdf</a></p>
 </div>
 
 

@@ -25,7 +25,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 7, tidy=FALSE)
 ```
 
-"2017-08-18 12:46:13 PDT"
+"2017-08-18 17:03:26 PDT"
 
 # Introduction {#introduction}
 
@@ -605,13 +605,18 @@ grid.arrange(grobs[[1]] + theme( axis.text.x = element_blank(),
 
 [TOP](#top)
 
-# Documentation {#documentation}
+# Documentation and references {#documentation}
 
-[doc-rmap-formulas-v02.pdf](doc-rmap-formulas-v02.pdf)
+"Evaluating disease prediction models using a cohort whose covariate distribution differs
+from that of the target population" [click here](doc-CSB_SMMR.pdf)
 
-[doc-rmap-simulatedData-v01.pdf](doc-rmap-simulatedData-v01.pdf)
+"Multi-stage sampling in genetic epidemiology", Alice Whittemore and Jerry Halpern, January 30, 1997, Statistics in Medicine.
 
-[doc-rmap-walkthrough-v01.pdf](doc-rmap-walkthrough-v01.pdf)
+[rmap-formulas-v02.pdf](doc-rmap-formulas-v02.pdf)
 
-[doc-concordance-formulas.pdf](doc-concordance-formulas.pdf)
+[rmap-simulatedData-v01.pdf](doc-rmap-simulatedData-v01.pdf)
+
+[rmap-walkthrough-v01.pdf](doc-rmap-walkthrough-v01.pdf)
+
+[concordance-formulas.pdf](doc-concordance-formulas.pdf)
 
