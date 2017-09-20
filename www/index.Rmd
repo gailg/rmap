@@ -1,5 +1,5 @@
 ---
-title: "rmap---v-0.03.00"
+title: "rmap---v-0.03.01"
 author: ''
 output:
   html_document:
@@ -25,7 +25,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 7, tidy=FALSE)
 ```
 
-"2017-08-18 17:03:26 PDT"
+"2017-09-19 22:30:39 PDT"
 
 # Introduction {#introduction}
 
@@ -530,7 +530,7 @@ grid.arrange(textGrob(the_message),
 
 [two_model_comparison_example.csv](two_model_comparison_example.csv)
 
-```{r compare, fig.height = 3, fig.width = 4}
+```{r compare_roc, fig.height = 5, fig.width = 6}
 library(rmap)
 xxx = read.csv("two_model_comparison_example.csv")
 head(xxx)
@@ -565,6 +565,29 @@ ggplot(df, aes(x = one_minus_specificity, y = sensitivity, color = model)) +
   theme(legend.title = element_blank()) +
   theme(legend.position = c(0.2, 0.9)) +
   ggtitle("ROC plots for assigned risk Models 1 and 2")
+```
+
+
+
+```{r compare_risk, fig.height = 5, fig.width = 6}
+risk_1 = rmap_1$plots$df_for_risk_plot
+risk_2 = rmap_2$plots$df_for_risk_plot
+head(risk_1)
+risk_1$model = rep("Model 1 is super duper", nrow(risk_1))
+risk_2$model = rep("Model 2", nrow(risk_2))
+df = rbind(risk_1, risk_2)
+df
+ggplot(df, aes(x = r, y = pi_hat, ymin = lower, ymax = upper, color = model)) +
+  geom_point() +
+  geom_line() +
+  geom_abline(slope = 1, intercept = 0, color = "gray", linetype = 2) +
+    scale_color_manual(values = c("blue", "red")) +
+  geom_errorbar(aes(ymin = df$lower, ymax = df$upper), width = 2) +
+  xlim(0, 100) + ylim(0, 100) +
+  xlab("Assigned Risk (%)") + ylab("Observed Risk (%)") +
+  theme(legend.title = element_blank()) +
+  theme(legend.position = c(0.2, 0.9)) +
+  ggtitle("Attribute diagram comparing assigned risk Models 1 and 2")
 ```
 
 ```{r fig.height = 5, fig.width = 7}

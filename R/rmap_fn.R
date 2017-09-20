@@ -253,6 +253,7 @@ rmap_fn = function(baseArgs){
   }
   plots = list(
     df_for_roc_plot = df_for_roc_plot,
+    df_for_risk_plot = df_for_risk_plot,
     roc_plot = roc_plot,
     risk_plot = risk_plot)
   numerical_summaries = list(
