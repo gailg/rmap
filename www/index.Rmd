@@ -1,5 +1,5 @@
 ---
-title: "rmap---v-0.03.01"
+title: "Risk Model Assessment Package (rmap)"
 author: ''
 output:
   html_document:
@@ -25,7 +25,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 7, tidy=FALSE)
 ```
 
-"2017-09-19 22:30:39 PDT"
+version 0.03.01  "2017-09-20 07:44:23 PDT"
 
 # Introduction {#introduction}
 
@@ -530,6 +530,8 @@ grid.arrange(textGrob(the_message),
 
 [two_model_comparison_example.csv](two_model_comparison_example.csv)
 
+## Read data and run `rmap` and `rmap_individual` on each model
+
 ```{r compare_roc, fig.height = 5, fig.width = 6}
 library(rmap)
 xxx = read.csv("two_model_comparison_example.csv")
@@ -552,6 +554,11 @@ individual_2 = rmap_individual(e, t, r2, t_star, design, risk_group, N_bootstrap
 rmap_1$numerical_summaries
 names(rmap_1$plots)
 names(individual_1)
+```
+
+## Create a ROC plot comparing the two models
+
+```{r}
 roc_1 = rmap_1$plots$df_for_roc_plot
 roc_2 = rmap_2$plots$df_for_roc_plot
 head(roc_1)
@@ -567,7 +574,7 @@ ggplot(df, aes(x = one_minus_specificity, y = sensitivity, color = model)) +
   ggtitle("ROC plots for assigned risk Models 1 and 2")
 ```
 
-
+## Create an attribute diagram comparing the two models
 
 ```{r compare_risk, fig.height = 5, fig.width = 6}
 risk_1 = rmap_1$plots$df_for_risk_plot
@@ -590,6 +597,7 @@ ggplot(df, aes(x = r, y = pi_hat, ymin = lower, ymax = upper, color = model)) +
   ggtitle("Attribute diagram comparing assigned risk Models 1 and 2")
 ```
 
+## Attribute and individualized attribute diagrams comparing the two models
 ```{r fig.height = 5, fig.width = 7}
 p1 = rmap_1$plots$risk_plot + ggtitle("Zee Model One")
 p2 = rmap_2$plots$risk_plot + ggtitle("Yep this is Model Two")
@@ -634,6 +642,7 @@ grid.arrange(grobs[[1]] + theme( axis.text.x = element_blank(),
 from that of the target population" [click here](doc-CSB_SMMR.pdf)
 
 "Multi-stage sampling in genetic epidemiology", Alice Whittemore and Jerry Halpern, January 30, 1997, Statistics in Medicine.
+[doc-WHSMMR2016.pdf](doc-WHSMMR2016.pdf)
 
 [rmap-formulas-v02.pdf](doc-rmap-formulas-v02.pdf)
 
