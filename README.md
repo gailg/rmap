@@ -6,7 +6,7 @@
 
 "2017-08-18 12:46:13 PDT"
 
-For documentation see http://stanford.edu/~ggong/rmap
+For documentation see https://gailg.github.io/rmap/
 
 For questions or corrections, please email gailgongster@gmail.com
 
